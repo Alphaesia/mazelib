@@ -1,0 +1,21 @@
+[package]
+name = "mazelib"
+version = "0.1.0"
+authors = ["Alphaesia <creepashadowz@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rand = "0.8.3"
+sysinfo = "0.16.4"
+nfd = "0.0.4"
+bmp = "0.5.0"
+
+[lib]
+name = "mazelib"
+path = "src/lib.rs"
+
+[[bin]]
+name = "mazelib-test"
+path = "src/test/main.rs"
