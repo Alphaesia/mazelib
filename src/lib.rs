@@ -5,8 +5,9 @@
 mod util;  // Macros at the top
 
 pub mod geometry;
-pub mod cell;
 pub mod buffer;
+pub mod cell;
+pub mod mapper;
 pub mod maze;
 pub mod template;
 pub mod generate;

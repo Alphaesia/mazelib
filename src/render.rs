@@ -1,29 +1,28 @@
 use crate::geometry::space::{TwoDimensionalSpace, CoordinateSpace, BoxCoordinateSpace};
-use crate::{cell, maze};
-use crate::cell::space::{UnalignedBoxyCellSpace, AlignedBoxyCellSpace, BoxyCellSpace};
-use crate::maze::Maze;
+use crate::cell;
+use crate::cell::manager::{UnalignedBoxyCellSpace, AlignedBoxyCellSpace, BoxyCellSpace, CellManager};
 use bmp::Pixel;
-use crate::cell::data::CellData;
+use crate::cell::data::Basic;
 use std::path::Path;
 use std::marker::PhantomData;
+use crate::buffer::MazeBuffer;
 
-pub trait MazeRenderer<Maze: maze::Maze<CellSpace>, CellSpace: cell::space::CellSpace<Maze>> {
+pub trait MazeRenderer<CellSpace: cell::manager::CellManager> {
     type Output;
 
-    fn render(maze: &Maze) -> Self::Output;
+    fn render(maze: &CellSpace) -> Self::Output;
 }
 
-pub trait MazeRendererWithMarker<Maze: maze::Maze<CellSpace>, CellSpace: cell::space::CellSpace<Maze>> : MazeRenderer<Maze, CellSpace> {
-    fn render_with_marker(maze: &Maze, marker: <<CellSpace as cell::space::CellSpace<Maze>>::CoordSpace as CoordinateSpace>::PtType) -> Self::Output;
+pub trait MazeRendererWithMarker<CellSpace: cell::manager::CellManager> : MazeRenderer<CellSpace> {
+    fn render_with_marker(maze: &CellSpace, marker: <<CellSpace as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType) -> Self::Output;
 }
 
-pub struct TextRenderer<Maze: maze::Maze<CellSpace>, CellSpace: cell::space::CellSpace<Maze>> {
-    _maze: PhantomData<Maze>,
-    _space: PhantomData<CellSpace>
+pub struct TextRenderer<CellSpace: cell::manager::CellManager> {
+    _space: PhantomData<CellSpace>,
 }
 
-impl <Maze: maze::Maze<UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>>> TextRenderer<Maze, UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>> {
-    fn render_internal_unaligned(maze: &Maze, marker: Option<<<UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2> as cell::space::CellSpace<Maze>>::CoordSpace as CoordinateSpace>::PtType>) -> <TextRenderer<Maze, UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>> as MazeRenderer<Maze, UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>>>::Output {
+impl <Buffer: MazeBuffer<<UnalignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CoordSpace, <UnalignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CellType> + MazeBuffer<TwoDimensionalSpace, Basic>> TextRenderer<UnalignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>> {
+    fn render_internal_unaligned(maze: &UnalignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>, marker: Option<<<UnalignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType>) -> <TextRenderer<UnalignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>> as MazeRenderer<UnalignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>>>::Output {
         let [width, height] = maze.space().dimensions();
 
         let mut render = Vec::with_capacity(height);
@@ -37,11 +36,11 @@ impl <Maze: maze::Maze<UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>>> Te
                 if marker.map(|marker| pt == marker).unwrap_or(false) {
                     line.push('@')
                 } else {
-                    line.push(match maze.buffer().get_pt(pt) {
-                        <UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2> as cell::space::CellSpace<Maze>>::CellType::PASSAGE => ' ',
-                        <UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2> as cell::space::CellSpace<Maze>>::CellType::WALL => '█',
-                        <UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2> as cell::space::CellSpace<Maze>>::CellType::BOUNDARY => '█',
-                        <UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2> as cell::space::CellSpace<Maze>>::CellType::UNVISITED => '.'
+                    line.push(match maze.get_pt(pt) {
+                        <UnalignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CellType::PASSAGE => ' ',
+                        <UnalignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CellType::WALL => '█',
+                        <UnalignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CellType::BOUNDARY => '█',
+                        <UnalignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CellType::UNVISITED => '.'
                     })
                 }
             };
@@ -53,9 +52,9 @@ impl <Maze: maze::Maze<UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>>> Te
     }
 }
 
-impl <Maze: maze::Maze<AlignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>>> TextRenderer<Maze, AlignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>> {
-    fn render_internal_aligned(maze: &Maze, marker: Option<<<AlignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2> as cell::space::CellSpace<Maze>>::CoordSpace as CoordinateSpace>::PtType>) -> <TextRenderer<Maze, AlignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>> as MazeRenderer<Maze, AlignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>>>::Output {
-        let [width, height] = maze.space().dimensions().map(|dim| dim * <AlignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>>::scale() + 1);
+impl <Buffer: MazeBuffer<<AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CoordSpace, <AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CellType> + MazeBuffer<TwoDimensionalSpace, Basic>> TextRenderer<AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>> {
+    fn render_internal_aligned(maze: &AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>, marker: Option<<<AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType>) -> <TextRenderer<AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>> as MazeRenderer<AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>>>::Output {
+        let [width, height] = maze.space().dimensions().map(|dim| dim * <AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>>::scale() + 1);
 
         let mut render = Vec::with_capacity(height);
 
@@ -68,11 +67,11 @@ impl <Maze: maze::Maze<AlignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>>> Text
                 if marker.map(|marker| pt == marker).unwrap_or(false) {
                     line.push('@')
                 } else {
-                    line.push(match maze.buffer().get_pt(pt) {
-                        <AlignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2> as cell::space::CellSpace<Maze>>::CellType::PASSAGE => ' ',
-                        <AlignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2> as cell::space::CellSpace<Maze>>::CellType::WALL => '█',
-                        <AlignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2> as cell::space::CellSpace<Maze>>::CellType::BOUNDARY => '█',
-                        <AlignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2> as cell::space::CellSpace<Maze>>::CellType::UNVISITED => '.'
+                    line.push(match maze.get_cell(pt) {
+                        <AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CellType::PASSAGE => ' ',
+                        <AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CellType::WALL => '█',
+                        <AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CellType::BOUNDARY => '█',
+                        <AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CellType::UNVISITED => '.'
                     })
                 }
             };
@@ -84,37 +83,36 @@ impl <Maze: maze::Maze<AlignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>>> Text
     }
 }
 
-impl <Maze: maze::Maze<UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>>> MazeRenderer<Maze, UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>> for TextRenderer<Maze, UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>> {
+impl <Buffer: MazeBuffer<<UnalignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CoordSpace, <UnalignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CellType> + MazeBuffer<TwoDimensionalSpace, Basic>> MazeRenderer<UnalignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>> for TextRenderer<UnalignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>> {
     type Output = Vec<String>;
 
-    fn render(maze: &Maze) -> Self::Output {
+    fn render(maze: &UnalignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>) -> Self::Output {
         Self::render_internal_unaligned(maze, None)
     }
 }
 
-impl <Maze: maze::Maze<UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>>> MazeRendererWithMarker<Maze, UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>> for TextRenderer<Maze, UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>> {
-    fn render_with_marker(maze: &Maze, marker: <<UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2> as cell::space::CellSpace<Maze>>::CoordSpace as CoordinateSpace>::PtType) -> Self::Output {
+impl <Buffer: MazeBuffer<<UnalignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CoordSpace, <UnalignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CellType> + MazeBuffer<TwoDimensionalSpace, Basic>> MazeRendererWithMarker<UnalignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>> for TextRenderer<UnalignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>> {
+    fn render_with_marker(maze: &UnalignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>, marker: <<UnalignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType) -> Self::Output {
         Self::render_internal_unaligned(maze, Some(marker))
     }
 }
 
-impl <Maze: maze::Maze<AlignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>>> MazeRenderer<Maze, AlignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>> for TextRenderer<Maze, AlignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>> {
+impl <Buffer: MazeBuffer<<AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CoordSpace, <AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CellType> + MazeBuffer<TwoDimensionalSpace, Basic>> MazeRenderer<AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>> for TextRenderer<AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>> {
     type Output = Vec<String>;
 
-    fn render(maze: &Maze) -> Self::Output {
+    fn render(maze: &AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>) -> Self::Output {
         Self::render_internal_aligned(maze, None)
     }
 }
 
-impl <Maze: maze::Maze<AlignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>>> MazeRendererWithMarker<Maze, AlignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>> for TextRenderer<Maze, AlignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>> {
-    fn render_with_marker(maze: &Maze, marker: <<AlignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2> as cell::space::CellSpace<Maze>>::CoordSpace as CoordinateSpace>::PtType) -> Self::Output {
+impl <Buffer: MazeBuffer<<AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CoordSpace, <AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CellType> + MazeBuffer<TwoDimensionalSpace, Basic>> MazeRendererWithMarker<AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>> for TextRenderer<AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>> {
+    fn render_with_marker(maze: &AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>, marker: <<AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType) -> Self::Output {
         Self::render_internal_aligned(maze, Some(marker))
     }
 }
 
-pub struct BitmapRenderer<Maze: maze::Maze<CellSpace>, CellSpace: cell::space::CellSpace<Maze>> {
-    _maze: PhantomData<Maze>,
-    _space: PhantomData<CellSpace>
+pub struct BitmapRenderer<CellSpace: cell::manager::CellManager> {
+    _space: PhantomData<CellSpace>,
 }
 
 const MARKER: Pixel = Pixel { r: 255, g: 0, b: 0 };
@@ -122,8 +120,8 @@ const WALL: Pixel = Pixel { r: 0, g: 0, b: 0 };
 const PASSAGE: Pixel = Pixel { r: 255, g: 255, b: 255 };
 const UNVISITED: Pixel = Pixel { r: 50, g: 50, b: 50 };
 
-impl <Maze: maze::Maze<UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>>> BitmapRenderer<Maze, UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>> {
-    fn render_internal(maze: &Maze, marker: Option<<<UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2> as cell::space::CellSpace<Maze>>::CoordSpace as CoordinateSpace>::PtType>) -> bmp::Image {
+impl <Buffer: MazeBuffer<<AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CoordSpace, <AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CellType> + MazeBuffer<TwoDimensionalSpace, Basic>> BitmapRenderer<AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>> {
+    fn render_internal(maze: &AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>, marker: Option<<<AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType>) -> bmp::Image {
         // TODO no clone
         let space = *(&maze.space() as &TwoDimensionalSpace);
 
@@ -132,9 +130,9 @@ impl <Maze: maze::Maze<UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>>> Bi
         for pt in space {
             if marker.map(|marker| marker == pt).unwrap_or(false) {
                 img.set_pixel(pt.x as u32, pt.y as u32, MARKER)
-            } else if maze.buffer().get_pt(pt).is_passage() {
+            } else if maze.is_passage(pt) {
                 img.set_pixel(pt.x as u32, pt.y as u32, PASSAGE)
-            } else if maze.buffer().get_pt(pt).is_wall() {
+            } else if maze.is_wall(pt) {
                 img.set_pixel(pt.x as u32, pt.y as u32, WALL)
             } else {
                 img.set_pixel(pt.x as u32, pt.y as u32, UNVISITED)
@@ -143,8 +141,8 @@ impl <Maze: maze::Maze<UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>>> Bi
 
         return img;
     }
-    fn render_internal_aligned(maze: &Maze, marker: Option<<<UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2> as cell::space::CellSpace<Maze>>::CoordSpace as CoordinateSpace>::PtType>) -> bmp::Image {
-        let [width, height] = maze.space().dimensions().map(|dim| dim * <AlignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>>::scale() + 1);
+    fn render_internal_aligned(maze: &AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>, marker: Option<<<AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType>) -> bmp::Image {
+        let [width, height] = maze.space().dimensions().map(|dim| dim * <AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>>::scale() + 1);
 
         let mut img = bmp::Image::new(width as u32, height as u32);
 
@@ -154,9 +152,9 @@ impl <Maze: maze::Maze<UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>>> Bi
 
                 if marker.map(|marker| marker == pt).unwrap_or(false) {
                     img.set_pixel(pt.x as u32, pt.y as u32, MARKER)
-                } else if maze.buffer().get_pt(pt).is_passage() {
+                } else if maze.is_passage(pt) {
                     img.set_pixel(pt.x as u32, pt.y as u32, PASSAGE)
-                } else if maze.buffer().get_pt(pt).is_wall() {
+                } else if maze.is_wall(pt) {
                     img.set_pixel(pt.x as u32, pt.y as u32, WALL)
                 } else {
                     img.set_pixel(pt.x as u32, pt.y as u32, UNVISITED)
@@ -167,7 +165,7 @@ impl <Maze: maze::Maze<UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>>> Bi
         return img;
     }
 
-    fn render_and_save_internal(maze: &Maze, path: &Path, marker: Option<<<UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2> as cell::space::CellSpace<Maze>>::CoordSpace as CoordinateSpace>::PtType>) -> std::io::Result<()> {
+    fn render_and_save_internal(maze: &AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>, path: &Path, marker: Option<<<AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType>) -> std::io::Result<()> {
         let img = Self::render_internal(maze, marker);
 
         return img.save(Path::new(&path));
@@ -175,39 +173,39 @@ impl <Maze: maze::Maze<UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>>> Bi
         //return std::io::Result::Ok(());
     }
 
-    pub fn render_and_save(maze: &Maze, path: &Path) -> std::io::Result<()> {
+    pub fn render_and_save(maze: &AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>, path: &Path) -> std::io::Result<()> {
         Self::render_and_save_internal(maze, path, None)
     }
 
-    pub fn render_and_save_with_marker(maze: &Maze, path: &Path, marker: <<UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2> as cell::space::CellSpace<Maze>>::CoordSpace as CoordinateSpace>::PtType) -> std::io::Result<()> {
+    pub fn render_and_save_with_marker(maze: &AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>, path: &Path, marker: <<AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType) -> std::io::Result<()> {
         Self::render_and_save_internal(maze, path, Some(marker))
     }
 
-    fn render_and_save_internal_aligned(maze: &Maze, path: &Path, marker: Option<<<UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2> as cell::space::CellSpace<Maze>>::CoordSpace as CoordinateSpace>::PtType>) -> std::io::Result<()> {
+    fn render_and_save_internal_aligned(maze: &AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>, path: &Path, marker: Option<<<AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType>) -> std::io::Result<()> {
         let img = Self::render_internal_aligned(maze, marker);
 
         return img.save(&path);
     }
 
-    pub fn render_and_save_aligned(maze: &Maze, path: &Path) -> std::io::Result<()> {
+    pub fn render_and_save_aligned(maze: &AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>, path: &Path) -> std::io::Result<()> {
         Self::render_and_save_internal_aligned(maze, path, None)
     }
 
-    pub fn render_and_save_with_marker_aligned(maze: &Maze, path: &Path, marker: <<UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2> as cell::space::CellSpace<Maze>>::CoordSpace as CoordinateSpace>::PtType) -> std::io::Result<()> {
+    pub fn render_and_save_with_marker_aligned(maze: &AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>, path: &Path, marker: <<AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType) -> std::io::Result<()> {
         Self::render_and_save_internal_aligned(maze, path, Some(marker))
     }
 }
 
-impl <Maze: maze::Maze<UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>>> MazeRenderer<Maze, UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>> for BitmapRenderer<Maze, UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>> {
+impl <Buffer: MazeBuffer<<AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CoordSpace, <AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CellType> + MazeBuffer<TwoDimensionalSpace, Basic>> MazeRenderer<AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>> for BitmapRenderer<AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>> {
     type Output = bmp::Image;
 
-    fn render(maze: &Maze) -> Self::Output {
+    fn render(maze: &AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>) -> Self::Output {
         Self::render_internal(maze, None)
     }
 }
 
-impl <Maze: maze::Maze<UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>>> MazeRendererWithMarker<Maze, UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>> for BitmapRenderer<Maze, UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>> {
-    fn render_with_marker(maze: &Maze, marker: <<UnalignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2> as cell::space::CellSpace<Maze>>::CoordSpace as CoordinateSpace>::PtType) -> Self::Output {
+impl <Buffer: MazeBuffer<<AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CoordSpace, <AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CellType> + MazeBuffer<TwoDimensionalSpace, Basic>> MazeRendererWithMarker<AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>> for BitmapRenderer<AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>> {
+    fn render_with_marker(maze: &AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2>, marker: <<AlignedBoxyCellSpace<Buffer, TwoDimensionalSpace, 2> as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType) -> Self::Output {
         Self::render_internal(maze, Some(marker))
     }
 }

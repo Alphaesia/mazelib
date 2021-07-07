@@ -11,7 +11,19 @@ pub trait Point: Copy + Clone + Sized + PartialEq + Eq + Debug {}
 /// Note: While the trait requires an implementation Into<[usize; DIMENSION]>, it is HIGHLY recommended
 /// that you implement From<YourCoordinateTuplet> for [usize; DIMENSION] (which provides an implementation
 /// of Into<[usize; DIMENSION]> for YourCoordinateTuplet). This will save you pain later on.
-pub trait CoordinateTuplet<const DIMENSION: usize>: Point + From<[usize; DIMENSION]> + From<[isize; DIMENSION]> + From<[i32; DIMENSION]> + Into<[usize; DIMENSION]> {}
+pub trait CoordinateTuplet<const DIMENSION: usize>: Point + From<[usize; DIMENSION]> + From<[isize; DIMENSION]> + From<[i32; DIMENSION]> + Into<[usize; DIMENSION]> {
+    /// Get the point at a given offset from this point
+    /// (dimension refers to the direction of the offset - e.g. x-direction is dimension 0).
+    fn offset(&self, dimension: usize, offset: usize) -> Self {
+        let array: [usize; DIMENSION] = self.into();
+
+        let mut array = array.clone();
+
+        array[dimension] += offset;
+
+        return array
+    }
+}
 
 #[derive(Copy, Clone, Eq, PartialEq)]
 pub struct CoordinatePair {

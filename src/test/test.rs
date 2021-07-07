@@ -4,16 +4,16 @@ use mazelib::geometry::space::TwoDimensionalSpace;
 use mazelib::buffer::{VecBuffer, MazeBuffer, MazeCreationError};
 use mazelib::generate::{HuntAndKillGenerator, MazeGenerator, BinaryTreeGenerator};
 use mazelib::render::{TextRenderer, MazeRenderer, BitmapRenderer};
-use mazelib::cell::space::{UnalignedBoxyCellSpace, AlignedBoxyCellSpace};
+use mazelib::cell::manager::{UnalignedBoxyCellSpace, AlignedBoxyCellSpace, CellManager};
 use mazelib::geometry::node::CoordinatePair;
 use mazelib::template::{SolidBorderTemplate, Template};
 use std::path::Path;
 use nfd::Response::{Okay, OkayMultiple, Cancel};
-use crate::stdout::start_progress_thread;
 use std::sync::Arc;
+use mazelib::cell::data::Basic;
 
 pub fn test() {
-    test_bmp()
+    test_maze()
 }
 
 pub fn test_space() {
@@ -25,20 +25,24 @@ pub fn test_space() {
 }
 
 pub fn test_maze() {
+    type cell_space = UnalignedBoxyCellSpace<VecBuffer<TwoDimensionalSpace, Basic>, TwoDimensionalSpace, 2>;
+
     let space = TwoDimensionalSpace::new(9, 9);
 
-    let mut maze = match VecBuffer::<AlignedBoxyCellSpace<TwoDimensionalSpace, 2>>::new(space) {
+    let buffer = match VecBuffer::new(space, cell_space::cells_required(&space)) {
         Ok(maze) => maze,
         Err(err) => match err {
             MazeCreationError::AllocationFailure => panic!("Allocation failure - maze is too big")
         }
     };
 
+    let mut maze = cell_space::new(buffer);
+
     SolidBorderTemplate::apply(&mut maze);
 
-    //type generator = HuntAndKillGenerator<UnalignedBoxyCellSpace<TwoDimensionalSpace, 2>>;
+    //type generator = HuntAndKillGenerator<cell_space>;
     type generator = BinaryTreeGenerator;
-    type renderer = TextRenderer;
+    type renderer = TextRenderer<cell_space>;
 
     let gen_start = std::time::Instant::now();
 
@@ -60,25 +64,29 @@ pub fn test_maze() {
 }
 
 pub fn test_bmp() {
-    let space = TwoDimensionalSpace::new(999, 999);
+    type cell_space = AlignedBoxyCellSpace<VecBuffer<TwoDimensionalSpace, Basic>, TwoDimensionalSpace, 2>;
 
-    let mut maze = match VecBuffer::<AlignedBoxyCellSpace<TwoDimensionalSpace, 2>>::new(space) {
+    let space = TwoDimensionalSpace::new(9, 9);
+
+    let buffer = match VecBuffer::new(space, cell_space::cells_required(&space)) {
         Ok(maze) => maze,
         Err(err) => match err {
             MazeCreationError::AllocationFailure => panic!("Allocation failure - maze is too big")
         }
     };
 
+    let mut maze = cell_space::new(buffer);
+
     SolidBorderTemplate::apply(&mut maze);
 
-    type generator = HuntAndKillGenerator<AlignedBoxyCellSpace<TwoDimensionalSpace, 2>>;
-    // type generator = BinaryTreeGenerator;
-    type renderer = BitmapRenderer;
+    //type generator = HuntAndKillGenerator;
+    type generator = BinaryTreeGenerator;
+    type renderer = BitmapRenderer<cell_space>;
 
-    let mut maze = Arc::from(maze);
-    let weak = Arc::downgrade(&maze);
+    //let mut maze = Arc::from(maze);
+    //let weak = Arc::downgrade(&maze);
 
-    let monitor = start_progress_thread(weak);
+    //let monitor = start_progress_thread(weak);
 
     let gen_start = std::time::Instant::now();
 

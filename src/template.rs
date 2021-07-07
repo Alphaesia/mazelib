@@ -1,34 +1,32 @@
 use crate::geometry::space::{BoxCoordinateSpace, CoordinateSpace};
-use crate::{cell, maze};
-use crate::maze::Maze;
+use crate::cell;
 use crate::geometry::node::CoordinateTuplet;
-use crate::cell::space::BoxyCellSpace;
+use crate::cell::manager::BoxyCellSpace;
 
-pub trait Template<Maze: maze::Maze<CellSpace>, CellSpace: cell::space::CellSpace<Maze>> {
-    fn apply(maze: &mut Maze);
+pub trait Template<CellSpace: cell::manager::CellManager> {
+    fn apply(maze: &mut CellSpace);
 }
 
 pub struct SolidBorderTemplate {}
 
-impl <Maze, CoordSpace, CellSpace> Template<Maze, CellSpace> for SolidBorderTemplate where
-        Maze: maze::Maze<CellSpace>,
-        CoordSpace: BoxCoordinateSpace<2>,
-        CellSpace: BoxyCellSpace<Maze, CoordSpace, 2, CoordSpace=CoordSpace>,
-        <CoordSpace as CoordinateSpace>::PtType: CoordinateTuplet<2>,
-        <CoordSpace as CoordinateSpace>::PtType: Into<[usize; 2]>,
-        <CoordSpace as CoordinateSpace>::PtType: From<[usize; 2]> {
-    fn apply(maze: &mut Maze) {
+impl <CellSpace: cell::manager::CellManager> Template<CellSpace> for SolidBorderTemplate where
+        <CellSpace as cell::manager::CellManager>::CoordSpace: BoxCoordinateSpace<2>,
+        CellSpace: BoxyCellSpace<<CellSpace as cell::manager::CellManager>::CoordSpace, 2>,
+        <<CellSpace as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType: CoordinateTuplet<2>,
+        <<CellSpace as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType: Into<[usize; 2]>,
+        <<CellSpace as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType: From<[usize; 2]> {
+    fn apply(maze: &mut CellSpace) {
         let dimensions = maze.space().dimensions();
 
-        let top_left: <CoordSpace as CoordinateSpace>::PtType = [0, 0].into();
-        let top_right: <CoordSpace as CoordinateSpace>::PtType = [dimensions[0] * CellSpace::scale(), 0].into();
-        let bottom_left: <CoordSpace as CoordinateSpace>::PtType = [0, dimensions[1] * CellSpace::scale()].into();
-        let bottom_right: <CoordSpace as CoordinateSpace>::PtType = [dimensions[0] * CellSpace::scale(), dimensions[1] * CellSpace::scale()].into();
+        let top_left: <<CellSpace as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType = [0, 0].into();
+        let top_right: <<CellSpace as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType = [dimensions[0] * CellSpace::scale() - 1, 0].into();
+        let bottom_left: <<CellSpace as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType = [0, dimensions[1] * CellSpace::scale() - 1].into();
+        let bottom_right: <<CellSpace as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType = [dimensions[0] * CellSpace::scale() - 1, dimensions[1] * CellSpace::scale() - 1].into();
 
-        CellSpace::make_unaligned_extended_boundary_between(maze, top_left, top_right);
-        CellSpace::make_unaligned_extended_boundary_between(maze, bottom_left, bottom_right);
-        CellSpace::make_unaligned_extended_boundary_between(maze, top_left, bottom_left);
-        CellSpace::make_unaligned_extended_boundary_between(maze, top_right, bottom_right);
+        maze.make_unaligned_extended_boundary_between(top_left, top_right);
+        maze.make_unaligned_extended_boundary_between(bottom_left, bottom_right);
+        maze.make_unaligned_extended_boundary_between(top_left, bottom_left);
+        maze.make_unaligned_extended_boundary_between(top_right, bottom_right);
     }
 }
 

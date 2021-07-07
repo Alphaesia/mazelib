@@ -1,14 +1,13 @@
 #![allow(non_camel_case_types)]
 
-use crate::{cell, maze};
-use crate::geometry::space::CoordinateSpace;
-#[cfg(debug_assertions)] use crate::geometry::node::CoordinatePair;
-#[cfg(debug_assertions)] use crate::geometry::space::TwoDimensionalSpace;
-#[cfg(debug_assertions)] use crate::render::{TextRenderer, MazeRendererWithMarker};
-#[cfg(debug_assertions)] use std::time::Duration;
-#[cfg(debug_assertions)] use crate::cell::space::AlignedBoxyCellSpace;
-use crate::cell::data::CellData;
-use crate::maze::Maze;
+use crate::cell;
+use crate::geometry::space::{CoordinateSpace, TwoDimensionalSpace};
+use std::time::Duration;
+use crate::cell::manager::AlignedBoxyCellSpace;
+use crate::buffer::VecBuffer;
+use crate::cell::data::Basic;
+use crate::geometry::node::CoordinatePair;
+use crate::render::{TextRenderer, MazeRendererWithMarker};
 
 #[cfg(target_pointer_width = "64")]
 pub(crate) type fsize = f64;
@@ -17,19 +16,19 @@ pub(crate) type fsize = f64;
 pub(crate) type fsize = f32;
 
 #[inline]
-pub(crate) fn get_neighbouring_unvisiteds<Maze: maze::Maze<CellSpace>, CellSpace: cell::space::CellSpace<Maze>>(maze: &Maze, pt: <<CellSpace as cell::space::CellSpace<Maze>>::CoordSpace as CoordinateSpace>::PtType) -> Vec<<<CellSpace as cell::space::CellSpace<Maze>>::CoordSpace as CoordinateSpace>::PtType> {
+pub(crate) fn get_neighbouring_unvisiteds<CellSpace: cell::manager::CellManager>(maze: &CellSpace, pt: <<CellSpace as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType) -> Vec<<<CellSpace as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType> {
     let mut neighbours = maze.space().neighbours_of_pt(pt).to_vec();
 
-    neighbours.retain(|&neighbour| maze.buffer().get_pt(neighbour).is_unvisited());
+    neighbours.retain(|&neighbour| maze.is_unvisited(neighbour));
 
     return neighbours
 }
 
 #[inline]
-pub(crate) fn get_neighbouring_walls<Maze: maze::Maze<CellSpace>, CellSpace: cell::space::CellSpace<Maze>>(maze: &Maze, pt: <<CellSpace as cell::space::CellSpace<Maze>>::CoordSpace as CoordinateSpace>::PtType) -> Vec<<<CellSpace as cell::space::CellSpace<Maze>>::CoordSpace as CoordinateSpace>::PtType> {
+pub(crate) fn get_neighbouring_walls<CellSpace: cell::manager::CellManager>(maze: &CellSpace, pt: <<CellSpace as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType) -> Vec<<<CellSpace as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType> {
     let mut neighbours = (*maze).space().neighbours_of_pt(pt).to_vec();
 
-    neighbours.retain(|&neighbour| maze.buffer().get_pt(neighbour).is_wall());
+    neighbours.retain(|&neighbour| maze.is_wall(neighbour));
 
     return neighbours
 }
@@ -108,11 +107,11 @@ macro_rules! coerce {
 /// Note: maze must be two-dimensional
 #[cfg(debug_assertions)]
 #[allow(dead_code)]
-pub(crate) fn debug_maze<Maze: maze::Maze<CellSpace>, CellSpace: cell::space::CellSpace<Maze>>(maze: &Maze, cursor: <<CellSpace as cell::space::CellSpace<Maze>>::CoordSpace as CoordinateSpace>::PtType) {
+pub(crate) fn debug_maze<CellSpace: cell::manager::CellManager>(maze: &CellSpace, cursor: <<CellSpace as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType) {
     // Coerce maze and point into something we can print
     let (coerced_maze, coerced_pt) = unsafe {
-        (coerce!(Maze, maze::Maze<AlignedBoxyCellSpace<Maze, TwoDimensionalSpace, 2>>, maze),
-         *coerce!(<<CellSpace as cell::space::CellSpace>::CoordSpace as CoordinateSpace>::PtType, CoordinatePair, &cursor))
+        (coerce!(CellSpace, AlignedBoxyCellSpace<VecBuffer<TwoDimensionalSpace, Basic>, TwoDimensionalSpace, 2>, maze),
+         *coerce!(<<CellSpace as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType, CoordinatePair, &cursor))
     };
 
     let coerced_pt = [coerced_pt.x * 2 + 1, coerced_pt.y * 2 + 1].into();

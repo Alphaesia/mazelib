@@ -1,49 +1,49 @@
 use rand::{Rng, RngCore};
 use rand::seq::SliceRandom;
 
-use crate::{cell, util, maze};
-use crate::cell::data::CellData;
+use crate::{cell, util};
 use crate::geometry::space::{CoordinateSpace, BoxCoordinateSpace};
-use crate::maze::Maze;
 use crate::geometry::node::CoordinateTuplet;
+use crate::util::debug_maze;
 
-pub trait MazeGenerator<Maze: maze::Maze<CellSpace>, CellSpace: cell::space::CellSpace<Maze>> {
-    fn generate_s(maze: &mut Maze, rng: &mut dyn RngCore);
-    fn generate(&mut self, maze: &mut Maze, rng: &mut dyn RngCore);
+pub trait MazeGenerator<CellSpace: cell::manager::CellManager> {
+    fn generate_s(maze: &mut CellSpace, rng: &mut dyn RngCore);
+    fn generate(&mut self, maze: &mut CellSpace, rng: &mut dyn RngCore);
 }
 
 //region Hunt and Kill
 
-pub struct HuntAndKillGenerator<Maze: maze::Maze<CellSpace>, CellSpace: cell::space::CellSpace<Maze>> {
-    start: <<CellSpace as cell::space::CellSpace<Maze>>::CoordSpace as CoordinateSpace>::PtType,
-    last_hunt_pos: <<CellSpace as cell::space::CellSpace<Maze>>::CoordSpace as CoordinateSpace>::PtType
+pub struct HuntAndKillGenerator<CellSpace: cell::manager::CellManager> {
+    start: <<CellSpace as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType,
+    last_hunt_pos: <<CellSpace as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType
 }
 
-impl <Maze: maze::Maze<CellSpace>, CellSpace: cell::space::CellSpace<Maze>> HuntAndKillGenerator<Maze, CellSpace> {
+impl <CellSpace: cell::manager::CellManager> HuntAndKillGenerator<CellSpace> {
     pub fn new() -> Self {
-        Self { start: CellSpace::CoordSpace::origin(), last_hunt_pos: CellSpace::CoordSpace::origin() }
+        Self { start: <CellSpace as cell::manager::CellManager>::CoordSpace::origin(), last_hunt_pos: <CellSpace as cell::manager::CellManager>::CoordSpace::origin() }
     }
 
-    pub fn starting_at(start: <<CellSpace as cell::space::CellSpace<Maze>>::CoordSpace as CoordinateSpace>::PtType) -> Self {
-        Self { start, last_hunt_pos: CellSpace::CoordSpace::origin() }
+    pub fn starting_at(start: <<CellSpace as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType) -> Self {
+        Self { start, last_hunt_pos: <CellSpace as cell::manager::CellManager>::CoordSpace::origin() }
     }
 }
 
-impl <Maze: maze::Maze<CellSpace>, CellSpace: cell::space::CellSpace<Maze>> MazeGenerator<Maze, CellSpace> for HuntAndKillGenerator<Maze, CellSpace> {
-    fn generate_s(maze: &mut Maze, rng: &mut dyn RngCore) {
+impl <CellSpace: cell::manager::CellManager> MazeGenerator<CellSpace> for HuntAndKillGenerator<CellSpace> {
+    fn generate_s(maze: &mut CellSpace, rng: &mut dyn RngCore) {
         Self::new().generate(maze, rng)
     }
 
-    fn generate(&mut self, maze: &mut Maze, rng: &mut dyn RngCore) {
-        let space = maze.space();
+    fn generate(&mut self, maze: &mut CellSpace, rng: &mut dyn RngCore) {
+        let space = *maze.space();
         
         let mut pos = self.start;
 
+        // TODO calling stuff marked to not be called from generation code
         'driver: loop {
             // Hunt phase
             'hunt: loop {
                 for candidate in space.iter_from(self.last_hunt_pos) {
-                    if maze.buffer().get_pt(candidate).is_unvisited() {
+                    if maze.is_unvisited(candidate) {
                         // Cache hunt pos
                         self.last_hunt_pos = candidate;
 
@@ -55,7 +55,7 @@ impl <Maze: maze::Maze<CellSpace>, CellSpace: cell::space::CellSpace<Maze>> Maze
                             let selection = rng.gen_range(0..adj_walls.len());
                             let selected_pt = adj_walls[selection];
 
-                            CellSpace::make_passage_between(maze, candidate, selected_pt);
+                            maze.make_passage_between(candidate, selected_pt);
                         }
 
                         break 'hunt
@@ -99,15 +99,17 @@ impl BinaryTreeGenerator {
     }
 }
 
-impl <Maze: maze::Maze<CellSpace>, CellSpace: cell::space::CellSpace<Maze>> MazeGenerator<Maze, CellSpace> for BinaryTreeGenerator where CellSpace::CoordSpace: BoxCoordinateSpace<2>, <<CellSpace as cell::space::CellSpace<Maze>>::CoordSpace as CoordinateSpace>::PtType: CoordinateTuplet<2> {
-    fn generate_s(maze: &mut Maze, rng: &mut dyn RngCore) {
+impl <CellSpace: cell::manager::CellManager> MazeGenerator<CellSpace> for BinaryTreeGenerator where <CellSpace as cell::manager::CellManager>::CoordSpace: BoxCoordinateSpace<2>, <<CellSpace as cell::manager::CellManager>::CoordSpace as CoordinateSpace>::PtType: CoordinateTuplet<2> {
+    fn generate_s(maze: &mut CellSpace, rng: &mut dyn RngCore) {
         Self::new().generate(maze, rng)
     }
 
-    fn generate(&mut self, maze: &mut Maze, rng: &mut dyn RngCore) {
+    fn generate(&mut self, maze: &mut CellSpace, rng: &mut dyn RngCore) {
         let space = maze.space();
 
-        for pt in space {
+        for pt in *space {
+            debug_maze(maze, pt);
+
             if CellSpace::is_wall(maze, pt) || CellSpace::is_boundary(maze, pt) { continue }
 
             let [x, y]: [usize; 2] = pt.into();
