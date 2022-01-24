@@ -11,7 +11,7 @@ impl<Buffer: MazeBuffer<BlockCellValue>> MazeRenderer<BoxSpaceBlockCellManager<B
     type Output = Vec<String>;
 
     fn render(maze: &BoxSpaceBlockCellManager<Buffer, 2>) -> Self::Output {
-        let [width, height] = maze.get_scaled_dimensions();
+        let [width, height] = maze.get_full_dimensions();
 
         let mut render = Vec::with_capacity(height);
 

@@ -4,7 +4,8 @@ pub trait CoordinateSpace : Copy + Clone + Send + Sync + Sized + IntoIterator<It
     type PtType: Point;
     type IntoIter: Iterator<Item = Self::PtType>;
 
-    fn origin() -> Self::PtType;
+    /// May return `None` if the coordinate space is empty.
+    fn origin(&self) -> Option<Self::PtType>;
 
     /// The maximum number of points/nodes in this coordinate space.
     fn logical_size(&self) -> usize;

@@ -17,12 +17,19 @@ pub struct BoxCoordinateSpace<const DIMENSION: usize> {
     /// The most minor coordinate comes first. The ordering is also consistent
     /// with the ordering of co-ordinates for the associated CoordinateTuplets.
     /// (e.g. (x, y, z), (width, height, depth))
-    dimensions: [usize; DIMENSION]
+    dimensions: [usize; DIMENSION],
+    size: usize,
 }
 
 impl <const DIMENSION: usize> BoxCoordinateSpace<DIMENSION> {
     pub fn new(dimensions: [usize; DIMENSION]) -> Self {
-        Self { dimensions }
+        let size = if DIMENSION != 0 {
+            dimensions.product()
+        } else {
+            0
+        };
+
+        Self { dimensions, size }
     }
 
     pub fn dimensions(&self) -> [usize; DIMENSION] {
@@ -50,12 +57,16 @@ impl <const DIMENSION: usize> CoordinateSpace for BoxCoordinateSpace<DIMENSION> 
     type PtType = CoordinateTuplet<DIMENSION>;
     type IntoIter = BoxCoordinateSpaceIterator<DIMENSION>;
 
-    fn origin() -> Self::PtType {
-        [0; DIMENSION].into()
+    fn origin(&self) -> Option<Self::PtType> {
+        if self.size == 0 {
+            return None
+        }
+
+        Some([0; DIMENSION].into())
     }
 
     fn logical_size(&self) -> usize {
-        self.dimensions.product()
+        self.size
     }
 
     fn neighbours_of_pt(&self, pt: Self::PtType) -> Vec<Self::PtType> {

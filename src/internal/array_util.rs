@@ -3,6 +3,8 @@ pub trait Product<T> {
 }
 
 impl <const LENGTH: usize> Product<usize> for [usize; LENGTH] {
+    /// Return the product of all elements in an array.
+    /// Returns 1 when LENGTH == 0.
     fn product(&self) -> usize {
         let mut product = 1;
 
@@ -19,6 +21,7 @@ pub trait And<T> {
 }
 
 impl <const LENGTH: usize> And<[bool; LENGTH]> for [bool; LENGTH] {
+    /// Element-wise AND two lists of booleans
     fn and(&self, other: [bool; LENGTH]) -> [bool; LENGTH] {
         self.zip(other).map(|(lhs, rhs)| lhs && rhs)
     }

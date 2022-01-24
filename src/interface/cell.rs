@@ -47,6 +47,16 @@ use crate::internal::noise_util::pt;
 ///
 /// *Note: In the source, `<Self::CoordSpace as CoordinateSpace>::PtType` is contracted to `pt!()`
 /// for readability.*
+///
+/// # Selecting a Cell Space
+///
+/// The cell space you use will depend entirely based on the types of coordinate space and
+/// cell values you use.
+///
+/// There is a list of built-in CellSpaces under the [Implementors](#implementors) header at
+/// the bottom of this page. If it does not contain the combination of coordinate space and
+/// cell value you want, or if you are using custom coordinate spaces / cell values, you will
+/// need to implement your own.
 pub trait CellManager: Debug {
     /// Since each CellManager will be specialised for dealing with a particular type
     /// of coordinate space and cell value, these are associated types rather than

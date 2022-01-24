@@ -13,13 +13,13 @@ use mazelib::interface::generate::MazeGenerator;
 use rand::thread_rng;
 
 fn main() {
-    let space = BoxCoordinateSpace::new([15, 15]);
+    let space = BoxCoordinateSpace::new([5, 5]);
 
     let mut cell_manager = BoxSpaceBlockCellManager::<VecBuffer<BlockCellValue>, 2>::new(space, [2, 2], [[1, 1], [1, 1]]);
 
     SolidBorderTemplate::apply(&mut cell_manager);
 
-    BinaryTreeGenerator {}.generate(&mut cell_manager, &mut thread_rng());
+    //BinaryTreeGenerator {}.generate(&mut cell_manager, &mut thread_rng());
 
     let render = BoxSpaceBlockCellTextMazeRenderer::render(&cell_manager);
 

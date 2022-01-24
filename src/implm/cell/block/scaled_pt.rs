@@ -17,7 +17,7 @@ impl <const DIMENSION: usize> ScaledPoint<DIMENSION> {
     /// Get the point at a given offset from this point
     /// (dimension refers to the direction of the offset - e.g. x-direction is dimension 0).
     pub fn offset(&self, axis: usize, offset: isize) -> Self {
-        let mut new = self.clone();
+        let mut new = *self;
 
         if offset >= 0 {
             new[axis] += TryInto::<usize>::try_into(offset).unwrap();
@@ -32,7 +32,7 @@ impl <const DIMENSION: usize> ScaledPoint<DIMENSION> {
     /// Useful when iterating along an axis.
     /// Suggestions for better names are welcome.
     pub fn at(&self, axis: usize, position: usize) -> Self {
-        let mut new: [usize; DIMENSION] = self.0.clone().into();
+        let mut new: [usize; DIMENSION] = self.0.into();
 
         new[axis] = position;
 

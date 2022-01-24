@@ -26,7 +26,7 @@ impl <const DIMENSION: usize> CoordinateTuplet<DIMENSION> {
     /// Get the point at a given offset from this point
     /// (dimension refers to the direction of the offset - e.g. x-direction is dimension 0).
     pub fn offset(&self, dimension: usize, offset: isize) -> Self {
-        let mut new = self.clone();
+        let mut new = *self;
 
         if offset >= 0 {
             new[dimension] += TryInto::<usize>::try_into(offset).unwrap();

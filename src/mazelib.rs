@@ -49,6 +49,8 @@
 #![feature(array_zip)]
 #![feature(min_specialization)]
 
+#![allow(clippy::needless_return, clippy::bool_comparison)]  // Stylistic choices
+
 pub mod interface;
 pub mod implm;
 pub(crate) mod internal;

@@ -32,7 +32,10 @@ impl <const DIMENSION: usize> Iterator for BoxCoordinateSpaceIterator<DIMENSION>
     fn next(&mut self) -> Option<Self::Item> {
         // Increment iterator position then return it
         match self.pos {
-            None => self.pos = Some(BoxCoordinateSpace::<DIMENSION>::origin()),
+            // Important: we DON'T unwrap the Option because if the coordinate space is
+            // empty, we do NOT want to return a result (CoordinateSpace::origin() returns
+            // None if it is empty).
+            None => self.pos = self.space.origin(),
             Some(pt) => {
                 let mut pt = pt;
 

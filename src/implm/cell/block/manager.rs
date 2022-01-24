@@ -16,6 +16,27 @@ use std::marker::PhantomData;
 /// With a scale factor of 1 in a direction, points along that axis will map to adjacent
 /// cells. With a factor of 2, there will be one cell in between each point. With a factor
 /// of 3, there will be two cells between each point, etc.
+///
+/// # Examples
+///
+/// With scaling and padding:
+/// ```
+/// use mazelib::implm::point::boxy::TwoDimensionalBoxCoordinateSpace;
+/// use mazelib::implm::cell::block::{BlockCellValue, BoxSpaceBlockCellManagerBuilder};
+/// use mazelib::implm::buffer::VecBuffer;
+///
+/// let coord_space = TwoDimensionalBoxCoordinateSpace::new([11, 11]); // Standard 2D coordinate space
+/// let scale_factor = [2, 2]; // A simple scale factor of 2 for a clean look
+/// let padding = [[1, 1], [1, 1]]; // 1 cell on each side for a border
+/// type CellType = BlockCellValue; // Pixelated maze style
+///
+/// type MazeBuffer = VecBuffer<CellType>;
+///
+/// let maze = BoxSpaceBlockCellManagerBuilder::<MazeBuffer, 2>::new(coord_space)
+///                                             .scale_factor(scale_factor)
+///                                             .padding(padding)
+///                                             .build();
+/// ```
 pub struct BoxSpaceBlockCellManager<Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> {
     buffer: Buffer,
     space: BoxCoordinateSpace<DIMENSION>,
@@ -45,6 +66,11 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
         self.scaled_dimensions
     }
 
+    /// The dimensions of the coordinate space, scaled by the resolution, plus padding
+    pub fn get_full_dimensions(&self) -> [usize; DIMENSION] {
+        self.scaled_dimensions.zip(self.padding).map(|(dim, padding)| dim + padding[0] + padding[1])
+    }
+
     /// The number of cells between the edge of the maze and the outermost cell that is mapped to
     /// a point. Useful for borders when the scale factor is greater than one.
     pub fn padding(&self) -> [[usize; 2]; DIMENSION] {
@@ -67,6 +93,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     pub fn scale_pt(&self, pt: pt!()) -> ScaledPoint<DIMENSION> {
         let mut pt: [usize; DIMENSION] = pt.into();
 
+        #[allow(clippy::needless_range_loop)]
         for i in 0..DIMENSION {
             pt[i] *= self.scale_factor[i];
         }

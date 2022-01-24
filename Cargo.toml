@@ -11,10 +11,10 @@ categories = ["algorithms"]
 publish = false
 
 [dependencies]
-rand = "0.8.3"
-# sysinfo = "0.20.3"
-# nfd = "0.0.4"
-# bmp = "0.5.0"
+rand = "0.8.4"
+sysinfo = "0.20.3"
+nfd = "0.0.4"
+bmp = "0.5.0"
 
 [lib]
 name = "mazelib"
