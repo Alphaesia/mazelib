@@ -48,10 +48,12 @@
 
 #![feature(array_zip)]
 #![feature(min_specialization)]
+#![feature(label_break_value)]
 
 #![allow(clippy::needless_return, clippy::bool_comparison)]  // Stylistic choices
 
 pub mod interface;
 pub mod implm;
+pub mod util;
 pub(crate) mod internal;
 #[cfg(test)] mod test;

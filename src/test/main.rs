@@ -10,12 +10,15 @@ use mazelib::interface::cell::CellManager;
 use mazelib::implm::template::boxy::SolidBorderTemplate;
 use mazelib::interface::template::Template;
 use mazelib::implm::generate::BinaryTreeGenerator;
+use mazelib::implm::generate::HuntAndKillGenerator;
 use mazelib::interface::generate::MazeGenerator;
 use rand::thread_rng;
+use mazelib::util::convert_unvisited_to_walls;
 
 fn main() {
     type CellType = BlockCellValue;
     type BufferType = VecBuffer<CellType>;
+    type Generator = HuntAndKillGenerator;
 
     let space = BoxCoordinateSpace::new([7, 7]);
 
@@ -23,7 +26,9 @@ fn main() {
 
     SolidBorderTemplate::apply(&mut cell_manager);
 
-    BinaryTreeGenerator {}.generate(&mut cell_manager, &mut thread_rng());
+    Generator::generate(&mut cell_manager, &mut thread_rng());
+
+    convert_unvisited_to_walls(&mut cell_manager);
 
     let render = BoxSpaceBlockCellTextMazeRenderer::render(&cell_manager);
 

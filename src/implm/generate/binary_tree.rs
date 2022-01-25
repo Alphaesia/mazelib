@@ -4,7 +4,24 @@ use rand::RngCore;
 use crate::interface::point::CoordinateSpace;
 use rand::seq::SliceRandom;
 
-pub struct BinaryTreeGenerator {}
+pub struct BinaryTreeGenerator
+{
+    _private: ()
+}
+
+impl BinaryTreeGenerator
+{
+    pub fn new() -> Self
+    {
+        Self { _private: () }
+    }
+
+    /// Sugar for `BinaryTreeGenerator::new().generate(maze, rng)`
+    pub fn generate<Maze: CellManager>(maze: &mut Maze, rng: &mut dyn RngCore)
+    {
+        Self::new().generate(maze, rng)
+    }
+}
 
 impl <Maze: CellManager> MazeGenerator<Maze> for BinaryTreeGenerator {
     fn generate(&mut self, maze: &mut Maze, rng: &mut dyn RngCore) {
