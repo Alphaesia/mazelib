@@ -34,17 +34,11 @@ impl <const DIMENSION: usize> Template<BoxSpaceBlockCellManager<VecBuffer<BlockC
         let mut cell = [0usize; DIMENSION];
 
         'outer: loop {
-            let mut on_edge = false;
-
             for (i, dim) in cell.iter().enumerate() {
                 if *dim == 0 || *dim == maze.get_full_dimensions()[i] - 1 {
-                    on_edge = true;
+                    maze.set(cell.into(), BlockCellValue::BOUNDARY);
                     break
                 }
-            }
-
-            if on_edge {
-                maze.set(cell.into(), BlockCellValue::BOUNDARY);
             }
 
             #[allow(clippy::needless_range_loop)]

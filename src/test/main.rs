@@ -19,7 +19,7 @@ fn main() {
 
     SolidBorderTemplate::apply(&mut cell_manager);
 
-    //BinaryTreeGenerator {}.generate(&mut cell_manager, &mut thread_rng());
+    BinaryTreeGenerator {}.generate(&mut cell_manager, &mut thread_rng());
 
     let render = BoxSpaceBlockCellTextMazeRenderer::render(&cell_manager);
 

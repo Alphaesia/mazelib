@@ -9,7 +9,7 @@ use crate::internal::array_util::Product;
 use crate::implm::render::text::BoxSpaceBlockCellTextMazeRenderer;
 use crate::interface::render::MazeRenderer;
 use crate::implm::cell::block::BlockCellValue;
-use crate::implm::cell::block::scaled_pt::ScaledPoint;
+use crate::implm::cell::block::scaled_pt::MappedPoint;
 use std::marker::PhantomData;
 
 /// Each maze has a scale factor. This determines the cellular distance between points.
@@ -61,11 +61,6 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
         &self.buffer
     }
 
-    /// The dimensions of the coordinate space, scaled by the resolution
-    pub fn get_scaled_dimensions(&self) -> [usize; DIMENSION] {
-        self.scaled_dimensions
-    }
-
     /// The dimensions of the coordinate space, scaled by the resolution, plus padding
     pub fn get_full_dimensions(&self) -> [usize; DIMENSION] {
         self.scaled_dimensions.zip(self.padding).map(|(dim, padding)| dim + padding[0] + padding[1])
@@ -89,16 +84,17 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
             })
     }
 
-    /// Scale a point by this maze's resolution.
-    pub fn scale_pt(&self, pt: pt!()) -> ScaledPoint<DIMENSION> {
+    /// Map a point to a cell.
+    pub fn map_pt(&self, pt: pt!()) -> MappedPoint<DIMENSION> {
         let mut pt: [usize; DIMENSION] = pt.into();
 
         #[allow(clippy::needless_range_loop)]
         for i in 0..DIMENSION {
             pt[i] *= self.scale_factor[i];
+            pt[i] += self.padding[i][0];
         }
 
-        ScaledPoint(pt.into())
+        MappedPoint(pt.into())
     }
 
     /// Get the value of any cell.
@@ -106,7 +102,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// In most cases you should use the methods on [CellManager::get()]. The only
     /// reason you should use this method is to access a cell that is not mapped by
     /// the coordinated space.
-    pub fn get_cell(&self, cell: ScaledPoint<DIMENSION>) -> BlockCellValue {
+    pub fn get_cell(&self, cell: MappedPoint<DIMENSION>) -> BlockCellValue {
         self.buffer.get(self.cell_to_buffer_loc(cell))
     }
 
@@ -118,7 +114,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// In most cases you should use the methods on [CellManager]. The only reason
     /// you should use this method is to access a cell that is not mapped by the
     /// coordinated space.
-    pub fn set(&mut self, cell: ScaledPoint<DIMENSION>, value: BlockCellValue) {
+    pub fn set(&mut self, cell: MappedPoint<DIMENSION>, value: BlockCellValue) {
         self.buffer.set(self.cell_to_buffer_loc(cell), value)
     }
 }
@@ -144,17 +140,17 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
         return None
     }
 
-    fn cell_to_buffer_loc(&self, pt: ScaledPoint<DIMENSION>) -> BufferLocation {
-        let mut offset = pt[0] + self.padding[0][0];
+    fn cell_to_buffer_loc(&self, pt: MappedPoint<DIMENSION>) -> BufferLocation {
+        let mut offset = pt[0];
 
         for i in 1..DIMENSION {
-            offset += pt[i] * self.scaled_dimensions[i - 1] + self.padding[i][0];
+            offset += pt[i] * (self.scaled_dimensions[i - 1] + self.padding[i - 1][0] + self.padding[i - 1][1]);
         }
 
         BufferLocation(offset)
     }
 
-    fn set_unvisited_neighbours_to_wall(&mut self, pt: ScaledPoint<DIMENSION>) {
+    fn set_unvisited_neighbours_to_wall(&mut self, pt: MappedPoint<DIMENSION>) {
         for i in 0..DIMENSION {
             if pt[i] > 0 {
                 let neighbour = pt.offset(i, -1);
@@ -185,12 +181,12 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> CellManager fo
     }
 
     fn get(&self, pt: pt!()) -> Self::CellVal {
-        self.get_cell(self.scale_pt(pt))
+        self.get_cell(self.map_pt(pt))
     }
 
     /// Set `pt` to [super::BlockCellValue::PASSAGE].
     fn make_passage(&mut self, pt: pt!()) {
-        let pt = self.scale_pt(pt);
+        let pt = self.map_pt(pt);
 
         self.set(pt, BlockCellValue::PASSAGE);
         self.set_unvisited_neighbours_to_wall(pt);
@@ -206,8 +202,8 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> CellManager fo
     fn make_passage_between(&mut self, from: pt!(), to: pt!()) {
         let axis_of_adjacency = Self::get_axis_of_adjacency(from, to).expect("from and to are not adjacent");
 
-        let from = self.scale_pt(from);
-        let to = self.scale_pt(to);
+        let from = self.map_pt(from);
+        let to = self.map_pt(to);
 
         let from_pos = from[axis_of_adjacency];
         let to_pos = to[axis_of_adjacency];
@@ -235,7 +231,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> CellManager fo
 
     /// Set `pt` to [super::BlockCellValue::WALL].
     fn make_wall(&mut self, pt: pt!()) {
-        self.set(self.scale_pt(pt), BlockCellValue::WALL)
+        self.set(self.map_pt(pt), BlockCellValue::WALL)
     }
 
     /// Set `from` and `to` to [super::BlockCellValue::WALL]. If the resolution is greater than
@@ -243,8 +239,8 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> CellManager fo
     fn make_wall_between(&mut self, from: pt!(), to: pt!()) {
         let axis_of_adjacency = Self::get_axis_of_adjacency(from, to).expect("from and to are not adjacent");
 
-        let from = self.scale_pt(from);
-        let to = self.scale_pt(to);
+        let from = self.map_pt(from);
+        let to = self.map_pt(to);
 
         let from_pos = from[axis_of_adjacency];
         let to_pos = to[axis_of_adjacency];
@@ -262,7 +258,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> CellManager fo
 
     /// Set `pt` to [super::BlockCellValue::BOUNDARY].
     fn make_boundary(&mut self, pt: pt!()) {
-        self.set(self.scale_pt(pt), BlockCellValue::BOUNDARY)
+        self.set(self.map_pt(pt), BlockCellValue::BOUNDARY)
     }
 
     /// Set `from` and `to` to [super::BlockCellValue::BOUNDARY]. If the resolution is greater than
@@ -270,8 +266,8 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> CellManager fo
     fn make_boundary_between(&mut self, from: pt!(), to: pt!()) {
         let axis_of_adjacency = Self::get_axis_of_adjacency(from, to).expect("from and to are not adjacent");
 
-        let from = self.scale_pt(from);
-        let to = self.scale_pt(to);
+        let from = self.map_pt(from);
+        let to = self.map_pt(to);
 
         let from_pos = from[axis_of_adjacency];
         let to_pos = to[axis_of_adjacency];
