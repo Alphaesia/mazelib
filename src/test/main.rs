@@ -9,7 +9,7 @@ use mazelib::interface::render::MazeRenderer;
 use mazelib::interface::cell::CellManager;
 use mazelib::implm::template::boxy::SolidBorderTemplate;
 use mazelib::interface::template::Template;
-use mazelib::implm::generate::BinaryTreeGenerator;
+use mazelib::implm::generate::NAryTreeGenerator;
 use mazelib::implm::generate::HuntAndKillGenerator;
 use mazelib::interface::generate::MazeGenerator;
 use rand::thread_rng;

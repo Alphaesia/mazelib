@@ -4,26 +4,29 @@ use rand::RngCore;
 use crate::interface::point::CoordinateSpace;
 use rand::seq::SliceRandom;
 
-pub struct BinaryTreeGenerator
+/// A BinaryTreeGenerator, but instead of an arity of 2 it has an arity of `DIMENSION`.
+/// Best used with [BoxCoordinateSpace][crate::implm::point::boxy::BoxCoordinateSpace]s.
+/// Results with other coordinate spaces are undefined.
+pub struct NAryTreeGenerator
 {
     _private: ()
 }
 
-impl BinaryTreeGenerator
+impl NAryTreeGenerator
 {
     pub fn new() -> Self
     {
         Self { _private: () }
     }
 
-    /// Sugar for `BinaryTreeGenerator::new().generate(maze, rng)`
+    /// Sugar for `NAryTreeGenerator::new().generate(maze, rng)`
     pub fn generate<Maze: CellManager>(maze: &mut Maze, rng: &mut dyn RngCore)
     {
         Self::new().generate(maze, rng)
     }
 }
 
-impl <Maze: CellManager> MazeGenerator<Maze> for BinaryTreeGenerator {
+impl <Maze: CellManager> MazeGenerator<Maze> for NAryTreeGenerator {
     fn generate(&mut self, maze: &mut Maze, rng: &mut dyn RngCore) {
         for pt in maze.coord_space().into_iter() {
             if maze.get(pt).is_unvisited() {
