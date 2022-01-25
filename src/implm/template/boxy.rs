@@ -1,9 +1,9 @@
+use crate::interface::buffer::MazeBuffer;
 use crate::interface::template::Template;
 use crate::interface::cell::CellManager;
 use crate::implm::point::boxy::BoxCoordinateSpace;
 use crate::interface::point::CoordinateSpace;
 use crate::implm::cell::block::{BoxSpaceBlockCellManager, BlockCellValue};
-use crate::implm::buffer::VecBuffer;
 
 pub struct SolidBorderTemplate {}
 
@@ -24,11 +24,10 @@ impl <Maze: CellManager<CoordSpace=BoxCoordinateSpace<DIMENSION>>, const DIMENSI
     }
 }
 
-// TODO make vecbuffer generic here without breaking everything
-/// We operate on cells directly here because there might be a "buffer" - i.e. the cells on
-/// the edge may not be addressable by points alone.
-impl <const DIMENSION: usize> Template<BoxSpaceBlockCellManager<VecBuffer<BlockCellValue>, DIMENSION>> for SolidBorderTemplate {
-    fn apply(maze: &mut BoxSpaceBlockCellManager<VecBuffer<BlockCellValue>, DIMENSION>) {
+// We operate on cells directly here so we can ignore any padding
+// or scaling effects.
+impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> Template<BoxSpaceBlockCellManager<Buffer, DIMENSION>> for SolidBorderTemplate {
+    fn apply(maze: &mut BoxSpaceBlockCellManager<Buffer, DIMENSION>) {
         // TODO this can probably be optimised even further
         //  and rewritten to not be ugly
         let mut cell = [0usize; DIMENSION];

@@ -1,4 +1,5 @@
 #![allow(unused_imports, unused_mut)]
+#![feature(generic_arg_infer)]
 
 use mazelib::implm::point::boxy::BoxCoordinateSpace;
 use mazelib::implm::buffer::VecBuffer;
@@ -13,9 +14,12 @@ use mazelib::interface::generate::MazeGenerator;
 use rand::thread_rng;
 
 fn main() {
-    let space = BoxCoordinateSpace::new([5, 5]);
+    type CellType = BlockCellValue;
+    type BufferType = VecBuffer<CellType>;
 
-    let mut cell_manager = BoxSpaceBlockCellManager::<VecBuffer<BlockCellValue>, 2>::new(space, [2, 2], [[1, 1], [1, 1]]);
+    let space = BoxCoordinateSpace::new([7, 7]);
+
+    let mut cell_manager = BoxSpaceBlockCellManager::<BufferType, _>::new(space, [2, 2], [[1, 1], [1, 1]]);
 
     SolidBorderTemplate::apply(&mut cell_manager);
 
