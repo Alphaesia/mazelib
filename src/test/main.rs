@@ -9,8 +9,7 @@ use mazelib::interface::render::MazeRenderer;
 use mazelib::interface::cell::CellManager;
 use mazelib::implm::template::boxy::SolidBorderTemplate;
 use mazelib::interface::template::Template;
-use mazelib::implm::generate::NAryTreeGenerator;
-use mazelib::implm::generate::HuntAndKillGenerator;
+use mazelib::implm::generate::{NAryTreeGenerator, HuntAndKillGenerator, RecursiveBacktrackerGenerator};
 use mazelib::interface::generate::MazeGenerator;
 use rand::thread_rng;
 use mazelib::util::convert_unvisited_to_walls;
@@ -18,9 +17,9 @@ use mazelib::util::convert_unvisited_to_walls;
 fn main() {
     type CellType = BlockCellValue;
     type BufferType = VecBuffer<CellType>;
-    type Generator = HuntAndKillGenerator;
+    type Generator = RecursiveBacktrackerGenerator;
 
-    let space = BoxCoordinateSpace::new([7, 7]);
+    let space = BoxCoordinateSpace::new([11, 11]);
 
     let mut cell_manager = BoxSpaceBlockCellManager::<BufferType, _>::new(space, [2, 2], [[1, 1], [1, 1]]);
 

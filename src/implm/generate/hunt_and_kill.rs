@@ -1,5 +1,6 @@
 use rand::RngCore;
 use rand::seq::SliceRandom;
+use crate::implm::generate::util::carve_to_unvisited_neighbour;
 use crate::interface::cell::{CellManager, CellValue};
 use crate::interface::generate::MazeGenerator;
 use crate::interface::point::CoordinateSpace;
@@ -46,30 +47,11 @@ impl <Maze: CellManager> MazeGenerator<Maze> for HuntAndKillGenerator {
                 'kill: {
                     let mut current_pt = pt;
 
-                    // Carve a random path
                     loop {
-                        // Get unvisited neighbours
-
-                        let mut neighbours = maze.coord_space().neighbours_of_pt(current_pt).to_vec();
-
-                        neighbours.retain(|&neighbour| maze.get(neighbour).is_unvisited());
-
-                        // If we're in a dead end, revert to the hunt phase
-                        if neighbours.len() == 0 {
-                            continue 'hunt
+                        match carve_to_unvisited_neighbour(maze, rng, current_pt) {
+                            Some(pt) => current_pt = pt,
+                            None => continue 'hunt  // If we're in a dead end, revert to the hunt phase
                         }
-
-                        // Pick a random unvisited neighbouring point
-
-                        let next_pt = *neighbours.choose(rng).unwrap();  // Already checked length
-
-                        // Make a passage from here to there
-
-                        maze.make_passage_between(current_pt, next_pt);
-
-                        // Move to the selected point
-
-                        current_pt = next_pt;
                     }
                 }
             }
