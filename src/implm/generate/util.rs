@@ -7,7 +7,7 @@ pub fn carve_to_unvisited_neighbour<Maze: CellManager>(maze: &mut Maze, rng: &mu
 {
     // Get unvisited neighbours
     let mut neighbours = maze.coord_space().neighbours_of_pt(from_pt).to_vec();
-    neighbours.retain(|&neighbour| maze.get(neighbour).is_unvisited());
+    neighbours.retain(|&neighbour| maze.get(neighbour).is_fully_visited() == false);
 
     // Pick a random unvisited neighbouring point
     let next_pt = *neighbours.choose(rng)?;

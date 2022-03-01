@@ -45,8 +45,8 @@ use crate::internal::noise_util::pt;
 /// enabled, and is undefined with them off. However, an out-of-bounds point will never cause
 /// an out-of-bounds write; memory safety is always preserved.
 ///
-/// *Note: In the source, `<Self::CoordSpace as CoordinateSpace>::PtType` is contracted to `pt!()`
-/// for readability.*
+/// *Note: In the source, `<<Self as CellManager>::CoordSpace as CoordinateSpace>::PtType` is
+/// contracted to `pt!()` for readability.*
 ///
 /// # Selecting a Cell Space
 ///
@@ -68,6 +68,41 @@ pub trait CellManager: Debug {
 
     /// Get the value of a cell at `pt`.
     fn get(&self, pt: pt!()) -> Self::CellVal;
+
+    /// Get the "connection" between two points.
+    ///
+    /// If you were walking from `from` to `to`, this is what
+    /// you would encounter.
+    ///
+    /// More specifically:
+    /// * If either side is a [CellValueType::BOUNDARY],
+    ///   return [CellValueType::BOUNDARY].
+    /// * Else, if either side is [CellValueType::UNVISITED],
+    ///   return [CellValueType::UNVISITED].
+    /// * Else, if either side is a [CellValueType::WALL],
+    ///   return [CellValueType::WALL].
+    /// * Else, return [CellValueType::PASSAGE].
+    fn get_connection(&self, from: pt!(), to: pt!()) -> CellConnectionType;
+
+    /// Returns true when [Self::get_connection] returns [CellValueType::PASSAGE].
+    fn is_passage_between(&self, from: pt!(), to: pt!()) -> bool {
+        self.get_connection(from, to) == CellConnectionType::PASSAGE
+    }
+
+    /// Returns true when [Self::get_connection] returns [CellValueType::WALL].
+    fn is_wall_between(&self, from: pt!(), to: pt!()) -> bool {
+        self.get_connection(from, to) == CellConnectionType::WALL
+    }
+
+    /// Returns true when [Self::get_connection] returns [CellValueType::BOUNDARY].
+    fn is_boundary_between(&self, from: pt!(), to: pt!()) -> bool {
+        self.get_connection(from, to) == CellConnectionType::BOUNDARY
+    }
+
+    /// Returns true when [Self::get_connection] returns [CellValueType::UNVISITED].
+    fn is_unvisited_between(&self, from: pt!(), to: pt!()) -> bool {
+        self.get_connection(from, to) == CellConnectionType::UNVISITED
+    }
 
     /// Make a passage at `pt`.
     fn make_passage(&mut self, pt: pt!());
@@ -96,62 +131,37 @@ pub trait CellManager: Debug {
 
 // TODO rename CellValue to Cell? or rename BufferLocation to Cell?
 //  (and if the former, keep CellValueType as-is, or rename to CellType?)
-/// A value of a cell. These are what is physically stored in a maze.
+/// A value of a cell.
 ///
-/// Cells can hold any data they like. However, each cell falls under one
-/// of four classes. See [CellValueType] for information on each of these.
-///
-/// Remember that [Point][super::point::Point]s map to cells, so this also
-/// represents the value at any given [Point][super::point::Point].
-///
-/// # Implementing
-///
-/// For any implementation of CellValue, its default value (as per the [Default] trait)
-/// should be a should an [CellValueType::UNVISITED] cell.
+/// Cells differ points in one key way. While points are live in the abstract
+/// world of a [CoordinateSpace][crate::interface::point::space::CoordinateSpace],
+/// cells are in the presentation layer of a maze, the [CellManager]. They are
+/// also what is stored are buffers.
 pub trait CellValue: Copy + Clone + Send + Sync + Sized + PartialEq + Eq + Default + Debug {
-    /// The cell's class.
-    ///
-    /// For more information, see [CellValueType].
-    fn get_type(&self) -> CellValueType;
-
-    /// Helper function - equivalent to `get_type() == CellValueType::PASSAGE`.
-    #[inline]
-    fn is_passage(&self) -> bool {
-        self.get_type() == CellValueType::PASSAGE
-    }
-
-    /// Helper function - equivalent to `get_type() == CellValueType::WALL`.
-    fn is_wall(&self) -> bool {
-        self.get_type() == CellValueType::WALL
-    }
-
-    /// Helper function - equivalent to `get_type() == CellValueType::BOUNDARY`.
-    fn is_boundary(&self) -> bool {
-        self.get_type() == CellValueType::BOUNDARY
-    }
-
-    /// Helper function - equivalent to `get_type() == CellValueType::UNVISITED`.
-    fn is_unvisited(&self) -> bool {
-        self.get_type() == CellValueType::UNVISITED
-    }
+    /// If the cell has not been fully generated (visited). Partially-generated
+    /// cells are not considered fully visited. This is because when applying
+    /// templates, such as a solid boundary around the edge of the maze, the cells
+    /// that get touched should still be considered by generators.
+    fn is_fully_visited(&self) -> bool;
 }
 
-/// While cells can store any data they want, for the purposes of generating and
-/// solving mazes there are four types of cell.
+// TODO rename to CellEdgeType to be consistent with graph theory?
+//  (also maps better onto traditional 2D mazes)
+/// A type of connection (e.g. wall, boundary) between two cells.
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
-pub enum CellValueType {
-    /// A cell is considered a passage one can move through it. Even if a cell is
-    /// tracking its walls with respect to its neighbours (like an
-    /// [InlineCellValue][crate::implm::cell::inline::InlineCellValue] does), it is
-    /// still considered a passage.
+pub enum CellConnectionType {
+    /// A connection is considered a passage one can move through it.
     PASSAGE,
-    /// A cell is considered a wall if one cannot move through it in any capacity.
-    /// Walls may be converted into passages by generation algorithms.
+    /// A connection is considered a wall if one cannot move through
+    /// it in any capacity. Walls may be converted into passages by
+    /// generation algorithms.
     WALL,
-    /// Like a wall, but it will never be touched by a generator. Boundaries
-    /// are ideal for the outlines of mazes and other important structural features.
+    /// Like a wall, but it will never be touched by a generator.
+    /// Boundaries are ideal for the outlines of mazes and other
+    /// important structural features.
     BOUNDARY,
-    /// This cell has not been generated yet by a generator. An unvisited cell
-    /// should never be accessible from a passage after generation is complete.
+    /// The default state, when cells have not yet been fully generated
+    /// by a generator. An unvisited connection should never be accessible
+    /// from within the maze itself after generation is complete.
     UNVISITED
 }

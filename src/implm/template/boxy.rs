@@ -4,6 +4,7 @@ use crate::interface::cell::CellManager;
 use crate::implm::point::boxy::BoxCoordinateSpace;
 use crate::interface::point::CoordinateSpace;
 use crate::implm::cell::block::{BoxSpaceBlockCellManager, BlockCellValue};
+use crate::implm::cell::inline::{BoxSpaceInlineCellManager, InlineCellValue, InlineCellValueWallType};
 
 pub struct SolidBorderTemplate {}
 
@@ -35,7 +36,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> Template<BoxSp
         'outer: loop {
             for (i, dim) in cell.iter().enumerate() {
                 if *dim == 0 || *dim == maze.get_full_dimensions()[i] - 1 {
-                    maze.set(cell.into(), BlockCellValue::BOUNDARY);
+                    maze.set_cell(cell.into(), BlockCellValue::BOUNDARY);
                     break
                 }
             }
@@ -45,6 +46,47 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> Template<BoxSp
                 cell[i] += 1;
 
                 if cell[i] != maze.get_full_dimensions()[i] {
+                    continue 'outer
+                } else {
+                    cell[i] = 0;
+                }
+            }
+
+            break 'outer
+        }
+    }
+}
+
+impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Template<BoxSpaceInlineCellManager<Buffer, DIMENSION>> for SolidBorderTemplate {
+    fn apply(maze: &mut BoxSpaceInlineCellManager<Buffer, DIMENSION>) {
+        // TODO this can probably be optimised even further
+        //  and rewritten to not be ugly
+        let mut cell = [0usize; DIMENSION];
+
+        'outer: loop {
+            let mut walls = [[InlineCellValueWallType::UNVISITED; 2]; DIMENSION];
+            let mut on_boundary = false;
+
+            for (i, dim) in cell.iter().enumerate() {
+                if dim == &0 {
+                    walls[i][0] = InlineCellValueWallType::BOUNDARY;
+                    on_boundary = true;
+                }
+                if *dim == maze.coord_space().dimensions()[i] - 1 {
+                    walls[i][1] = InlineCellValueWallType::BOUNDARY;
+                    on_boundary = true;
+                }
+            }
+
+            if on_boundary {
+                maze.set(cell.into(), InlineCellValue(walls));
+            }
+
+            #[allow(clippy::needless_range_loop)]
+            for i in 0..DIMENSION {
+                cell[i] += 1;
+
+                if cell[i] != maze.coord_space().dimensions()[i] {
                     continue 'outer
                 } else {
                     cell[i] = 0;

@@ -1,12 +1,12 @@
 use crate::interface::buffer::{MazeBuffer, BufferLocation};
-use crate::interface::cell::{CellManager, CellValue};
+use crate::interface::cell::{CellManager, CellConnectionType};
 use crate::implm::point::boxy::{BoxCoordinateSpace};
 use crate::internal::noise_util::pt;
 use crate::interface::point::CoordinateSpace;
 use std::fmt::{Debug, Formatter};
 use crate::internal::abs_util::abs_diff;
 use crate::internal::array_util::Product;
-use crate::implm::render::text::BoxSpaceBlockCellTextMazeRenderer;
+use crate::implm::render::text::BoxSpaceTextMazeRenderer;
 use crate::interface::render::MazeRenderer;
 use crate::implm::cell::block::BlockCellValue;
 use crate::implm::cell::block::scaled_pt::MappedPoint;
@@ -47,7 +47,7 @@ pub struct BoxSpaceBlockCellManager<Buffer: MazeBuffer<BlockCellValue>, const DI
 
 // Public functions
 impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockCellManager<Buffer, DIMENSION> {
-    /// Construct a new maze from a given coordinate space and scale factor.
+    /// Construct a new maze from a given coordinate space, scale factor, and padding.
     /// A [crate::interface::buffer::MazeBuffer] will be created from the value of type parameter `Buffer`.
     pub fn new(space: BoxCoordinateSpace<DIMENSION>, scale_factor: [usize; DIMENSION], padding: [[usize; 2]; DIMENSION]) -> Self {
         let cells_required = Self::scale_dimensions(space.dimensions(), scale_factor).zip(padding).map(|(scaled_dim, padding)| scaled_dim + padding[0] + padding[1]).product();
@@ -114,7 +114,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// In most cases you should use the methods on [CellManager]. The only reason
     /// you should use this method is to access a cell that is not mapped by the
     /// coordinated space.
-    pub fn set(&mut self, cell: MappedPoint<DIMENSION>, value: BlockCellValue) {
+    pub fn set_cell(&mut self, cell: MappedPoint<DIMENSION>, value: BlockCellValue) {
         self.buffer.set(self.cell_to_buffer_loc(cell), value)
     }
 }
@@ -156,16 +156,16 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
                 let neighbour = pt.offset(i, -1);
 
                 // We don't overwrite boundaries
-                if self.get_cell(neighbour).is_unvisited() {
-                    self.set(neighbour, BlockCellValue::WALL)
+                if self.get_cell(neighbour) == BlockCellValue::UNVISITED {
+                    self.set_cell(neighbour, BlockCellValue::WALL)
                 }
             }
 
             if pt[i] + 1 < self.scaled_dimensions[i] {
                 let neighbour = pt.offset(i, 1);
 
-                if self.get_cell(neighbour).is_unvisited() {
-                    self.set(neighbour, BlockCellValue::WALL)
+                if self.get_cell(neighbour) == BlockCellValue::UNVISITED {
+                    self.set_cell(neighbour, BlockCellValue::WALL)
                 }
             }
         }
@@ -184,11 +184,20 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> CellManager fo
         self.get_cell(self.map_pt(pt))
     }
 
+    fn get_connection(&self, from: pt!(), to: pt!()) -> CellConnectionType {
+        match [self.get(from), self.get(to)] {
+            [Self::CellVal::BOUNDARY,  _] | [_, Self::CellVal::BOUNDARY ] => CellConnectionType::BOUNDARY,
+            [Self::CellVal::UNVISITED, _] | [_, Self::CellVal::UNVISITED] => CellConnectionType::UNVISITED,
+            [Self::CellVal::WALL,      _] | [_, Self::CellVal::WALL     ] => CellConnectionType::WALL,
+            [Self::CellVal::PASSAGE,  Self::CellVal::PASSAGE]             => CellConnectionType::PASSAGE,
+        }
+    }
+
     /// Set `pt` to [super::BlockCellValue::PASSAGE].
     fn make_passage(&mut self, pt: pt!()) {
         let pt = self.map_pt(pt);
 
-        self.set(pt, BlockCellValue::PASSAGE);
+        self.set_cell(pt, BlockCellValue::PASSAGE);
         self.set_unvisited_neighbours_to_wall(pt);
     }
 
@@ -213,7 +222,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> CellManager fo
             for i in from_pos..to_pos {
                 let pt = from.at(axis_of_adjacency, i);
 
-                self.set(pt, BlockCellValue::PASSAGE);
+                self.set_cell(pt, BlockCellValue::PASSAGE);
                 self.set_unvisited_neighbours_to_wall(pt);
             }
         } else {
@@ -221,17 +230,17 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> CellManager fo
             for i in (to_pos + 1)..=from_pos {
                 let pt = from.at(axis_of_adjacency, i);
 
-                self.set(pt, BlockCellValue::PASSAGE);
+                self.set_cell(pt, BlockCellValue::PASSAGE);
                 self.set_unvisited_neighbours_to_wall(pt);
             }
         }
 
-        self.set(to, BlockCellValue::PASSAGE);
+        self.set_cell(to, BlockCellValue::PASSAGE);
     }
 
     /// Set `pt` to [super::BlockCellValue::WALL].
     fn make_wall(&mut self, pt: pt!()) {
-        self.set(self.map_pt(pt), BlockCellValue::WALL)
+        self.set_cell(self.map_pt(pt), BlockCellValue::WALL)
     }
 
     /// Set `from` and `to` to [super::BlockCellValue::WALL]. If the resolution is greater than
@@ -247,18 +256,18 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> CellManager fo
 
         if from_pos < to_pos {
             for i in from_pos..=to_pos {
-                self.set(from.at(axis_of_adjacency, i), BlockCellValue::WALL);
+                self.set_cell(from.at(axis_of_adjacency, i), BlockCellValue::WALL);
             }
         } else {
             for i in to_pos..=from_pos {
-                self.set(from.at(axis_of_adjacency, i), BlockCellValue::WALL);
+                self.set_cell(from.at(axis_of_adjacency, i), BlockCellValue::WALL);
             }
         }
     }
 
     /// Set `pt` to [super::BlockCellValue::BOUNDARY].
     fn make_boundary(&mut self, pt: pt!()) {
-        self.set(self.map_pt(pt), BlockCellValue::BOUNDARY)
+        self.set_cell(self.map_pt(pt), BlockCellValue::BOUNDARY)
     }
 
     /// Set `from` and `to` to [super::BlockCellValue::BOUNDARY]. If the resolution is greater than
@@ -274,11 +283,11 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> CellManager fo
 
         if from_pos < to_pos {
             for i in from_pos..=to_pos {
-                self.set(from.at(axis_of_adjacency, i), BlockCellValue::BOUNDARY);
+                self.set_cell(from.at(axis_of_adjacency, i), BlockCellValue::BOUNDARY);
             }
         } else {
             for i in to_pos..=from_pos {
-                self.set(from.at(axis_of_adjacency, i), BlockCellValue::BOUNDARY);
+                self.set_cell(from.at(axis_of_adjacency, i), BlockCellValue::BOUNDARY);
             }
         }
     }
@@ -355,7 +364,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>> Debug for BoxSpaceBlockCellManager<Buf
 
         writeln!(f)?;
 
-        for line in BoxSpaceBlockCellTextMazeRenderer::render(self) {
+        for line in BoxSpaceTextMazeRenderer::render(self) {
             writeln!(f, "\t{}", line)?;
         };
 

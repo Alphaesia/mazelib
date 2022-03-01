@@ -25,14 +25,14 @@ impl <Maze: CellManager> MazeGenerator<Maze> for HuntAndKillGenerator {
         'hunt: for pt in maze.coord_space().into_iter() {
             // Look for an unvisited point
 
-            if maze.get(pt).is_unvisited() {
+            if maze.get(pt).is_fully_visited() == false {
                 // Connect the new kill path to a previous path
                 {
                     // Get neighbouring visited points
 
                     let mut neighbours = maze.coord_space().neighbours_of_pt(pt).to_vec();
 
-                    neighbours.retain(|&neighbour| !maze.get(neighbour).is_unvisited());
+                    neighbours.retain(|&neighbour| maze.get(neighbour).is_fully_visited());
 
                     if neighbours.len() > 0 {
                         // unwrap() is safe by virtue of the algorithm
