@@ -169,7 +169,7 @@ impl BoxSpaceTextMazeRenderer {
             (WallType::WALL | WallType::UNVISITED,     WallType::WALL | WallType::UNVISITED,     WallType::PASSAGE,     WallType::BOUNDARY) => '┧',
             (WallType::BOUNDARY, WallType::BOUNDARY, WallType::PASSAGE,     WallType::WALL | WallType::UNVISITED    ) => '┩',
             (WallType::BOUNDARY, WallType::WALL | WallType::UNVISITED,     WallType::PASSAGE,     WallType::BOUNDARY) => '┫',
-            (WallType::WALL | WallType::UNVISITED,     WallType::BOUNDARY, WallType::PASSAGE,     WallType::BOUNDARY) => '┪',
+            (WallType::WALL | WallType::UNVISITED,     WallType::BOUNDARY, WallType::PASSAGE,     WallType::BOUNDARY) => '┨',
             (WallType::BOUNDARY, WallType::BOUNDARY, WallType::PASSAGE,     WallType::BOUNDARY) => '┫',
 
             (WallType::WALL | WallType::UNVISITED,     WallType::WALL | WallType::UNVISITED,     WallType::WALL | WallType::UNVISITED,     WallType::PASSAGE    ) => '┴',
