@@ -1,5 +1,6 @@
 use crate::interface::point::CoordinateSpace;
-use crate::implm::point::boxy::{CoordinateTuplet, BoxCoordinateSpaceIterator};
+use crate::implm::point::boxy::CoordinateTuplet;
+use crate::implm::point::boxy::implm::BoxCoordinateSpaceIterator;
 use crate::internal::array_util::Product;
 use crate::internal::abs_util::abs_diff;
 use std::ops::Index;
@@ -49,7 +50,7 @@ impl <const DIMENSION: usize> BoxCoordinateSpace<DIMENSION> {
 
     // TODO specialisation - DIRTY TEMP - how do I do narrowing on iterators?
     pub fn iter(&self) -> BoxCoordinateSpaceIterator<DIMENSION> {
-        BoxCoordinateSpaceIterator { space: *self, pos: None }
+        BoxCoordinateSpaceIterator::new(*self, None)
     }
 }
 
@@ -86,7 +87,7 @@ impl <const DIMENSION: usize> CoordinateSpace for BoxCoordinateSpace<DIMENSION> 
     }
 
     fn iter_from(&self, pt: Self::PtType) -> <Self as CoordinateSpace>::IntoIter {
-        BoxCoordinateSpaceIterator { space: *self, pos: Some(pt) }
+        BoxCoordinateSpaceIterator::new(*self, Some(pt))
     }
 
     fn are_adjacent(pt1: Self::PtType, pt2: Self::PtType) -> bool {

@@ -21,9 +21,17 @@ impl<const DIMENSION: usize> IntoIterator for &BoxCoordinateSpace<DIMENSION> {
     }
 }
 
+// Enclosing module is not public, so this struct is not visible outside of crate::implm::point::boxy
 pub struct BoxCoordinateSpaceIterator<const DIMENSION: usize> {
-    pub(crate) space: BoxCoordinateSpace<DIMENSION>,
-    pub(crate) pos: Option<CoordinateTuplet<DIMENSION>>
+    space: BoxCoordinateSpace<DIMENSION>,
+    pos: Option<CoordinateTuplet<DIMENSION>>
+}
+
+// Constructor
+impl <const DIMENSION: usize> BoxCoordinateSpaceIterator<DIMENSION> {
+    pub(crate) fn new(space: BoxCoordinateSpace<DIMENSION>, starting_pos: Option<CoordinateTuplet<DIMENSION>>) -> Self {
+        Self { space, pos: starting_pos }
+    }
 }
 
 impl <const DIMENSION: usize> Iterator for BoxCoordinateSpaceIterator<DIMENSION> {

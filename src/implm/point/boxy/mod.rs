@@ -36,13 +36,11 @@ mod implm {
     mod index;
     mod display;
 
-    // TODO figure out how to stop this being accessible under boxy::impl::, just boxy::
-    pub use self::iterator::BoxCoordinateSpaceIterator;
+    pub(super) use self::iterator::BoxCoordinateSpaceIterator;
 }
 
 pub use self::space::BoxCoordinateSpace;
 pub use self::point::CoordinateTuplet;
-pub use self::implm::BoxCoordinateSpaceIterator;
 
 // TODO link to templates when they're implemented
 /// A flat rectangular coordinate space. The most common type of coordinate space for mazes.
