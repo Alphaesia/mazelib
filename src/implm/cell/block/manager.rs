@@ -5,7 +5,7 @@ use crate::internal::noise_util::pt;
 use crate::interface::point::CoordinateSpace;
 use std::fmt::{Debug, Formatter};
 use crate::internal::abs_util::abs_diff;
-use crate::internal::array_util::Product;
+use crate::internal::array_util::{Product, Sum};
 use crate::implm::render::text::BoxSpaceTextMazeRenderer;
 use crate::interface::render::MazeRenderer;
 use crate::implm::cell::block::BlockCellValue;
@@ -41,8 +41,8 @@ pub struct BoxSpaceBlockCellManager<Buffer: MazeBuffer<BlockCellValue>, const DI
     buffer: Buffer,
     space: BoxCoordinateSpace<DIMENSION>,
     scale_factor: [usize; DIMENSION],
-    scaled_dimensions: [usize; DIMENSION],
     padding: [[usize; 2]; DIMENSION],
+    full_dimensions: [usize; DIMENSION],
 }
 
 // Public functions
@@ -50,11 +50,11 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// Construct a new maze from a given coordinate space, scale factor, and padding.
     /// A [crate::interface::buffer::MazeBuffer] will be created from the value of type parameter `Buffer`.
     pub fn new(space: BoxCoordinateSpace<DIMENSION>, scale_factor: [usize; DIMENSION], padding: [[usize; 2]; DIMENSION]) -> Self {
-        let cells_required = Self::scale_dimensions(space.dimensions(), scale_factor).zip(padding).map(|(scaled_dim, padding)| scaled_dim + padding[0] + padding[1]).product();
+        let full_dimensions = Self::scale_dimensions(space.dimensions(), scale_factor).zip(padding).map(|(scaled_dim, padding)| scaled_dim + padding.sum());
 
-        let scaled_dimensions = Self::scale_dimensions(space.dimensions(), scale_factor);
+        let cells_required = full_dimensions.product();
 
-        Self { buffer: Buffer::new(cells_required), space, scale_factor, scaled_dimensions, padding }
+        Self { buffer: Buffer::new(cells_required), space, scale_factor, full_dimensions, padding }
     }
 
     pub fn buffer(&self) -> &Buffer {
@@ -63,7 +63,15 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
 
     /// The dimensions of the coordinate space, scaled by the resolution, plus padding
     pub fn get_full_dimensions(&self) -> [usize; DIMENSION] {
-        self.scaled_dimensions.zip(self.padding).map(|(dim, padding)| dim + padding[0] + padding[1])
+        self.full_dimensions
+    }
+
+    /// The number of cells between points, minus one.
+    ///
+    /// A scale factor of 1 would have each point directly adjacent to one another.
+    /// A scale factor of 2 will have 1 cell between each point.
+    pub fn scale_factor(&self) -> [usize; DIMENSION] {
+        self.scale_factor
     }
 
     /// The number of cells between the edge of the maze and the outermost cell that is mapped to
@@ -144,7 +152,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
         let mut offset = pt[0];
 
         for i in 1..DIMENSION {
-            offset += pt[i] * (self.scaled_dimensions[i - 1] + self.padding[i - 1][0] + self.padding[i - 1][1]);
+            offset += pt[i] * self.full_dimensions[i - 1];
         }
 
         BufferLocation(offset)
@@ -161,7 +169,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
                 }
             }
 
-            if pt[i] + 1 < self.scaled_dimensions[i] {
+            if pt[i] + 1 < self.full_dimensions[i] {
                 let neighbour = pt.offset(i, 1);
 
                 if self.get_cell(neighbour) == BlockCellValue::UNVISITED {
@@ -343,7 +351,8 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
         writeln!(f, "\tbuffer: {:?}", self.buffer)?;
         writeln!(f, "\tspace: {:?}", self.space)?;
         writeln!(f, "\tresolution: {:?}", self.scale_factor)?;
-        writeln!(f, "\tscaled_dimensions: {:?}", self.scaled_dimensions)?;
+        writeln!(f, "\tpadding: {:?}", self.padding)?;
+        writeln!(f, "\tfull_dimensions: {:?}", self.full_dimensions)?;
 
         return Result::Ok(())
     }

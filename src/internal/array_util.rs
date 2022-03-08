@@ -1,3 +1,20 @@
+pub trait Sum<T> {
+    fn sum(&self) -> T;
+}
+
+impl <const LENGTH: usize> Sum<usize> for [usize; LENGTH] {
+    /// Return the sum of all elements in an array.
+    fn sum(&self) -> usize {
+        let mut sum = 0;
+
+        for x in self {
+            sum += x;
+        }
+
+        return sum;
+    }
+}
+
 pub trait Product<T> {
     fn product(&self) -> T;
 }
