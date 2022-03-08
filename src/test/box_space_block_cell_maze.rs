@@ -7,6 +7,8 @@ use crate::interface::buffer::{BufferLocation, MazeBuffer};
 // We test both at a cell-manager level and a buffer level
 // (i.e. ignoring and taking into account the resolution)
 
+// TODO add tests for mazes with padding
+
 #[test]
 #[allow(unused_variables)]
 fn test_construction() {
@@ -185,9 +187,9 @@ fn test_initialisation() {
 }
 
 #[test]
-fn test_boundary_single_without_scaling() {
+fn test_boundary_single_without_scaling_or_padding() {
     let coord_space = BoxCoordinateSpace::new([5, 5]);
-    let mut maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).build();
+    let mut maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor([1, 1]).padding([[0, 0], [0, 0]]).build();
 
     // Empty
 
@@ -248,9 +250,9 @@ fn test_boundary_single_without_scaling() {
 }
 
 #[test]
-fn test_boundary_single_with_scaling() {
+fn test_boundary_single_with_scaling_wthout_padding() {
     let coord_space = BoxCoordinateSpace::new([5, 5]);
-    let mut maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor([2, 2]).build();
+    let mut maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor([2, 2]).padding([[0, 0], [0, 0]]).build();
 
     // Empty
 
@@ -352,9 +354,9 @@ fn test_boundary_single_with_scaling() {
 }
 
 #[test]
-fn test_boundary_between_without_scaling() {
+fn test_boundary_between_without_scaling_or_padding() {
     let coord_space = BoxCoordinateSpace::new([5, 5]);
-    let mut maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).build();
+    let mut maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor([1, 1]).padding([[0, 0], [0, 0]]).build();
 
     // Empty
 
@@ -418,9 +420,9 @@ fn test_boundary_between_without_scaling() {
 }
 
 #[test]
-fn test_boundary_between_with_scaling() {
+fn test_boundary_between_with_scaling_without_padding() {
     let coord_space = BoxCoordinateSpace::new([5, 5]);
-    let mut maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor([2, 2]).build();
+    let mut maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor([2, 2]).padding([[0, 0], [0, 0]]).build();
 
     // Empty
 
@@ -528,9 +530,9 @@ fn test_boundary_between_with_scaling() {
 }
 
 #[test]
-fn test_wall_single_without_scaling() {
+fn test_wall_single_without_scaling_or_padding() {
     let coord_space = BoxCoordinateSpace::new([5, 5]);
-    let mut maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).build();
+    let mut maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor([1, 1]).padding([[0, 0], [0, 0]]).build();
 
     // Empty
 
@@ -591,9 +593,9 @@ fn test_wall_single_without_scaling() {
 }
 
 #[test]
-fn test_wall_single_with_scaling() {
+fn test_wall_single_with_scaling_without_padding() {
     let coord_space = BoxCoordinateSpace::new([5, 5]);
-    let mut maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor([2, 2]).build();
+    let mut maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor([2, 2]).padding([[0, 0], [0, 0]]).build();
 
     // Empty
 
@@ -695,9 +697,9 @@ fn test_wall_single_with_scaling() {
 }
 
 #[test]
-fn test_wall_between_without_scaling() {
+fn test_wall_between_without_scaling_or_padding() {
     let coord_space = BoxCoordinateSpace::new([5, 5]);
-    let mut maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).build();
+    let mut maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor([1, 1]).padding([[0, 0], [0, 0]]).build();
 
     // Empty
 
@@ -761,9 +763,9 @@ fn test_wall_between_without_scaling() {
 }
 
 #[test]
-fn test_wall_between_with_scaling() {
+fn test_wall_between_with_scaling_without_padding() {
     let coord_space = BoxCoordinateSpace::new([5, 5]);
-    let mut maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor([2, 2]).build();
+    let mut maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor([2, 2]).padding([[0, 0], [0, 0]]).build();
 
     // Empty
 
@@ -871,9 +873,9 @@ fn test_wall_between_with_scaling() {
 }
 
 #[test]
-fn test_passage_single_without_scaling() {
+fn test_passage_single_without_scaling_or_padding() {
     let coord_space = BoxCoordinateSpace::new([5, 5]);
-    let mut maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).build();
+    let mut maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor([1, 1]).padding([[0, 0], [0, 0]]).build();
 
     // Empty
 
@@ -943,9 +945,9 @@ fn test_passage_single_without_scaling() {
 }
 
 #[test]
-fn test_passage_single_with_scaling() {
+fn test_passage_single_with_scaling_without_padding() {
     let coord_space = BoxCoordinateSpace::new([5, 5]);
-    let mut maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor([2, 2]).build();
+    let mut maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor([2, 2]).padding([[0, 0], [0, 0]]).build();
 
     // Empty
 
@@ -1056,9 +1058,9 @@ fn test_passage_single_with_scaling() {
 }
 
 #[test]
-fn test_passage_between_without_scaling() {
+fn test_passage_between_without_scaling_or_padding() {
     let coord_space = BoxCoordinateSpace::new([5, 5]);
-    let mut maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).build();
+    let mut maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor([1, 1]).padding([[0, 0], [0, 0]]).build();
 
     // Empty
 
@@ -1131,9 +1133,9 @@ fn test_passage_between_without_scaling() {
 }
 
 #[test]
-fn test_passage_between_with_scaling() {
+fn test_passage_between_with_scaling_without_padding() {
     let coord_space = BoxCoordinateSpace::new([5, 5]);
-    let mut maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor([2, 2]).build();
+    let mut maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor([2, 2]).padding([[0, 0], [0, 0]]).build();
 
     // Empty
 

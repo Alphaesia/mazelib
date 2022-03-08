@@ -316,8 +316,8 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
         Self {
             _buffer: PhantomData,
             space,
-            scale_factor: [1; DIMENSION],
-            padding: [[0, 0]; DIMENSION],
+            scale_factor: [2; DIMENSION],
+            padding: [[1, 1]; DIMENSION],
         }
     }
 
