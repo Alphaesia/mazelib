@@ -45,18 +45,21 @@ pub struct BoxSpaceBlockCellManager<Buffer: MazeBuffer<BlockCellValue>, const DI
     full_dimensions: [usize; DIMENSION],
 }
 
-// Public functions
+// Constructor (private - use the builder)
 impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockCellManager<Buffer, DIMENSION> {
     /// Construct a new maze from a given coordinate space, scale factor, and padding.
     /// A [crate::interface::buffer::MazeBuffer] will be created from the value of type parameter `Buffer`.
-    pub fn new(space: BoxCoordinateSpace<DIMENSION>, scale_factor: [usize; DIMENSION], padding: [[usize; 2]; DIMENSION]) -> Self {
+    fn new(space: BoxCoordinateSpace<DIMENSION>, scale_factor: [usize; DIMENSION], padding: [[usize; 2]; DIMENSION]) -> Self {
         let full_dimensions = Self::scale_dimensions(space.dimensions(), scale_factor).zip(padding).map(|(scaled_dim, padding)| scaled_dim + padding.sum());
 
         let cells_required = full_dimensions.product();
 
         Self { buffer: Buffer::new(cells_required), space, scale_factor, full_dimensions, padding }
     }
+}
 
+// Public functions
+impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockCellManager<Buffer, DIMENSION> {
     pub fn buffer(&self) -> &Buffer {
         &self.buffer
     }
