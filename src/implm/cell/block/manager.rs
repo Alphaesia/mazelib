@@ -9,7 +9,7 @@ use crate::internal::array_util::{Product, Sum};
 use crate::implm::render::text::BoxSpaceTextMazeRenderer;
 use crate::interface::render::MazeRenderer;
 use crate::implm::cell::block::BlockCellValue;
-use crate::implm::cell::block::scaled_pt::MappedPoint;
+use crate::implm::cell::block::cell::BlockCell;
 use std::marker::PhantomData;
 
 /// Each maze has a scale factor. This determines the cellular distance between points.
@@ -96,7 +96,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     }
 
     /// Map a point to a cell.
-    pub fn map_pt(&self, pt: pt!()) -> MappedPoint<DIMENSION> {
+    pub fn map_pt(&self, pt: pt!()) -> BlockCell<DIMENSION> {
         let mut pt: [usize; DIMENSION] = pt.into();
 
         #[allow(clippy::needless_range_loop)]
@@ -105,7 +105,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
             pt[i] += self.padding[i][0];
         }
 
-        MappedPoint(pt.into())
+        BlockCell(pt.into())
     }
 
     /// Get the value of any cell.
@@ -113,7 +113,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// In most cases you should use the methods on [CellManager::get()]. The only
     /// reason you should use this method is to access a cell that is not mapped by
     /// the coordinated space.
-    pub fn get_cell(&self, cell: MappedPoint<DIMENSION>) -> BlockCellValue {
+    pub fn get_cell(&self, cell: BlockCell<DIMENSION>) -> BlockCellValue {
         self.buffer.get(self.cell_to_buffer_loc(cell))
     }
 
@@ -125,7 +125,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// In most cases you should use the methods on [CellManager]. The only reason
     /// you should use this method is to access a cell that is not mapped by the
     /// coordinated space.
-    pub fn set_cell(&mut self, cell: MappedPoint<DIMENSION>, value: BlockCellValue) {
+    pub fn set_cell(&mut self, cell: BlockCell<DIMENSION>, value: BlockCellValue) {
         self.buffer.set(self.cell_to_buffer_loc(cell), value)
     }
 }
@@ -151,7 +151,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
         return None
     }
 
-    fn cell_to_buffer_loc(&self, pt: MappedPoint<DIMENSION>) -> BufferLocation {
+    fn cell_to_buffer_loc(&self, pt: BlockCell<DIMENSION>) -> BufferLocation {
         let mut offset = pt[0];
 
         for i in 1..DIMENSION {
@@ -161,7 +161,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
         BufferLocation(offset)
     }
 
-    fn set_unvisited_neighbours_to_wall(&mut self, pt: MappedPoint<DIMENSION>) {
+    fn set_unvisited_neighbours_to_wall(&mut self, pt: BlockCell<DIMENSION>) {
         for i in 0..DIMENSION {
             if pt[i] > 0 {
                 let neighbour = pt.offset(i, -1);

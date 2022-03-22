@@ -2,6 +2,8 @@ use crate::interface::cell::CellValue;
 
 /// A cell where walls and passages do not overlap,
 /// and instead are separate cells.
+///
+/// *See also: [BlockCell][super::value::BlockCellValue]*
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
 pub enum BlockCellValue {
     UNVISITED,

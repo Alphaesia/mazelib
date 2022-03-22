@@ -2,7 +2,10 @@ use crate::implm::point::boxy::CoordinateTuplet;
 use std::convert::TryInto;
 use std::ops::{Index, IndexMut};
 use std::fmt::{Debug, Formatter};
+use crate::interface::cell::CellLocation;
 
+/// TODO rewrite
+///
 /// MappedPoint is just a regular CoordinateTuplet.
 /// To avoid accidentally passing a non-scaled point into a function
 /// expecting a scaled point, and vice versa, we leverage nominal typing
@@ -10,10 +13,14 @@ use std::fmt::{Debug, Formatter};
 ///
 /// At compile time, Rust should optimise out this wrapper struct, so
 /// there will be no performance penalty.
+///
+/// *See also: [BlockCellValue][super::value::BlockCellValue]*
 #[derive(Copy, Clone)]
-pub struct MappedPoint<const DIMENSION: usize>(pub(super) CoordinateTuplet<DIMENSION>);
+pub struct BlockCell<const DIMENSION: usize>(pub(super) CoordinateTuplet<DIMENSION>);
 
-impl <const DIMENSION: usize> MappedPoint<DIMENSION> {
+impl <const DIMENSION: usize> CellLocation for BlockCell<DIMENSION> {}
+
+impl <const DIMENSION: usize> BlockCell<DIMENSION> {
     /// Get the point at a given offset from this point
     /// (dimension refers to the direction of the offset - e.g. x-direction is dimension 0).
     pub fn offset(&self, axis: usize, offset: isize) -> Self {
@@ -40,7 +47,7 @@ impl <const DIMENSION: usize> MappedPoint<DIMENSION> {
     }
 }
 
-impl <const DIMENSION: usize> Index<usize> for MappedPoint<DIMENSION> {
+impl <const DIMENSION: usize> Index<usize> for BlockCell<DIMENSION> {
     type Output = usize;
 
     fn index(&self, index: usize) -> &Self::Output {
@@ -48,38 +55,38 @@ impl <const DIMENSION: usize> Index<usize> for MappedPoint<DIMENSION> {
     }
 }
 
-impl <const DIMENSION: usize> IndexMut<usize> for MappedPoint<DIMENSION> {
+impl <const DIMENSION: usize> IndexMut<usize> for BlockCell<DIMENSION> {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         &mut self.0[index]
     }
 }
 
-impl <const DIMENSION: usize> Debug for MappedPoint<DIMENSION> {
+impl <const DIMENSION: usize> Debug for BlockCell<DIMENSION> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "s{:?}", self.0)
     }
 }
 
-impl <const DIMENSION: usize> From<[usize; DIMENSION]> for MappedPoint<DIMENSION> {
+impl <const DIMENSION: usize> From<[usize; DIMENSION]> for BlockCell<DIMENSION> {
     fn from(coordinates: [usize; DIMENSION]) -> Self {
-        MappedPoint(coordinates.into())
+        BlockCell(coordinates.into())
     }
 }
 
-impl <const DIMENSION: usize> From<[isize; DIMENSION]> for MappedPoint<DIMENSION> {
+impl <const DIMENSION: usize> From<[isize; DIMENSION]> for BlockCell<DIMENSION> {
     fn from(pt: [isize; DIMENSION]) -> Self {
-        MappedPoint(pt.into())
+        BlockCell(pt.into())
     }
 }
 
-impl <const DIMENSION: usize> From<[i32; DIMENSION]> for MappedPoint<DIMENSION> {
+impl <const DIMENSION: usize> From<[i32; DIMENSION]> for BlockCell<DIMENSION> {
     fn from(pt: [i32; DIMENSION]) -> Self {
-        MappedPoint(pt.into())
+        BlockCell(pt.into())
     }
 }
 
-impl <const DIMENSION: usize> From<MappedPoint<DIMENSION>> for [usize; DIMENSION] {
-    fn from(pt: MappedPoint<DIMENSION>) -> Self {
+impl <const DIMENSION: usize> From<BlockCell<DIMENSION>> for [usize; DIMENSION] {
+    fn from(pt: BlockCell<DIMENSION>) -> Self {
         pt.0.into()
     }
 }

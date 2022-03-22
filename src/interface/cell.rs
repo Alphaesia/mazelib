@@ -129,8 +129,15 @@ pub trait CellManager: Debug {
     fn make_boundary_between(&mut self, from: pt!(), to: pt!());
 }
 
-// TODO rename CellValue to Cell? or rename BufferLocation to Cell?
-//  (and if the former, keep CellValueType as-is, or rename to CellType?)
+/// Structs that implement this trait are "addresses" for cells. You can
+/// give them to a [`CellManager`] to retrieve the [value][CellValue] of a cell.
+///
+/// This trait does not have any associated logic, nor does any generic interface
+/// accept them. Rather, it is a signifier of the intent and purpose of structs
+/// that implement it. It allows implementers to clearly delineate to readers
+/// and future code editors what role a struct players in the maze model.
+pub trait CellLocation {}
+
 /// A value of a cell.
 ///
 /// Cells differ points in one key way. While points are live in the abstract
