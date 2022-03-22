@@ -12,6 +12,7 @@ publish = false
 
 [dependencies]
 rand = "0.8.4"
+embed-doc-image = "0.1.4"
 
 [lib]
 name = "mazelib"
