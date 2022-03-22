@@ -14,7 +14,6 @@ use mazelib::interface::generate::MazeGenerator;
 use rand::thread_rng;
 use mazelib::implm::cell::inline::{BoxSpaceInlineCellManager, InlineCellValue, InlineCellValueWallType};
 use mazelib::interface::buffer::{BufferLocation, MazeBuffer};
-use mazelib::util::convert_unvisited_to_walls;
 
 fn main() {
     const DIMENSION: usize = 2;
@@ -34,8 +33,6 @@ fn main() {
     Template::apply(&mut cell_manager);
 
     Generator::generate(&mut cell_manager, &mut thread_rng());
-
-    // convert_unvisited_to_walls(&mut cell_manager);
 
     let render = Renderer::render(&cell_manager);
 

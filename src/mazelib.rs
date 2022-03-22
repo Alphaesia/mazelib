@@ -174,6 +174,5 @@
 
 pub mod interface;
 pub mod implm;
-pub mod util;
 pub(crate) mod internal;
 #[cfg(test)] mod test;
