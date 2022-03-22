@@ -3,7 +3,7 @@
 
 use mazelib::implm::point::boxy::BoxCoordinateSpace;
 use mazelib::implm::buffer::VecBuffer;
-use mazelib::implm::cell::block::{BoxSpaceBlockCellManager, BlockCellValue};
+use mazelib::implm::cell::block::{BoxSpaceBlockCellManager, BlockCellValue, BoxSpaceBlockCellManagerBuilder};
 use mazelib::implm::render::text::BoxSpaceTextMazeRenderer;
 use mazelib::interface::render::MazeRenderer;
 use mazelib::interface::cell::CellManager;
@@ -20,16 +20,16 @@ fn main() {
     const DIMENSION: usize = 2;
 
     type Space = BoxCoordinateSpace<DIMENSION>;
-    type CellType = InlineCellValue<DIMENSION>;
+    type CellType = BlockCellValue;
     type BufferType = VecBuffer<CellType>;
-    type CellManager = BoxSpaceInlineCellManager<BufferType, DIMENSION>;
+    type CellManager = BoxSpaceBlockCellManagerBuilder<BufferType, DIMENSION>;
     type Template = SolidBorderTemplate;
-    type Generator = RecursiveBacktrackerGenerator;
+    type Generator = NAryTreeGenerator;
     type Renderer = BoxSpaceTextMazeRenderer;
 
-    let space = Space::new([9, 9]);
+    let space = Space::new([7, 7]);
 
-    let mut cell_manager = CellManager::new(space);
+    let mut cell_manager = CellManager::new(space).build();
 
     Template::apply(&mut cell_manager);
 
