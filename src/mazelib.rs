@@ -170,6 +170,8 @@
 #![feature(min_specialization)]
 #![feature(label_break_value)]
 
+#![deny(rustdoc::broken_intra_doc_links)]
+
 #![allow(clippy::needless_return, clippy::bool_comparison)]  // Stylistic choices
 
 pub mod interface;
