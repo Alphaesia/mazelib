@@ -1,4 +1,4 @@
-use rand::RngCore;
+use rand::Rng;
 use rand::seq::SliceRandom;
 use crate::implm::generate::util::carve_to_unvisited_neighbour;
 use crate::interface::cell::{CellManager, CellValue};
@@ -14,14 +14,14 @@ impl HuntAndKillGenerator {
         Self { _private: () }
     }
 
-    /// Sugar for `HuntAndKillGenerator::new().generate(maze, rng)`
-    pub fn generate<Maze: CellManager>(maze: &mut Maze, rng: &mut dyn RngCore) {
-        Self::new().generate(maze, rng)
+    /// Sugar for `HuntAndKillGenerator::new().generate(maze)`
+    pub fn generate<Maze: CellManager>(maze: &mut Maze) {
+        Self::new().generate(maze)
     }
 }
 
 impl <Maze: CellManager> MazeGenerator<Maze> for HuntAndKillGenerator {
-    fn generate(&mut self, maze: &mut Maze, rng: &mut dyn RngCore) {
+    fn generate_with_rng<R: Rng + ?Sized>(&mut self, maze: &mut Maze, rng: &mut R) {
         'hunt: for pt in maze.coord_space().into_iter() {
             // Look for an unvisited point
 

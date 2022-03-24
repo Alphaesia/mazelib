@@ -1,32 +1,30 @@
 use crate::interface::generate::MazeGenerator;
 use crate::interface::cell::CellManager;
-use rand::RngCore;
+use rand::Rng;
 use rand::seq::IteratorRandom;
 use crate::implm::point::boxy::{BoxCoordinateSpace, CoordinateTuplet};
 
 /// A BinaryTreeGenerator, but instead of an arity of 2 it has an arity of `DIMENSION`.
 /// Only works with [BoxCoordinateSpace][crate::implm::point::boxy::BoxCoordinateSpace]s.
-pub struct NAryTreeGenerator
-{
+pub struct NAryTreeGenerator {
     _private: ()
 }
 
-impl NAryTreeGenerator
-{
+impl NAryTreeGenerator {
     pub fn new() -> Self
     {
         Self { _private: () }
     }
 
-    /// Sugar for `NAryTreeGenerator::new().generate(maze, rng)`
-    pub fn generate<Maze: CellManager<CoordSpace=BoxCoordinateSpace<DIMENSION>>, const DIMENSION: usize>(maze: &mut Maze, rng: &mut dyn RngCore)
+    /// Sugar for `NAryTreeGenerator::new().generate(maze)`
+    pub fn generate<Maze: CellManager<CoordSpace=BoxCoordinateSpace<DIMENSION>>, const DIMENSION: usize>(maze: &mut Maze)
     {
-        Self::new().generate(maze, rng)
+        Self::new().generate(maze)
     }
 }
 
 impl <Maze: CellManager<CoordSpace=BoxCoordinateSpace<DIMENSION>>, const DIMENSION: usize> MazeGenerator<Maze> for NAryTreeGenerator {
-    fn generate(&mut self, maze: &mut Maze, rng: &mut dyn RngCore) {
+    fn generate_with_rng<R: Rng + ?Sized>(&mut self, maze: &mut Maze, rng: &mut R) {
         // For every point in the maze,
         maze.coord_space().into_iter().for_each(|pt| {
             let pt_as_arr: [usize; DIMENSION] = pt.into();

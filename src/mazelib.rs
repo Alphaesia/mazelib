@@ -38,7 +38,7 @@
 //! SolidBorderTemplate::apply(&mut maze);
 //!
 //! // Generate the maze
-//! HuntAndKillGenerator::generate(&mut maze, &mut rand::thread_rng());
+//! HuntAndKillGenerator::generate(&mut maze);
 //!
 //! // Print the maze as text
 //! let maze_as_text = BoxSpaceTextMazeRenderer::render(&maze);

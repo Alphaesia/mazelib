@@ -1,4 +1,4 @@
-use rand::RngCore;
+use rand::Rng;
 use crate::implm::generate::util::carve_to_unvisited_neighbour;
 use crate::interface::cell::CellManager;
 use crate::interface::generate::MazeGenerator;
@@ -13,14 +13,14 @@ impl RecursiveBacktrackerGenerator {
         Self { _private: () }
     }
 
-    /// Sugar for `RecursiveBacktrackerGenerator::new().generate(maze, rng)`
-    pub fn generate<Maze: CellManager>(maze: &mut Maze, rng: &mut dyn RngCore) {
-        Self::new().generate(maze, rng)
+    /// Sugar for `RecursiveBacktrackerGenerator::new().generate(maze)`
+    pub fn generate<Maze: CellManager>(maze: &mut Maze) {
+        Self::new().generate(maze)
     }
 }
 
 impl <Maze: CellManager> MazeGenerator<Maze> for RecursiveBacktrackerGenerator {
-    fn generate(&mut self, maze: &mut Maze, rng: &mut dyn RngCore) {
+    fn generate_with_rng<R: Rng + ?Sized>(&mut self, maze: &mut Maze, rng: &mut R) {
         // Start at the origin
         let mut current_pt = match maze.coord_space().origin() {
             Some(pt) => pt,

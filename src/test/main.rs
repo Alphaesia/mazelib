@@ -11,7 +11,6 @@ use mazelib::implm::template::boxy::SolidBorderTemplate;
 use mazelib::interface::template::Template;
 use mazelib::implm::generate::{NAryTreeGenerator, HuntAndKillGenerator, RecursiveBacktrackerGenerator};
 use mazelib::interface::generate::MazeGenerator;
-use rand::thread_rng;
 use mazelib::implm::cell::inline::{BoxSpaceInlineCellManager, InlineCellValue, InlineCellValueWallType};
 use mazelib::interface::buffer::{BufferLocation, MazeBuffer};
 
@@ -32,7 +31,7 @@ fn main() {
 
     Template::apply(&mut cell_manager);
 
-    Generator::generate(&mut cell_manager, &mut thread_rng());
+    Generator::generate(&mut cell_manager);
 
     let render = Renderer::render(&cell_manager);
 
