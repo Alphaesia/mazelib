@@ -42,13 +42,12 @@ mod implm {
 pub use self::space::BoxCoordinateSpace;
 pub use self::point::CoordinateTuplet;
 
-// TODO link to templates when they're implemented
 /// A flat rectangular coordinate space. The most common type of coordinate space for mazes.
 ///
 /// A 2D coordinate space will produce mazes you can print out on paper.
 ///
 /// While it is optimised for square mazes, you can use whatever maze outline you want.
-/// See &lt;template&gt;s for more information.
+/// See [templates][crate::interface::template] for more information.
 ///
 /// *This is a specialisation of [BoxCoordinateSpace] for two dimensions. See
 /// [CoordinateSpace][crate::interface::point::CoordinateSpace] and [BoxCoordinateSpace] for
@@ -65,7 +64,7 @@ pub type CoordinatePair = CoordinateTuplet<2>;
 /// Like [TwoDimensionalBoxCoordinateSpace], but 3D.
 ///
 /// While this is optimised for cuboid mazes, you can use whatever maze outline you want.
-/// See &lt;template&gt;s for more information.
+/// See [templates][crate::interface::template] for more information.
 ///
 /// *This is a specialisation of [BoxCoordinateSpace] for three dimensions. See
 /// [CoordinateSpace][crate::interface::point::CoordinateSpace] and [BoxCoordinateSpace] for
