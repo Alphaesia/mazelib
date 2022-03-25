@@ -1,21 +1,17 @@
-//! Everything to do with reading and manipulating a maze at a high-level.
+//! Reading and manipulating mazes at a high level.
 //!
 //! Mazes are fundamentally a collection of cells. These collections are stored
 //! in [MazeBuffer][crate::interface::buffer::MazeBuffer]s.
-//!
-//! Each cell has a value. While different types of cells can store different information,
-//! the value of each cell is one of four [types][CellValueType]: [PASSAGE][CellValueType::PASSAGE],
-//! [WALL][CellValueType::WALL], [BOUNDARY][CellValueType::BOUNDARY], or
-//! [UNVISITED][CellValueType::UNVISITED].
 //!
 //! While a collection of cells constitutes a maze, they need to be
 //! interpreted before any useful analysis can be done. This is the purpose
 //! of [CellManager] - to hold the necessary information for interpreting
 //! cells.
 //!
-//! Recommended reading order:
+//! # Recommended Reading
+//! *(In order)*
 //! 1. [CellValue]
-//! 2. [CellValueType]
+//! 2. [CellConnectionType]
 //! 3. [CellManager]
 
 use std::fmt::Debug;
@@ -46,7 +42,7 @@ use crate::internal::noise_util::pt;
 /// an out-of-bounds write; memory safety is always preserved.
 ///
 /// *Note: In the source, `<<Self as CellManager>::CoordSpace as CoordinateSpace>::PtType` is
-/// contracted to `pt!()` for readability.*
+/// contracted to `pt!()` for brevity.*
 ///
 /// # Selecting a Cell Space
 ///
@@ -75,31 +71,31 @@ pub trait CellManager: Debug {
     /// you would encounter.
     ///
     /// More specifically:
-    /// * If either side is a [CellValueType::BOUNDARY],
-    ///   return [CellValueType::BOUNDARY].
-    /// * Else, if either side is [CellValueType::UNVISITED],
-    ///   return [CellValueType::UNVISITED].
-    /// * Else, if either side is a [CellValueType::WALL],
-    ///   return [CellValueType::WALL].
-    /// * Else, return [CellValueType::PASSAGE].
+    /// * If either side is a [CellConnectionType::BOUNDARY],
+    ///   return [CellConnectionType::BOUNDARY].
+    /// * Else, if either side is [CellConnectionType::UNVISITED],
+    ///   return [CellConnectionType::UNVISITED].
+    /// * Else, if either side is a [CellConnectionType::WALL],
+    ///   return [CellConnectionType::WALL].
+    /// * Else, return [CellConnectionType::PASSAGE].
     fn get_connection(&self, from: pt!(), to: pt!()) -> CellConnectionType;
 
-    /// Returns true when [Self::get_connection] returns [CellValueType::PASSAGE].
+    /// Returns true when [Self::get_connection] returns [CellConnectionType::PASSAGE].
     fn is_passage_between(&self, from: pt!(), to: pt!()) -> bool {
         self.get_connection(from, to) == CellConnectionType::PASSAGE
     }
 
-    /// Returns true when [Self::get_connection] returns [CellValueType::WALL].
+    /// Returns true when [Self::get_connection] returns [CellConnectionType::WALL].
     fn is_wall_between(&self, from: pt!(), to: pt!()) -> bool {
         self.get_connection(from, to) == CellConnectionType::WALL
     }
 
-    /// Returns true when [Self::get_connection] returns [CellValueType::BOUNDARY].
+    /// Returns true when [Self::get_connection] returns [CellConnectionType::BOUNDARY].
     fn is_boundary_between(&self, from: pt!(), to: pt!()) -> bool {
         self.get_connection(from, to) == CellConnectionType::BOUNDARY
     }
 
-    /// Returns true when [Self::get_connection] returns [CellValueType::UNVISITED].
+    /// Returns true when [Self::get_connection] returns [CellConnectionType::UNVISITED].
     fn is_unvisited_between(&self, from: pt!(), to: pt!()) -> bool {
         self.get_connection(from, to) == CellConnectionType::UNVISITED
     }
@@ -141,7 +137,7 @@ pub trait CellLocation {}
 /// A value of a cell.
 ///
 /// Cells differ points in one key way. While points are live in the abstract
-/// world of a [CoordinateSpace][crate::interface::point::space::CoordinateSpace],
+/// world of a [CoordinateSpace][crate::interface::point::CoordinateSpace],
 /// cells are in the presentation layer of a maze, the [CellManager]. They are
 /// also what is stored are buffers.
 pub trait CellValue: Copy + Clone + Send + Sync + Sized + PartialEq + Eq + Default + Debug {

@@ -188,7 +188,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Ce
         self.make_between(from, to, InlineCellValueWallType::WALL)
     }
 
-    /// Set `pt` to [super::InlineCellValue::PASSAGE], surrounded by boundaries on all sides.
+    /// Set all edges of `pt` to [InlineCellValueWallType::BOUNDARY].
     fn make_boundary(&mut self, pt: pt!()) {
         self.set(pt, InlineCellValue([[InlineCellValueWallType::BOUNDARY; 2]; DIMENSION]))
     }
