@@ -2,6 +2,6 @@
 //!
 //! If you are looking for [two-dimensional][self::boxy::TwoDimensionalBoxCoordinateSpace]
 //! or [three-dimensional][self::boxy::ThreeDimensionalBoxCoordinateSpace] coordinate spaces,
-//! check out [self::boxy].
+//! check out [`boxy`].
 
 pub mod boxy;

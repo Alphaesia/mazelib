@@ -2,6 +2,9 @@
 //!
 //! If you are not doing anything special, and just generating/solving regular mazes,
 //! you can use the implementations in this crate instead of rolling your own.
+//!
+//! Despite what the name may otherwise imply, public items found in this module are
+//! considered API and are safe to use.
 
 pub mod buffer;
 pub mod point;

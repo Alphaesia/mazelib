@@ -6,7 +6,9 @@ use crate::internal::abs_util::abs_diff;
 use std::ops::Index;
 
 /// An n-dimensional coordinate space shaped like a box.
-/// Basically just think of your regular 2D and 3D cartesian planes/spaces.
+///
+/// Basically just think of your regular 2D and 3D cartesian planes/spaces,
+/// but generalised to n-dimensions.
 ///
 /// All dimensions of the space must be at least 1.
 #[derive(Copy, Clone)]
