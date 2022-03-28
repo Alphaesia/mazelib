@@ -4,8 +4,7 @@ use std::fmt::{Debug, Formatter};
 
 /// A [MazeBuffer] that stores its cells in a fixed-size array.
 ///
-/// `MAX_CELLS` is the maximum capacity of this array.
-///
+/// `MAX_CELLS` is the capacity of the backing array.
 ///
 /// You should probably use [VecBuffer][super::VecBuffer] instead.
 pub struct ArrayBuffer<CellVal: CellValue, const MAX_CELLS: usize> {

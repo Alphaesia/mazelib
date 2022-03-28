@@ -1,49 +1,64 @@
+//! Working maze storage.
+//!
+//! Mazes are typically stored in memory, but do not have to be. It
+//! is up to the implementation of the [MazeBuffer].
+//!
+//! For exporting mazes to persistent forms (like images), see [crate::interface::render].
+//!
+//! # Recommended Reading
+//! * [MazeBuffer]
+
 use std::fmt::Debug;
 use crate::interface::cell::CellValue;
 
-/// A MazeBuffer is a storage vessel for a maze in memory.
-/// It is used to mutate the maze at the most primitive level.
+/// Maze cell container.
 ///
-/// It only accepts single BufferLocations.
+/// Maze buffers store the values of all cells in a maze. This is the meat of the maze. They are
+/// not responsible for other [core maze components], which are held by the
+/// [cell manager][crate::interface::cell::CellManager] instead.
 ///
-/// For general interaction with a maze, a user should use the higher-level
-/// [CellManager][crate::interface::cell::CellManager] API. A maze buffer should only be directly read
-/// from or written to by a [CellManager][crate::interface::cell::CellManager].
+/// A buffer's size is determined at construction, and cannot be changed.
 ///
-/// Likewise, MazeBuffers are not intended to be constructed directly. Rather, they
-/// will be constructed by [CellManager][crate::interface::cell::CellManager]s from information such as the
-/// coordinate space.
+/// Buffers are very low-level and not intended to be interacted with directly. They should
+/// always be accessed through the maze's cell manager.
 ///
-/// A MazeBuffer's size is determined at construction, and cannot be changed.
+/// Likewise, they should not be constructed directly. The maze's cell manager is responsible
+/// for the construction of the buffer.
+///
+/// While most buffers would store their contents in memory, it is conceivable that a buffer
+/// could stream the maze from disk (or elsewhere). This would allow mazes too big to fit in
+/// memory to be generated.
+///
+/// [core maze components]: crate::interface#core-components
 pub trait MazeBuffer<CellVal: CellValue> : Debug + Send {
-    /// Construct a new MazeBuffer.
+    /// Construct a new buffer.
     ///
-    /// `cell_count` is the number of cells that the buffer is required to track. This
-    /// is the buffer's size and capacity. It cannot be changed once a buffer is constructed.
+    /// `cell_count` is the size of the maze's cell space, and is the number of cells that the
+    /// buffer is required to track. This is the buffer's size and capacity. It cannot be changed
+    /// once a buffer is constructed.
     fn new(cell_count: usize) -> Self;
 
     /// Get the value of a given cell.
     ///
-    /// This should *not* be called from maze generation code. This should only be called by
-    /// a [CellManager][crate::interface::cell::CellManager]. All other users should proxy through
-    /// [CellManager::get()][crate::interface::cell::CellManager::get()].
-    ///
     /// # Panics
     ///
-    /// Panics if `loc` is greater than or equal to this buffer's size.
+    /// Panics if `loc` out of bounds (is greater than or equal to this buffer's size).
     fn get(&self, loc: BufferLocation) -> CellVal;
 
     /// Set the value of a given cell.
     ///
-    /// This should *not* be called from maze generation code. This should only be called by
-    /// a [CellManager][crate::interface::cell::CellManager]. All other users should proxy through
-    /// the various [CellManager][crate::interface::cell::CellManager] methods (such as
-    /// [CellManager::make_passage()][crate::interface::cell::CellManager::make_passage()]).
-    ///
     /// # Panics
     ///
-    /// Panics if `loc` is greater than or equal to this buffer's size.
+    /// Panics if `loc` out of bounds (is greater than or equal to this buffer's size).
     fn set(&mut self, loc: BufferLocation, new_value: CellVal);
 }
 
+/// Universal cell ID for interacting with [`MazeBuffer`]s.
+///
+/// A BufferLocation represents the position of a cell in a [MazeBuffer]. It is a
+/// unique sequential ID assigned to each cell.
+///
+/// The exact semantics of how points and cells map to BufferLocations is
+/// unspecified and up to each [CellManager][crate::interface::cell::CellManager].
+/// Typically it will differ between implementations, and is not API.
 pub struct BufferLocation(pub usize);
