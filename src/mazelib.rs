@@ -140,11 +140,15 @@
 //!
 //! ### Think Labyrinth!
 //!
-//! Walter D. Pullen's [Think Labyrinth!](http://www.astrolog.org/labyrnth.htm) has a very
+//! <a href="https://www.astrolog.org/labyrnth.htm"><img src="https://www.astrolog.org/labyrnth/labyrnth.gif"></a>
+//!
+//! Walter D. Pullen's [Think Labyrinth!](https://www.astrolog.org/labyrnth.htm) has a very
 //! comprehensive reference on all aspects of mazes, including the various characteristics
 //! of different algorithms and a glossary of maze-related terms.
 //!
 //! ### Buckblog & Mazes for Programmers
+//!
+//! <a href="http://www.mazesforprogrammers.com/"><img src="https://imagery.pragprog.com/products/439/jbmaze_largecover.jpg?1421259509"></a>
 //!
 //! For precise information about how maze generation algorithms actually work and how to
 //! implement them yourself, Jamis Buck has some great blog entries on the subject.
@@ -158,7 +162,7 @@
 //! It discusses generating mazes, solving mazes, mazes on cubes, spheres, cylinders,
 //! and mobius strips, and more.
 //!
-//! You can find it at <https://pragprog.com/titles/jbmaze/mazes-for-programmers/>.
+//! <http://www.mazesforprogrammers.com>.
 //!
 //! # Glossary
 //!
