@@ -1,6 +1,8 @@
 use crate::implm::cell::inline::InlineCellValueWallType::UNVISITED;
 use crate::interface::cell::CellValue;
 
+/// TODO rewrite
+///
 /// The first element is the cell in the positive direction,
 /// the 2nd is the cell in the negative direction.
 /// Even if it is `None` for a particular direction, the

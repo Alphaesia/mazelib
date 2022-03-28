@@ -4,13 +4,17 @@ use crate::implm::cell::inline::value::InlineCellValueWallType;
 use crate::implm::point::boxy::BoxCoordinateSpace;
 use crate::implm::render::text::BoxSpaceTextMazeRenderer;
 use crate::interface::buffer::{BufferLocation, MazeBuffer};
-use crate::interface::cell::{CellManager, CellConnectionType};
+use crate::interface::cell::{CellManager, ConnectionType};
 use crate::interface::point::CoordinateSpace;
 use crate::interface::render::MazeRenderer;
 use crate::internal::abs_util::abs_diff;
 use crate::internal::array_util::Product;
 use crate::pt;
 
+/// As this manager implements a one-to-one mapping between points and cells, there is
+/// no separate [CellLocation][crate::interface::cell::CellLocation] struct.
+/// [CoordinateTuplet][crate::implm::point::boxy::CoordinateTuplet]s are converted directly
+/// into [BufferLocation]s.
 pub struct BoxSpaceInlineCellManager<Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> {
     buffer: Buffer,
     space: BoxCoordinateSpace<DIMENSION>,
@@ -129,7 +133,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Ce
         self.buffer.get(self.pt_to_buffer_loc(pt))
     }
 
-    fn get_connection(&self, from: pt!(), to: pt!()) -> CellConnectionType {
+    fn get_connection(&self, from: pt!(), to: pt!()) -> ConnectionType {
         let axis_of_adjacency = Self::get_axis_of_adjacency(from, to).expect("from and to are not adjacent");
 
         let (from_wall_side, to_wall_side) = if from[axis_of_adjacency] < to[axis_of_adjacency] {
@@ -142,10 +146,10 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Ce
         let to_wall = self.get(to).0[axis_of_adjacency][to_wall_side];
 
         return match [from_wall, to_wall] {
-            [InlineCellValueWallType::BOUNDARY,  _] | [_, InlineCellValueWallType::BOUNDARY ] => CellConnectionType::BOUNDARY,
-            [InlineCellValueWallType::UNVISITED, _] | [_, InlineCellValueWallType::UNVISITED] => CellConnectionType::UNVISITED,
-            [InlineCellValueWallType::WALL,      _] | [_, InlineCellValueWallType::WALL     ] => CellConnectionType::WALL,
-            [InlineCellValueWallType::PASSAGE, InlineCellValueWallType::PASSAGE]              => CellConnectionType::PASSAGE,
+            [InlineCellValueWallType::BOUNDARY,  _] | [_, InlineCellValueWallType::BOUNDARY ] => ConnectionType::BOUNDARY,
+            [InlineCellValueWallType::UNVISITED, _] | [_, InlineCellValueWallType::UNVISITED] => ConnectionType::UNVISITED,
+            [InlineCellValueWallType::WALL,      _] | [_, InlineCellValueWallType::WALL     ] => ConnectionType::WALL,
+            [InlineCellValueWallType::PASSAGE, InlineCellValueWallType::PASSAGE]              => ConnectionType::PASSAGE,
         };
     }
 

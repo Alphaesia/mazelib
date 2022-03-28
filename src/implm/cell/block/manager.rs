@@ -1,5 +1,5 @@
 use crate::interface::buffer::{MazeBuffer, BufferLocation};
-use crate::interface::cell::{CellManager, CellConnectionType};
+use crate::interface::cell::{CellManager, ConnectionType};
 use crate::implm::point::boxy::{BoxCoordinateSpace};
 use crate::internal::noise_util::pt;
 use crate::interface::point::CoordinateSpace;
@@ -12,10 +12,7 @@ use crate::implm::cell::block::BlockCellValue;
 use crate::implm::cell::block::cell::BlockCell;
 use std::marker::PhantomData;
 
-/// Each maze has a scale factor. This determines the cellular distance between points.
-/// With a scale factor of 1 in a direction, points along that axis will map to adjacent
-/// cells. With a factor of 2, there will be one cell in between each point. With a factor
-/// of 3, there will be two cells between each point, etc.
+/// TODO write a description
 ///
 /// # Examples
 ///
@@ -64,7 +61,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
         &self.buffer
     }
 
-    /// The dimensions of the coordinate space, scaled by the resolution, plus padding
+    /// The dimensions of the coordinate space, scaled by the resolution, plus padding.
     pub fn get_full_dimensions(&self) -> [usize; DIMENSION] {
         self.full_dimensions
     }
@@ -73,6 +70,9 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     ///
     /// A scale factor of 1 would have each point directly adjacent to one another.
     /// A scale factor of 2 will have 1 cell between each point.
+    ///
+    /// Does not affect the distance of points from the outer edge of the maze (see
+    /// [`padding()`][Self::padding]).
     pub fn scale_factor(&self) -> [usize; DIMENSION] {
         self.scale_factor
     }
@@ -195,12 +195,12 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> CellManager fo
         self.get_cell(self.map_pt(pt))
     }
 
-    fn get_connection(&self, from: pt!(), to: pt!()) -> CellConnectionType {
+    fn get_connection(&self, from: pt!(), to: pt!()) -> ConnectionType {
         match [self.get(from), self.get(to)] {
-            [Self::CellVal::BOUNDARY,  _] | [_, Self::CellVal::BOUNDARY ] => CellConnectionType::BOUNDARY,
-            [Self::CellVal::UNVISITED, _] | [_, Self::CellVal::UNVISITED] => CellConnectionType::UNVISITED,
-            [Self::CellVal::WALL,      _] | [_, Self::CellVal::WALL     ] => CellConnectionType::WALL,
-            [Self::CellVal::PASSAGE,  Self::CellVal::PASSAGE]             => CellConnectionType::PASSAGE,
+            [Self::CellVal::BOUNDARY,  _] | [_, Self::CellVal::BOUNDARY ] => ConnectionType::BOUNDARY,
+            [Self::CellVal::UNVISITED, _] | [_, Self::CellVal::UNVISITED] => ConnectionType::UNVISITED,
+            [Self::CellVal::WALL,      _] | [_, Self::CellVal::WALL     ] => ConnectionType::WALL,
+            [Self::CellVal::PASSAGE,  Self::CellVal::PASSAGE]             => ConnectionType::PASSAGE,
         }
     }
 
