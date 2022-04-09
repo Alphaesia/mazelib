@@ -2,7 +2,6 @@ use crate::interface::point::CoordinateSpace;
 use crate::implm::point::boxy::CoordinateTuplet;
 use crate::implm::point::boxy::implm::BoxCoordinateSpaceIterator;
 use crate::internal::array_util::Product;
-use crate::internal::abs_util::abs_diff;
 use std::ops::Index;
 
 /// An n-dimensional coordinate space shaped like a box.
@@ -94,7 +93,7 @@ impl <const DIMENSION: usize> CoordinateSpace for BoxCoordinateSpace<DIMENSION> 
 
     fn are_adjacent(pt1: Self::PtType, pt2: Self::PtType) -> bool {
         for dim in 0..DIMENSION {
-            if abs_diff(pt1[dim], pt2[dim]) == 1 {
+            if pt1[dim].abs_diff(pt2[dim]) == 1 {
                 return true
             }
         }

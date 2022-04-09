@@ -7,7 +7,6 @@ use crate::interface::buffer::{BufferLocation, MazeBuffer};
 use crate::interface::cell::{CellManager, ConnectionType};
 use crate::interface::point::CoordinateSpace;
 use crate::interface::render::MazeRenderer;
-use crate::internal::abs_util::abs_diff;
 use crate::internal::array_util::Product;
 use crate::pt;
 
@@ -60,7 +59,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Bo
     /// Returns None if the points are identical or not adjacent.
     fn get_axis_of_adjacency(pt1: pt!(), pt2: pt!()) -> Option<usize> {
         for i in 0..DIMENSION {
-            if abs_diff(pt1[i], pt2[i]) == 1 {
+            if pt1[i].abs_diff(pt2[i]) == 1 {
                 return Some(i)
             }
         }

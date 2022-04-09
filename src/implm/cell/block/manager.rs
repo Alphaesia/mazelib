@@ -4,7 +4,6 @@ use crate::implm::point::boxy::{BoxCoordinateSpace};
 use crate::internal::noise_util::pt;
 use crate::interface::point::CoordinateSpace;
 use std::fmt::{Debug, Formatter};
-use crate::internal::abs_util::abs_diff;
 use crate::internal::array_util::{Product, Sum};
 use crate::implm::render::text::BoxSpaceTextMazeRenderer;
 use crate::interface::render::MazeRenderer;
@@ -143,7 +142,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// Returns None if the points are identical or not adjacent.
     fn get_axis_of_adjacency(pt1: pt!(), pt2: pt!()) -> Option<usize> {
         for i in 0..DIMENSION {
-            if abs_diff(pt1[i], pt2[i]) == 1 {
+            if pt1[i].abs_diff(pt2[i]) == 1 {
                 return Some(i)
             }
         }
