@@ -46,11 +46,17 @@ jobs:
           profile: minimal
           override: true
           components: rustfmt, rust-src
+\
+      - name: Build docs
+        uses: actions-rs/cargo@v1
+        with:
+          command: cargo doc
+          args: --lib --no-deps
 
-      - name: Build Documentation
-        run: cargo doc --all --no-deps && echo '<meta http-equiv=refresh content=0;url=mazelib/index.html>' > target/doc/index.html
+      - name: Create index.html redirect
+        run: echo '<meta http-equiv=refresh content=0;url=mazelib/index.html>' > target/doc/index.html
 
-      - name: Deploy Docs
+      - name: Deploy docs
         uses: peaceiris/actions-gh-pages@364c31d33bb99327c77b3a5438a83a357a6729ad # v3.4.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
