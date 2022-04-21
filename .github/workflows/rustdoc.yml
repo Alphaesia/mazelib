@@ -28,7 +28,7 @@ name: rustdoc
 on:
   push:
     branches:
-      - "**"
+      - master
 
 jobs:
   rustdoc:
