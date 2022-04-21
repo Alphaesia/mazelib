@@ -50,7 +50,7 @@ jobs:
       - name: Build docs
         uses: actions-rs/cargo@v1
         with:
-          command: cargo doc
+          command: doc
           args: --lib --no-deps
 
       - name: Create index.html redirect
