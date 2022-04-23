@@ -10,9 +10,13 @@ keywords = ["maze", "mazes", "mz"]
 categories = ["algorithms"]
 publish = false
 
+[features]
+img = []
+
 [dependencies]
 rand = "0.8.4"
 embed-doc-image = "0.1.4"
+image = { version = "0.24.1", default-features = false }
 
 [lib]
 name = "mazelib"

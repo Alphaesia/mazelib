@@ -19,6 +19,12 @@ impl <const DIMENSION: usize> From<[i32; DIMENSION]> for CoordinateTuplet<DIMENS
     }
 }
 
+impl <const DIMENSION: usize> From<[u32; DIMENSION]> for CoordinateTuplet<DIMENSION> {
+    fn from(pt: [u32; DIMENSION]) -> Self {
+        CoordinateTuplet { coords: pt.map(|coord| coord.try_into().expect("coordinate was negative")) }
+    }
+}
+
 impl <const DIMENSION: usize> From<CoordinateTuplet<DIMENSION>> for [usize; DIMENSION] {
     fn from(pt: CoordinateTuplet<DIMENSION>) -> Self {
         pt.coords

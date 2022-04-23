@@ -85,6 +85,12 @@ impl <const DIMENSION: usize> From<[i32; DIMENSION]> for BlockCell<DIMENSION> {
     }
 }
 
+impl <const DIMENSION: usize> From<[u32; DIMENSION]> for BlockCell<DIMENSION> {
+    fn from(pt: [u32; DIMENSION]) -> Self {
+        BlockCell(pt.into())
+    }
+}
+
 impl <const DIMENSION: usize> From<BlockCell<DIMENSION>> for [usize; DIMENSION] {
     fn from(pt: BlockCell<DIMENSION>) -> Self {
         pt.0.into()

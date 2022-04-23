@@ -12,6 +12,7 @@ use mazelib::interface::template::Template;
 use mazelib::implm::generate::{NAryTreeGenerator, HuntAndKillGenerator, RecursiveBacktrackerGenerator};
 use mazelib::interface::generate::MazeGenerator;
 use mazelib::implm::cell::inline::{BoxSpaceInlineCellManager, InlineCellValue, InlineCellValueWallType};
+use mazelib::implm::render::img::BoxSpaceImageMazeRenderer;
 use mazelib::interface::buffer::{BufferLocation, MazeBuffer};
 
 fn main() {
@@ -22,10 +23,10 @@ fn main() {
     type BufferType = VecBuffer<CellType>;
     type CellManager = BoxSpaceBlockCellManagerBuilder<BufferType, DIMENSION>;
     type Template = SolidBorderTemplate;
-    type Generator = NAryTreeGenerator;
-    type Renderer = BoxSpaceTextMazeRenderer;
+    type Generator = HuntAndKillGenerator;
+    type Renderer = BoxSpaceImageMazeRenderer;
 
-    let space = Space::new([7, 7]);
+    let space = Space::new([99, 99]);
 
     let mut cell_manager = CellManager::new(space).build();
 
@@ -35,7 +36,9 @@ fn main() {
 
     let render = Renderer::render(&cell_manager);
 
-    for line in render {
+    render.save("img.png");
+
+    /*for line in render {
         println!("{}", line)
-    }
+    }*/
 }
