@@ -1,16 +1,14 @@
 use std::collections::HashMap;
-use std::fs::File;
+use std::io::{Write, Result};
 use std::time::SystemTime;
 use crate::interface::buffer::MazeBuffer;
-use crate::interface::render::MazeRenderer;
+use crate::interface::render::MazeRendererNonSeeking;
 use crate::implm::cell::block::{BoxSpaceBlockCellManager, BlockCellValue};
 use crate::implm::render::minecraft::{BoxSpaceSchematicMazeRenderer, SchematicMazeRenderer};
 use crate::implm::render::minecraft::schem::{SpongeSchematicV3, SpongeSchematicV3SchematicObject, SpongeSchematicV3MetadataObject, SpongeSchematicV3BlockContainer};
 
-impl <Buffer: MazeBuffer<BlockCellValue>> MazeRenderer<BoxSpaceBlockCellManager<Buffer, 2>> for BoxSpaceSchematicMazeRenderer {
-    type Output = ();
-
-    fn render(maze: &BoxSpaceBlockCellManager<Buffer, 2>) -> Self::Output {
+impl <Buffer: MazeBuffer<BlockCellValue>> MazeRendererNonSeeking<BoxSpaceBlockCellManager<Buffer, 2>> for BoxSpaceSchematicMazeRenderer {
+    fn render<Output: Write>(&self, maze: &BoxSpaceBlockCellManager<Buffer, 2>, output: &mut Output) -> Result<()> {
         // Spec: https://github.com/SpongePowered/Schematic-Specification/blob/master/versions/schematic-3.md
 
         let [width, length] = maze.get_full_dimensions().map(|dim| TryInto::<u16>::try_into(dim).expect("Cannot render mazes with dimensions larger than u16"));
@@ -75,10 +73,12 @@ impl <Buffer: MazeBuffer<BlockCellValue>> MazeRenderer<BoxSpaceBlockCellManager<
             }
         };
 
-        // TODO make all renderers write to io::Writers
-        match nbt::to_gzip_writer(&mut File::create("test.schem").unwrap(), &schem, None) {
-            Ok(_) => (),
-            Err(err) => { dbg!(err); panic!() }
+        return match nbt::to_gzip_writer(output, &schem, None) {
+            Ok(_) => Ok(()),
+            Err(err) => match err {
+                nbt::Error::IoError(err) => Err(err),
+                err => panic!("[Bug] Failed to serialise schematic: {}", err),
+            }
         }
     }
 }

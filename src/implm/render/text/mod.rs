@@ -1,14 +1,13 @@
 use crate::interface::cell::CellManager;
-use crate::interface::render::MazeRenderer;
+use crate::interface::render::MazeRendererNonSeeking;
 
 mod block;
 mod inline;
+mod line_break;
 
 /// Render a two-dimensional maze (i.e. `BoxCoordinateSpace<2>`) into text and return it.
 ///
-/// Notes:
-/// * Text may contain Unicode characters (not just ASCII).
-/// * Exact output may change and should not be depended upon.
+/// The output may contain any UTF-8 codepoint, not just ASCII.
 pub struct BoxSpaceTextMazeRenderer {
     _private: ()
 }
@@ -19,4 +18,4 @@ impl BoxSpaceTextMazeRenderer {
     }
 }
 
-pub trait TextMazeRenderer<CellSpace: CellManager> : MazeRenderer<CellSpace, Output=Vec<String>> {}
+pub trait TextMazeRenderer<CellSpace: CellManager> : MazeRendererNonSeeking<CellSpace> {}

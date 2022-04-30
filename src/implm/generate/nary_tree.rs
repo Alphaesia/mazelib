@@ -17,8 +17,7 @@ impl NAryTreeGenerator {
     }
 
     /// Sugar for `NAryTreeGenerator::new().generate(maze)`
-    pub fn generate<Maze: CellManager<CoordSpace=BoxCoordinateSpace<DIMENSION>>, const DIMENSION: usize>(maze: &mut Maze)
-    {
+    pub fn generate<Maze: CellManager<CoordSpace=BoxCoordinateSpace<DIMENSION>>, const DIMENSION: usize>(maze: &mut Maze) {
         Self::new().generate(maze)
     }
 }

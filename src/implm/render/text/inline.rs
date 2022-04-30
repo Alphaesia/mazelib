@@ -1,13 +1,13 @@
-use crate::interface::render::MazeRenderer;
+use std::io::{Write, Result};
+use crate::interface::render::MazeRendererNonSeeking;
 use crate::interface::cell::CellManager;
 use crate::implm::cell::inline::{BoxSpaceInlineCellManager, InlineCellValue, InlineCellValueWallType as WallType};
 use crate::interface::buffer::{MazeBuffer, BufferLocation};
 use crate::implm::render::text::{TextMazeRenderer, BoxSpaceTextMazeRenderer};
+use crate::implm::render::text::line_break::WriteLineBreak;
 
-impl <Buffer: MazeBuffer<InlineCellValue<2>>> MazeRenderer<BoxSpaceInlineCellManager<Buffer, 2>> for BoxSpaceTextMazeRenderer {
-    type Output = Vec<String>;
-
-    fn render(maze: &BoxSpaceInlineCellManager<Buffer, 2>) -> Self::Output {
+impl <Buffer: MazeBuffer<InlineCellValue<2>>> MazeRendererNonSeeking<BoxSpaceInlineCellManager<Buffer, 2>> for BoxSpaceTextMazeRenderer {
+    fn render<Output: Write>(&self, maze: &BoxSpaceInlineCellManager<Buffer, 2>, output: &mut Output) -> Result<()> {
         let [width, height] = maze.coord_space().dimensions();
 
         // Below +1's: cause we're looking at walls not cells
@@ -20,9 +20,8 @@ impl <Buffer: MazeBuffer<InlineCellValue<2>>> MazeRenderer<BoxSpaceInlineCellMan
         // (bottom and right can be worked out at print time)
         let mut wall_connections = vec![[WallType::PASSAGE; 2]; height + 1];
 
-        let mut render = Vec::with_capacity((width + 1) * (height + 1));
-
         for y in 0..height {
+            // TODO can we get rid of these and just write to the output directly?
             // We render two lines simultaneously
             let mut line_top_walls: String = String::with_capacity(width * 2 + 1);
             let mut line_side_walls: String = String::with_capacity(width * 2 + 1);
@@ -89,8 +88,9 @@ impl <Buffer: MazeBuffer<InlineCellValue<2>>> MazeRenderer<BoxSpaceInlineCellMan
                 wall_connections[width][1] = wall_previously;
             }
 
-            render.push(line_top_walls);
-            render.push(line_side_walls);
+            output.write_all(line_top_walls.as_bytes())?;
+            output.write_all(line_side_walls.as_bytes())?;
+            output.write_line_break()?;
         }
 
         // Draw the bottom side
@@ -117,10 +117,11 @@ impl <Buffer: MazeBuffer<InlineCellValue<2>>> MazeRenderer<BoxSpaceInlineCellMan
             // Bottom-right corner
             line.push(Self::get_box_char(wall_connections[width][0], wall_connections[width][1], WallType::PASSAGE, WallType::PASSAGE));
 
-            render.push(line);
+            output.write_all(line.as_bytes())?;
+            output.write_line_break()?;
         }
 
-        return render;
+        return Ok(())
     }
 }
 

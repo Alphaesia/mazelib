@@ -1,34 +1,32 @@
+use std::io::{Result, Write};
 use crate::interface::buffer::{MazeBuffer, BufferLocation};
-use crate::interface::render::MazeRenderer;
+use crate::interface::render::MazeRendererNonSeeking;
 use crate::implm::cell::block::{BoxSpaceBlockCellManager, BlockCellValue};
 use crate::implm::render::text::{TextMazeRenderer, BoxSpaceTextMazeRenderer};
+use crate::implm::render::text::line_break::WriteLineBreak;
 
-impl <Buffer: MazeBuffer<BlockCellValue>> MazeRenderer<BoxSpaceBlockCellManager<Buffer, 2>> for BoxSpaceTextMazeRenderer {
-    type Output = Vec<String>;
-
-    fn render(maze: &BoxSpaceBlockCellManager<Buffer, 2>) -> Self::Output {
+impl <Buffer: MazeBuffer<BlockCellValue>> MazeRendererNonSeeking<BoxSpaceBlockCellManager<Buffer, 2>> for BoxSpaceTextMazeRenderer {
+    fn render<Output: Write>(&self, maze: &BoxSpaceBlockCellManager<Buffer, 2>, output: &mut Output) -> Result<()> {
         let [width, height] = maze.get_full_dimensions();
 
-        let mut render = Vec::with_capacity(height);
-
         for y in 0..height {
-            let mut line: String = String::with_capacity(width);
-
             for x in 0..width {
                 let pt = BufferLocation(x + y * width);
 
-                line.push(match maze.buffer().get(pt) {
+                let char = match maze.buffer().get(pt) {
                     BlockCellValue::PASSAGE => ' ',
                     BlockCellValue::WALL => '█',
                     BlockCellValue::BOUNDARY => '█',
                     BlockCellValue::UNVISITED => '.'
-                });
+                };
+
+                output.write_all(char.to_string().as_bytes())?;
             };
 
-            render.push(line);
+            output.write_line_break()?;
         }
 
-        return render
+        return Ok(())
     }
 }
 

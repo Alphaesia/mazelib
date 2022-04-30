@@ -1,11 +1,13 @@
 #![allow(unused, unused_imports, unused_mut)]
 #![feature(generic_arg_infer)]
 
+use std::io;
+use std::io::BufWriter;
 use mazelib::implm::point::boxy::BoxCoordinateSpace;
 use mazelib::implm::buffer::VecBuffer;
 use mazelib::implm::cell::block::{BoxSpaceBlockCellManager, BlockCellValue, BoxSpaceBlockCellManagerBuilder};
 use mazelib::implm::render::text::BoxSpaceTextMazeRenderer;
-use mazelib::interface::render::MazeRenderer;
+use mazelib::interface::render::MazeRendererNonSeeking;
 use mazelib::interface::cell::CellManager;
 use mazelib::implm::template::boxy::SolidBorderTemplate;
 use mazelib::interface::template::Template;
@@ -25,7 +27,7 @@ fn main() {
     type CellManager = BoxSpaceBlockCellManagerBuilder<BufferType, DIMENSION>;
     type Template = SolidBorderTemplate;
     type Generator = HuntAndKillGenerator;
-    type Renderer = BoxSpaceSchematicMazeRenderer;
+    type Renderer = BoxSpaceTextMazeRenderer;
 
     let space = Space::new([9, 9]);
 
@@ -35,11 +37,5 @@ fn main() {
 
     Generator::generate(&mut cell_manager);
 
-    let render = Renderer::render(&cell_manager);
-
-    //render.save("img.png");
-
-    /*for line in render {
-        println!("{}", line)
-    }*/
+    let render = Renderer::new().render(&cell_manager, &mut BufWriter::new(io::stdout()));
 }

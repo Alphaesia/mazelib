@@ -13,8 +13,9 @@ mod schem;
 /// directly with the vanilla game, and must be imported with mods or 3rd-party tools (such as
 /// [WorldEdit](https://enginehub.org/worldedit/)).
 ///
-/// Notes:
-/// * Exact output may change and should not be depended upon.
+/// The blocks used cannot be changed, however most programs that let you import schematics
+/// also let you replace blocks of one type with another. The vanilla game also supports this
+/// on small areas with [`/fill <from> <to> replace <block>`](https://minecraft.fandom.com/wiki/Commands/fill).
 pub struct BoxSpaceSchematicMazeRenderer {
     _private: ()
 }
@@ -25,4 +26,4 @@ impl BoxSpaceSchematicMazeRenderer {
     }
 }
 
-pub trait SchematicMazeRenderer<CellSpace: CellManager> : MazeRenderer<CellSpace, Output=()> {}
+pub trait SchematicMazeRenderer<CellSpace: CellManager> : MazeRenderer<CellSpace> {}

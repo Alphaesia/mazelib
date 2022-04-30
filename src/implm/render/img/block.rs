@@ -1,13 +1,12 @@
-use image::{Rgba, RgbaImage};
+use std::io::{Write, Result, Seek};
+use image::{ImageError, Rgba, RgbaImage};
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::render::MazeRenderer;
 use crate::implm::cell::block::{BoxSpaceBlockCellManager, BlockCellValue};
 use crate::implm::render::img::{BoxSpaceImageMazeRenderer, ImageMazeRenderer};
 
 impl <Buffer: MazeBuffer<BlockCellValue>> MazeRenderer<BoxSpaceBlockCellManager<Buffer, 2>> for BoxSpaceImageMazeRenderer {
-    type Output = RgbaImage;
-
-    fn render(maze: &BoxSpaceBlockCellManager<Buffer, 2>) -> Self::Output {
+    fn render<Output: Write + Seek>(&self, maze: &BoxSpaceBlockCellManager<Buffer, 2>, output: &mut Output) -> Result<()> {
         let [width, height] = maze.get_full_dimensions().map(|dim| TryInto::<u32>::try_into(dim).expect("Cannot render mazes with dimensions larger than u32"));
 
         let mut img = RgbaImage::new(width, height);
@@ -24,7 +23,13 @@ impl <Buffer: MazeBuffer<BlockCellValue>> MazeRenderer<BoxSpaceBlockCellManager<
             }
         }
 
-        return img;
+        return match img.write_to(output, self.format) {
+            Ok(_) => Ok(()),
+            Err(err) => match err {
+                ImageError::IoError(err) => Err(err),
+                err => panic!("[Bug] Failed to write image: {}", err),
+            }
+        }
     }
 }
 

@@ -6,10 +6,10 @@ use crate::interface::point::CoordinateSpace;
 use std::fmt::{Debug, Formatter};
 use crate::internal::array_util::{Product, Sum};
 use crate::implm::render::text::BoxSpaceTextMazeRenderer;
-use crate::interface::render::MazeRenderer;
 use crate::implm::cell::block::BlockCellValue;
 use crate::implm::cell::block::cell::BlockCell;
 use std::marker::PhantomData;
+use crate::interface::render::MazeRendererNonSeeking;
 
 /// TODO write a description
 ///
@@ -356,7 +356,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
         writeln!(f, "\tpadding: {:?}", self.padding)?;
         writeln!(f, "\tfull_dimensions: {:?}", self.full_dimensions)?;
 
-        return Result::Ok(())
+        return Ok(())
     }
 }
 
@@ -365,7 +365,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> Debug for BoxS
         self.write_main_dbg_fmt(f)?;
         writeln!(f, "}}")?;
 
-        return Result::Ok(())
+        return Ok(())
     }
 }
 
@@ -375,12 +375,20 @@ impl <Buffer: MazeBuffer<BlockCellValue>> Debug for BoxSpaceBlockCellManager<Buf
 
         writeln!(f)?;
 
-        for line in BoxSpaceTextMazeRenderer::render(self) {
+        let mut render = Vec::<u8>::new();
+
+        if let Err(err) = BoxSpaceTextMazeRenderer::new().render(self, &mut render) {
+            panic!("{}", err)
+        }
+
+        let render = std::str::from_utf8(&render).expect("BoxSpaceTextMazeRenderer did not produce valid UTF-8");
+
+        for line in render.lines() {
             writeln!(f, "\t{}", line)?;
         };
 
         writeln!(f, "}}")?;
 
-        return Result::Ok(())
+        return Ok(())
     }
 }
