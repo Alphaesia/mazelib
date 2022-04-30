@@ -115,7 +115,7 @@
 //!
 //! # Reading Order
 //!
-//! Firstly, read the previous section in this page on the crate [architecture](#architecture).
+//! Firstly, read the previous section in this page on the [crate architecture](#architecture).
 //!
 //! Then, you should read the module-level docs of [crate::interface]. It explains all of the
 //! key interfaces and their role in our maze model.

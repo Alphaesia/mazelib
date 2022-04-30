@@ -6,8 +6,8 @@
 //!
 //! # Recommended Reading
 //!
-//! 1. [MazeGenerator] --- the generator interface.
-//! 2. [crate::implm::generate] --- a comparison of the builtin generators.
+//! 1. [`MazeGenerator`] --- the generator interface.
+//! 2. [`crate::implm::generate`] --- a comparison of the builtin generators.
 
 use crate::interface::cell::CellManager;
 
