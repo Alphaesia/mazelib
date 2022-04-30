@@ -32,7 +32,7 @@ on:
 
 jobs:
   rustdoc:
-    if: github.repository == 'Alphaesia/mzlib'
+    if: github.repository == 'Alphaesia/mazelib'
     runs-on: ubuntu-latest
 
     steps:
