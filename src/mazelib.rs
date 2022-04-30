@@ -9,16 +9,16 @@
 //! though!
 //!
 //! ```
-//! # use mazelib::implm::buffer::VecBuffer;
-//! # use mazelib::implm::cell::block::{BlockCellValue, BoxSpaceBlockCellManagerBuilder};
-//! # use mazelib::implm::cell::inline::{BoxSpaceInlineCellManager, InlineCellValue};
-//! # use mazelib::implm::generate::HuntAndKillGenerator;
-//! # use mazelib::implm::point::boxy::BoxCoordinateSpace;
-//! # use mazelib::implm::render::text::BoxSpaceTextMazeRenderer;
-//! # use mazelib::implm::template::boxy::SolidBorderTemplate;
-//! # use mazelib::interface::render::MazeRenderer;
-//! # use mazelib::interface::template::Template;
-//! #
+//! use mazelib::implm::buffer::VecBuffer;
+//! use mazelib::implm::cell::block::{BlockCellValue, BoxSpaceBlockCellManagerBuilder};
+//! use mazelib::implm::cell::inline::{BoxSpaceInlineCellManager, InlineCellValue};
+//! use mazelib::implm::generate::HuntAndKillGenerator;
+//! use mazelib::implm::point::boxy::BoxCoordinateSpace;
+//! use mazelib::implm::render::text::BoxSpaceTextMazeRenderer;
+//! use mazelib::implm::template::boxy::SolidBorderTemplate;
+//! use mazelib::interface::render::MazeRendererNonSeeking;
+//! use mazelib::interface::template::Template;
+//!
 //! // 2 for a 2D maze, 3 for a 3D maze, etc.
 //! const DIMENSION: usize = 2;
 //!
@@ -41,10 +41,7 @@
 //! HuntAndKillGenerator::generate(&mut maze);
 //!
 //! // Print the maze as text
-//! let maze_as_text = BoxSpaceTextMazeRenderer::render(&maze);
-//! for line in maze_as_text {
-//!     println!("{}", line)
-//! }
+//! let maze_as_text = BoxSpaceTextMazeRenderer::new().render(&maze, &mut std::io::stdout());
 //! ```
 //! produces
 //! ```text
