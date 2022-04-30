@@ -4,7 +4,7 @@ A flexible and ambitious W.I.P. library to create, solve, and analyse mazes of a
 
 ## Documentation
 
-The latest rustdoc can be found on GitHub pages at <https://alphaesia.github.io/mzlib/mazelib/index.html>.
+The latest rustdoc can be found on GitHub pages at <https://alphaesia.github.io/mazelib/mazelib/index.html>.
 
 ## Planned Features
 
