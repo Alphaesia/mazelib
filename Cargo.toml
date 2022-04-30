@@ -17,6 +17,8 @@ img = []
 rand = "0.8.4"
 embed-doc-image = "0.1.4"
 image = { version = "0.24.1", default-features = false }
+hematite-nbt = "0.5.2"
+serde = "1.0.136"
 
 [lib]
 name = "mazelib"

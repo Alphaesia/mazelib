@@ -13,6 +13,7 @@ use mazelib::implm::generate::{NAryTreeGenerator, HuntAndKillGenerator, Recursiv
 use mazelib::interface::generate::MazeGenerator;
 use mazelib::implm::cell::inline::{BoxSpaceInlineCellManager, InlineCellValue, InlineCellValueWallType};
 use mazelib::implm::render::img::BoxSpaceImageMazeRenderer;
+use mazelib::implm::render::minecraft::BoxSpaceSchematicMazeRenderer;
 use mazelib::interface::buffer::{BufferLocation, MazeBuffer};
 
 fn main() {
@@ -24,9 +25,9 @@ fn main() {
     type CellManager = BoxSpaceBlockCellManagerBuilder<BufferType, DIMENSION>;
     type Template = SolidBorderTemplate;
     type Generator = HuntAndKillGenerator;
-    type Renderer = BoxSpaceImageMazeRenderer;
+    type Renderer = BoxSpaceSchematicMazeRenderer;
 
-    let space = Space::new([99, 99]);
+    let space = Space::new([9, 9]);
 
     let mut cell_manager = CellManager::new(space).build();
 
@@ -36,7 +37,7 @@ fn main() {
 
     let render = Renderer::render(&cell_manager);
 
-    render.save("img.png");
+    //render.save("img.png");
 
     /*for line in render {
         println!("{}", line)
