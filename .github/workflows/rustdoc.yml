@@ -51,7 +51,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: doc
-          args: --lib --no-deps
+          args: --lib --no-deps --all-features
 
       - name: Create index.html redirect
         run: echo '<meta http-equiv=refresh content=0;url=mazelib/index.html>' > target/doc/index.html
