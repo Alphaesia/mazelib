@@ -26,8 +26,12 @@ impl <Buffer: MazeBuffer<BlockCellValue>> MazeRenderer<BoxSpaceBlockCellManager<
         return match img.write_to(output, self.format) {
             Ok(_) => Ok(()),
             Err(err) => match err {
+                ImageError::Decoding(_) => unreachable!("Decoding error encountered during encoding???"),
+                ImageError::Encoding(err) => panic!("[Bug] Failed to write image: {}", err),
+                ImageError::Parameter(err) => panic!("[Bug] Failed to write image: {}", err),
+                ImageError::Limits(err) => panic!("{}", err),
+                ImageError::Unsupported(err) => panic!("{}", err),
                 ImageError::IoError(err) => Err(err),
-                err => panic!("[Bug] Failed to write image: {}", err),
             }
         }
     }

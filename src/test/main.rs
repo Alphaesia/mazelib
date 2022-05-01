@@ -1,8 +1,10 @@
 #![allow(unused, unused_imports, unused_mut)]
 #![feature(generic_arg_infer)]
 
+use std::fs::File;
 use std::io;
 use std::io::BufWriter;
+//use image::ImageFormat;
 use mazelib::implm::point::boxy::BoxCoordinateSpace;
 use mazelib::implm::buffer::VecBuffer;
 use mazelib::implm::cell::block::{BoxSpaceBlockCellManager, BlockCellValue, BoxSpaceBlockCellManagerBuilder};
@@ -14,8 +16,8 @@ use mazelib::interface::template::Template;
 use mazelib::implm::generate::{NAryTreeGenerator, HuntAndKillGenerator, RecursiveBacktrackerGenerator};
 use mazelib::interface::generate::MazeGenerator;
 use mazelib::implm::cell::inline::{BoxSpaceInlineCellManager, InlineCellValue, InlineCellValueWallType};
-use mazelib::implm::render::img::BoxSpaceImageMazeRenderer;
-use mazelib::implm::render::minecraft::BoxSpaceSchematicMazeRenderer;
+//use mazelib::implm::render::img::BoxSpaceImageMazeRenderer;
+//use mazelib::implm::render::minecraft::BoxSpaceSchematicMazeRenderer;
 use mazelib::interface::buffer::{BufferLocation, MazeBuffer};
 
 fn main() {
@@ -37,5 +39,7 @@ fn main() {
 
     Generator::generate(&mut cell_manager);
 
-    let render = Renderer::new().render(&cell_manager, &mut BufWriter::new(io::stdout()));
+    let output = std::io::stdout();
+
+    Renderer::new().render(&cell_manager, &mut BufWriter::new(output)).unwrap();
 }

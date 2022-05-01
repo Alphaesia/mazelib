@@ -1,3 +1,6 @@
+#![cfg(any(feature = "minecraft", doc))]
+#![doc(cfg(feature = "minecraft"))]
+
 use crate::interface::cell::CellManager;
 use crate::interface::render::MazeRenderer;
 

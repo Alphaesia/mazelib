@@ -1,3 +1,6 @@
+#![cfg(any(feature = "img", doc))]
+#![doc(cfg(feature = "img"))]
+
 use image::ImageFormat;
 use crate::interface::cell::CellManager;
 use crate::interface::render::MazeRenderer;
