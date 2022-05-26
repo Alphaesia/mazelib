@@ -48,10 +48,7 @@ jobs:
           components: rustfmt, rust-src
 
       - name: Build docs
-        uses: actions-rs/cargo@v1
-        with:
-          command: doc
-          args: --lib --no-deps --all-features
+        run: rustdoc --lib --color=always --all-features -- --extend-css src/doc/override.css
 
       - name: Create index.html redirect
         run: echo '<meta http-equiv=refresh content=0;url=mazelib/index.html>' > target/doc/index.html
