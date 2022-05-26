@@ -1,4 +1,5 @@
 use std::io::{Result, Write};
+use crate::internal::util::get_line_sep;
 
 pub(super) trait WriteLineBreak: Write {
     fn write_line_break(&mut self) -> Result<()>;
@@ -6,11 +7,6 @@ pub(super) trait WriteLineBreak: Write {
 
 impl <T: Write> WriteLineBreak for T {
     fn write_line_break(&mut self) -> Result<()> {
-        #[cfg(windows)]
-        self.write_all('\r'.to_string().as_bytes())?;
-
-        self.write_all('\n'.to_string().as_bytes())?;
-
-        return Ok(())
+        self.write_all(get_line_sep().as_bytes())
     }
 }

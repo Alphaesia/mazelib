@@ -4,6 +4,8 @@
 use std::fs::File;
 use std::io;
 use std::io::BufWriter;
+use rand::{SeedableRng, thread_rng};
+use rand::rngs::{StdRng, ThreadRng};
 //use image::ImageFormat;
 use mazelib::implm::point::boxy::BoxCoordinateSpace;
 use mazelib::implm::buffer::VecBuffer;
@@ -24,20 +26,22 @@ fn main() {
     const DIMENSION: usize = 2;
 
     type Space = BoxCoordinateSpace<DIMENSION>;
-    type CellType = BlockCellValue;
+    type CellType = InlineCellValue<2>;
     type BufferType = VecBuffer<CellType>;
-    type CellManager = BoxSpaceBlockCellManagerBuilder<BufferType, DIMENSION>;
+    type CellManager = BoxSpaceInlineCellManager<BufferType, DIMENSION>;
     type Template = SolidBorderTemplate;
     type Generator = HuntAndKillGenerator;
     type Renderer = BoxSpaceTextMazeRenderer;
 
+    let mut rng = thread_rng();
+
     let space = Space::new([9, 9]);
 
-    let mut cell_manager = CellManager::new(space).build();
+    let mut cell_manager = CellManager::new(space);
 
-    Template::apply(&mut cell_manager);
+    //Template::apply(&mut cell_manager);
 
-    Generator::generate(&mut cell_manager);
+    Generator::new().generate_with_rng(&mut cell_manager, &mut rng);
 
     let output = std::io::stdout();
 
