@@ -133,11 +133,6 @@ fn test_construction() {
         let coord_space = BoxCoordinateSpace::new([2, 2, 2, 2, 2, 2]);
         let maze = MazeBuilder::<VecBuffer<BlockCellValue>, 6>::new(coord_space).scale_factor([3, 1, 4, 1, 5, 9]).build();
     }
-
-    {
-        let coord_space = BoxCoordinateSpace::new([]);
-        let maze = MazeBuilder::<VecBuffer<BlockCellValue>, 0>::new(coord_space);
-    }
 }
 
 #[test]

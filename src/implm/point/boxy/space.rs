@@ -3,6 +3,7 @@ use crate::implm::point::boxy::CoordinateTuplet;
 use crate::implm::point::boxy::implm::BoxCoordinateSpaceIterator;
 use crate::internal::array_util::Product;
 use std::ops::Index;
+use rand::Rng;
 
 /// An n-dimensional coordinate space shaped like a box.
 ///
@@ -25,13 +26,11 @@ pub struct BoxCoordinateSpace<const DIMENSION: usize> {
 
 impl <const DIMENSION: usize> BoxCoordinateSpace<DIMENSION> {
     pub fn new(dimensions: [usize; DIMENSION]) -> Self {
-        let size = if DIMENSION != 0 {
-            dimensions.product()
-        } else {
-            0
-        };
+        if DIMENSION == 0 {
+            panic!("DIMENSION must be >= 1")
+        }
 
-        Self { dimensions, size }
+        Self { dimensions, size: dimensions.product() }
     }
 
     pub fn dimensions(&self) -> [usize; DIMENSION] {
@@ -59,14 +58,6 @@ impl <const DIMENSION: usize> CoordinateSpace for BoxCoordinateSpace<DIMENSION> 
     type PtType = CoordinateTuplet<DIMENSION>;
     type IntoIter = BoxCoordinateSpaceIterator<DIMENSION>;
 
-    fn origin(&self) -> Option<Self::PtType> {
-        if self.size == 0 {
-            return None
-        }
-
-        Some([0; DIMENSION].into())
-    }
-
     fn logical_size(&self) -> usize {
         self.size
     }
@@ -87,10 +78,6 @@ impl <const DIMENSION: usize> CoordinateSpace for BoxCoordinateSpace<DIMENSION> 
         return neighbours
     }
 
-    fn iter_from(&self, pt: Self::PtType) -> <Self as CoordinateSpace>::IntoIter {
-        BoxCoordinateSpaceIterator::new(*self, Some(pt))
-    }
-
     fn are_adjacent(pt1: Self::PtType, pt2: Self::PtType) -> bool {
         for dim in 0..DIMENSION {
             if pt1[dim].abs_diff(pt2[dim]) == 1 {
@@ -99,6 +86,14 @@ impl <const DIMENSION: usize> CoordinateSpace for BoxCoordinateSpace<DIMENSION> 
         }
 
         return false
+    }
+
+    fn iter_from(&self, pt: Self::PtType) -> <Self as CoordinateSpace>::IntoIter {
+        BoxCoordinateSpaceIterator::new(*self, Some(pt))
+    }
+
+    fn choose<RNG: Rng + ?Sized>(&self, rng: &mut RNG) -> Self::PtType {
+        self.dimensions.map(|dim| rng.gen_range(0..dim)).into()
     }
 }
 

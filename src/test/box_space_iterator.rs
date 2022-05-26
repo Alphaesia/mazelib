@@ -1,16 +1,6 @@
 use crate::implm::point::boxy::{BoxCoordinateSpace, CoordinateTuplet};
 
 #[test]
-fn test_zero_dimensional() {
-    let space = BoxCoordinateSpace::new([]);
-
-    let mut iter = space.iter();
-
-    assert_eq!(iter.next(), None);
-    assert_eq!(iter.next(), None);  // Check FusedIterator contract
-}
-
-#[test]
 fn test_one_dimensional() {
     {
         let space = BoxCoordinateSpace::new([0]);

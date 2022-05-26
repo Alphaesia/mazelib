@@ -15,7 +15,7 @@ use std::convert::TryInto;
 /// [From\<YourCoordinateTuplet\>][From] for `[usize; DIMENSION]` instead, as it provides an
 /// implementation of [Into<\[usize; DIMENSION\]>][Into] for YourCoordinateTuplet.
 /// This will save you pain later on.
-#[derive(Copy, Clone, Eq, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub struct CoordinateTuplet<const DIMENSION: usize> {
     pub(super) coords: [usize; DIMENSION]
 }

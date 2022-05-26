@@ -3,9 +3,6 @@ use crate::interface::point::CoordinateSpace;
 
 #[test]
 fn test_size() {
-    // Zero-dimensional
-    assert_eq!(BoxCoordinateSpace::<0>::new([]).logical_size(), 0);
-
     // One-dimensional
     assert_eq!(BoxCoordinateSpace::<1>::new([0]).logical_size(), 0);
     assert_eq!(BoxCoordinateSpace::<1>::new([1]).logical_size(), 1);

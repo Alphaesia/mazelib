@@ -22,10 +22,7 @@ impl RecursiveBacktrackerGenerator {
 impl <Maze: CellManager> MazeGenerator<Maze> for RecursiveBacktrackerGenerator {
     fn generate_with_rng<R: Rng + ?Sized>(&mut self, maze: &mut Maze, rng: &mut R) {
         // Start at the origin
-        let mut current_pt = match maze.coord_space().origin() {
-            Some(pt) => pt,
-            None => return
-        };
+        let mut current_pt = maze.coord_space().choose(rng);
 
         maze.make_passage(current_pt);
 
