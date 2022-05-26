@@ -89,6 +89,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<2>>> MazeRendererNonSeeking<BoxSpaceInl
             }
 
             output.write_all(line_top_walls.as_bytes())?;
+            output.write_line_break()?;
             output.write_all(line_side_walls.as_bytes())?;
             output.write_line_break()?;
         }
@@ -164,14 +165,14 @@ impl BoxSpaceTextMazeRenderer {
             (WallType::WALL | WallType::UNVISITED,  WallType::PASSAGE,                     WallType::BOUNDARY,                    WallType::BOUNDARY)                   => '┲',
             (WallType::BOUNDARY,                    WallType::PASSAGE,                     WallType::BOUNDARY,                    WallType::BOUNDARY)                   => '┳',
 
-            (WallType::WALL | WallType::UNVISITED,  WallType::WALL | WallType::UNVISITED,  WallType::PASSAGE,                     WallType::WALL | WallType::UNVISITED) => 'a',
-            (WallType::BOUNDARY,                    WallType::WALL | WallType::UNVISITED,  WallType::PASSAGE,                     WallType::WALL | WallType::UNVISITED) => 'b',
-            (WallType::WALL | WallType::UNVISITED,  WallType::BOUNDARY,                    WallType::PASSAGE,                     WallType::WALL | WallType::UNVISITED) => 'c',
-            (WallType::WALL | WallType::UNVISITED,  WallType::WALL | WallType::UNVISITED,  WallType::PASSAGE,                     WallType::BOUNDARY)                   => 'd',
-            (WallType::BOUNDARY,                    WallType::BOUNDARY,                    WallType::PASSAGE,                     WallType::WALL | WallType::UNVISITED) => 'e',
-            (WallType::BOUNDARY,                    WallType::WALL | WallType::UNVISITED,  WallType::PASSAGE,                     WallType::BOUNDARY)                   => 'f',
-            (WallType::WALL | WallType::UNVISITED,  WallType::BOUNDARY,                    WallType::PASSAGE,                     WallType::BOUNDARY)                   => 'g',
-            (WallType::BOUNDARY,                    WallType::BOUNDARY,                    WallType::PASSAGE,                     WallType::BOUNDARY)                   => 'h',
+            (WallType::WALL | WallType::UNVISITED,  WallType::WALL | WallType::UNVISITED,  WallType::PASSAGE,                     WallType::WALL | WallType::UNVISITED) => '┤',
+            (WallType::BOUNDARY,                    WallType::WALL | WallType::UNVISITED,  WallType::PASSAGE,                     WallType::WALL | WallType::UNVISITED) => '┥',
+            (WallType::WALL | WallType::UNVISITED,  WallType::BOUNDARY,                    WallType::PASSAGE,                     WallType::WALL | WallType::UNVISITED) => '┦',
+            (WallType::WALL | WallType::UNVISITED,  WallType::WALL | WallType::UNVISITED,  WallType::PASSAGE,                     WallType::BOUNDARY)                   => '┧',
+            (WallType::BOUNDARY,                    WallType::BOUNDARY,                    WallType::PASSAGE,                     WallType::WALL | WallType::UNVISITED) => '┩',
+            (WallType::BOUNDARY,                    WallType::WALL | WallType::UNVISITED,  WallType::PASSAGE,                     WallType::BOUNDARY)                   => '┪',
+            (WallType::WALL | WallType::UNVISITED,  WallType::BOUNDARY,                    WallType::PASSAGE,                     WallType::BOUNDARY)                   => '┨',
+            (WallType::BOUNDARY,                    WallType::BOUNDARY,                    WallType::PASSAGE,                     WallType::BOUNDARY)                   => '┫',
 
             (WallType::WALL | WallType::UNVISITED,  WallType::WALL | WallType::UNVISITED,  WallType::WALL | WallType::UNVISITED,  WallType::PASSAGE)                    => '┴',
             (WallType::BOUNDARY,                    WallType::WALL | WallType::UNVISITED,  WallType::WALL | WallType::UNVISITED,  WallType::PASSAGE)                    => '┵',
