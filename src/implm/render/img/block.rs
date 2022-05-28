@@ -2,7 +2,7 @@ use std::io::{Write, Result, Seek};
 use image::{ImageError, Rgba, RgbaImage};
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::render::MazeRenderer;
-use crate::implm::cell::block::{BoxSpaceBlockCellManager, BlockCellValue};
+use crate::implm::cell::block::{BoxSpaceBlockCellManager, BlockCellValue, BlockCellValueType};
 use crate::implm::render::img::{BoxSpaceImageMazeRenderer, ImageMazeRenderer};
 
 impl <Buffer: MazeBuffer<BlockCellValue>> MazeRenderer<BoxSpaceBlockCellManager<Buffer, 2>> for BoxSpaceImageMazeRenderer {
@@ -13,10 +13,10 @@ impl <Buffer: MazeBuffer<BlockCellValue>> MazeRenderer<BoxSpaceBlockCellManager<
 
         for y in 0..height {
             for x in 0..width {
-                let pixel = match maze.get_cell([x, y].into()) {
-                    BlockCellValue::PASSAGE => Rgba::from([255, 255, 255, 255]),
-                    BlockCellValue::WALL | BlockCellValue::BOUNDARY => Rgba::from([0, 0, 0, 255]),
-                    BlockCellValue::UNVISITED => Rgba::from([0, 0, 0, 0]),
+                let pixel = match maze.get_cell_value([x, y].into()).cell_type {
+                    BlockCellValueType::PASSAGE => Rgba::from([255, 255, 255, 255]),
+                    BlockCellValueType::WALL | BlockCellValueType::BOUNDARY => Rgba::from([0, 0, 0, 255]),
+                    BlockCellValueType::UNVISITED => Rgba::from([0, 0, 0, 0]),
                 };
 
                 img.put_pixel(x as u32, y as u32, pixel);

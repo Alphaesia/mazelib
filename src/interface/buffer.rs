@@ -45,6 +45,13 @@ pub trait MazeBuffer<CellVal: CellValue> : Debug + Send {
     /// Panics if `loc` out of bounds (is greater than or equal to this buffer's size).
     fn get(&self, loc: BufferLocation) -> CellVal;
 
+    /// Get the value of a given cell for mutation.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `loc` out of bounds (is greater than or equal to this buffer's size).
+    fn get_mut(&mut self, loc: BufferLocation) -> &mut CellVal;
+
     /// Set the value of a given cell.
     ///
     /// # Panics

@@ -26,9 +26,9 @@ fn main() {
     const DIMENSION: usize = 2;
 
     type Space = BoxCoordinateSpace<DIMENSION>;
-    type CellType = InlineCellValue<2>;
+    type CellType = BlockCellValue;
     type BufferType = VecBuffer<CellType>;
-    type CellManager = BoxSpaceInlineCellManager<BufferType, DIMENSION>;
+    type CellManager = BoxSpaceBlockCellManagerBuilder<BufferType, DIMENSION>;
     type Template = SolidBorderTemplate;
     type Generator = HuntAndKillGenerator;
     type Renderer = BoxSpaceTextMazeRenderer;
@@ -37,7 +37,7 @@ fn main() {
 
     let space = Space::new([9, 9]);
 
-    let mut cell_manager = CellManager::new(space);
+    let mut cell_manager = CellManager::new(space).build();
 
     //Template::apply(&mut cell_manager);
 

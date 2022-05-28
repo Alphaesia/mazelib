@@ -3,7 +3,7 @@ use crate::interface::template::Template;
 use crate::interface::cell::CellManager;
 use crate::implm::point::boxy::BoxCoordinateSpace;
 use crate::interface::point::CoordinateSpace;
-use crate::implm::cell::block::{BoxSpaceBlockCellManager, BlockCellValue};
+use crate::implm::cell::block::{BoxSpaceBlockCellManager, BlockCellValue, BlockCellValueType};
 use crate::implm::cell::inline::{BoxSpaceInlineCellManager, InlineCellValue, InlineCellValueWallType};
 
 pub struct SolidBorderTemplate {}
@@ -36,7 +36,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> Template<BoxSp
         'outer: loop {
             for (i, dim) in cell.iter().enumerate() {
                 if *dim == 0 || *dim == maze.get_full_dimensions()[i] - 1 {
-                    maze.set_cell(cell.into(), BlockCellValue::BOUNDARY);
+                    maze.set_cell_value_type(cell.into(), BlockCellValueType::BOUNDARY);
                     break
                 }
             }
@@ -61,6 +61,8 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Te
     fn apply(maze: &mut BoxSpaceInlineCellManager<Buffer, DIMENSION>) {
         // TODO this can probably be optimised even further
         //  and rewritten to not be ugly
+
+        // TODO preserve existing walls on the edge (dont overwrite them)
         let mut cell = [0usize; DIMENSION];
 
         'outer: loop {
@@ -79,7 +81,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Te
             }
 
             if on_boundary {
-                maze.set(cell.into(), InlineCellValue(walls));
+                maze.set(cell.into(), InlineCellValue { walls, marked: false });
             }
 
             #[allow(clippy::needless_range_loop)]

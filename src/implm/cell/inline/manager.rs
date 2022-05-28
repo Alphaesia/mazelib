@@ -31,10 +31,6 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Bo
         &self.buffer
     }
 
-    pub fn buffer_mut(&mut self) -> &mut Buffer {
-        &mut self.buffer
-    }
-
     /// Set the value of any cell, including ones not mapped by the coordinate space
     ///
     /// Since with a [InlineCellValue] it is impossible to get the maze into an
@@ -77,6 +73,10 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Bo
         BufferLocation(offset)
     }
 
+    fn get_mut(&mut self, pt: pt!()) -> &mut <Self as CellManager>::CellVal {
+        self.buffer.get_mut(self.pt_to_buffer_loc(pt))
+    }
+
     fn set_unvisited_edges_to_wall(cell: &mut [[InlineCellValueWallType; 2]; DIMENSION]) {
         for i in 0..DIMENSION {
             let dim = &mut cell[i];
@@ -98,25 +98,30 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Bo
     fn make_between(&mut self, from: pt!(), to: pt!(), edge_type: InlineCellValueWallType) {
         let axis_of_adjacency = Self::get_axis_of_adjacency(from, to).expect("from and to are not adjacent");
 
-        let mut from_walls = self.get(from).0;
-        let mut to_walls = self.get(to).0;
-
         let from_pos = from[axis_of_adjacency];
         let to_pos = to[axis_of_adjacency];
 
-        if from_pos < to_pos {
-            from_walls[axis_of_adjacency][1] = edge_type;
-            to_walls[axis_of_adjacency][0] = edge_type;
+        let from_before_to = from_pos < to_pos;
+
+        let mut from_existing = self.get_mut(from);
+
+        if from_before_to {
+            from_existing.walls[axis_of_adjacency][1] = edge_type;
         } else {
-            from_walls[axis_of_adjacency][0] = edge_type;
-            to_walls[axis_of_adjacency][1] = edge_type;
+            from_existing.walls[axis_of_adjacency][0] = edge_type;
         }
 
-        Self::set_unvisited_edges_to_wall(&mut from_walls);
-        Self::set_unvisited_edges_to_wall(&mut to_walls);
+        Self::set_unvisited_edges_to_wall(&mut from_existing.walls);
 
-        self.set(from, InlineCellValue(from_walls));
-        self.set(to, InlineCellValue(to_walls));
+        let mut to_existing = self.get_mut(to);
+
+        if from_before_to {
+            to_existing.walls[axis_of_adjacency][0] = edge_type;
+        } else {
+            to_existing.walls[axis_of_adjacency][1] = edge_type;
+        }
+
+        Self::set_unvisited_edges_to_wall(&mut to_existing.walls);
     }
 }
 
@@ -141,8 +146,8 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Ce
             (0, 1)
         };
 
-        let from_wall = self.get(from).0[axis_of_adjacency][from_wall_side];
-        let to_wall = self.get(to).0[axis_of_adjacency][to_wall_side];
+        let from_wall = self.get(from).walls[axis_of_adjacency][from_wall_side];
+        let to_wall = self.get(to).walls[axis_of_adjacency][to_wall_side];
 
         return match [from_wall, to_wall] {
             [InlineCellValueWallType::BOUNDARY,  _] | [_, InlineCellValueWallType::BOUNDARY ] => ConnectionType::BOUNDARY,
@@ -155,17 +160,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Ce
     /// Replace all edges of `pt` that are [InlineCellValueWallType::UNVISITED] with
     /// [InlineCellValueWallType::WALL].
     fn make_passage(&mut self, pt: pt!()) {
-        let cell = self.get(pt);
-
-        if cell.is_fully_unvisited() {
-            self.set(pt, InlineCellValue([[InlineCellValueWallType::WALL; 2]; DIMENSION]))
-        } else {
-            let mut walls = cell.0;
-
-            Self::set_unvisited_edges_to_wall(&mut walls);
-
-            self.set(pt, InlineCellValue(walls));
-        }
+        Self::set_unvisited_edges_to_wall(&mut self.get_mut(pt).walls);
     }
 
     /// Set the edge between the two cells to [InlineCellValueWallType::PASSAGE],
@@ -179,7 +174,9 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Ce
 
     /// Set all edges of `pt` to [InlineCellValueWallType::WALL].
     fn make_wall(&mut self, pt: pt!()) {
-        self.set(pt, InlineCellValue([[InlineCellValueWallType::WALL; 2]; DIMENSION]))
+        let cell_value = self.get_mut(pt);
+
+        cell_value.walls = [[InlineCellValueWallType::WALL; 2]; DIMENSION];
     }
 
     /// Set the edge between the two cells to [InlineCellValueWallType::WALL],
@@ -193,7 +190,9 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Ce
 
     /// Set all edges of `pt` to [InlineCellValueWallType::BOUNDARY].
     fn make_boundary(&mut self, pt: pt!()) {
-        self.set(pt, InlineCellValue([[InlineCellValueWallType::BOUNDARY; 2]; DIMENSION]))
+        let cell_value = self.get_mut(pt);
+
+        cell_value.walls = [[InlineCellValueWallType::BOUNDARY; 2]; DIMENSION];
     }
 
     // TODO what should we do with unvisited edges here? set to wall, boundary, or ignore?

@@ -1,7 +1,7 @@
 use std::io::{Result, Write};
 use crate::interface::buffer::{MazeBuffer, BufferLocation};
 use crate::interface::render::MazeRendererNonSeeking;
-use crate::implm::cell::block::{BoxSpaceBlockCellManager, BlockCellValue};
+use crate::implm::cell::block::{BoxSpaceBlockCellManager, BlockCellValue, BlockCellValueType};
 use crate::implm::render::text::{TextMazeRenderer, BoxSpaceTextMazeRenderer};
 use crate::implm::render::text::line_break::WriteLineBreak;
 
@@ -13,11 +13,11 @@ impl <Buffer: MazeBuffer<BlockCellValue>> MazeRendererNonSeeking<BoxSpaceBlockCe
             for x in 0..width {
                 let pt = BufferLocation(x + y * width);
 
-                let char = match maze.buffer().get(pt) {
-                    BlockCellValue::PASSAGE => ' ',
-                    BlockCellValue::WALL => '█',
-                    BlockCellValue::BOUNDARY => '█',
-                    BlockCellValue::UNVISITED => '.'
+                let char = match maze.buffer().get(pt).cell_type {
+                    BlockCellValueType::PASSAGE   => ' ',
+                    BlockCellValueType::WALL      => '█',
+                    BlockCellValueType::BOUNDARY  => '█',
+                    BlockCellValueType::UNVISITED => '.'
                 };
 
                 output.write_all(char.to_string().as_bytes())?;

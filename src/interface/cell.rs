@@ -127,12 +127,23 @@ pub trait CellManager: Debug {
 pub trait CellLocation {}
 
 /// Value of a cell.
+///
+/// Cells can be marked. Marks are a general-purpose signalling mechanism, and have
+/// no universal interpretation. It is recommended you clean up any marks you make,
+/// as other components may make marks of their own and get confused by pre-existing
+/// marks.
 pub trait CellValue: Copy + Clone + Send + Sync + Sized + PartialEq + Eq + Default + Debug {
     /// If the cell has not been fully generated (visited). Partially-generated
     /// cells are not considered fully visited. This is because when applying
     /// templates, such as a solid boundary around the edge of the maze, the cells
     /// that get touched should still be considered by generators.
     fn is_fully_visited(&self) -> bool;
+
+    /// If the cell is currently marked.
+    fn is_marked(&self) -> bool;
+
+    /// Set the cell's mark flag.
+    fn set_marked(&mut self, marked: bool);
 }
 
 /// Type of connection (graph theory: *edge*) (e.g. wall, passage) between two points.

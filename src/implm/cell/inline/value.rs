@@ -8,7 +8,10 @@ use crate::interface::cell::CellValue;
 /// Even if it is `None` for a particular direction, the
 /// neighbouring cell in that direction may have a wall there.
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
-pub struct InlineCellValue<const DIMENSION: usize>(pub [[InlineCellValueWallType; 2]; DIMENSION]);
+pub struct InlineCellValue<const DIMENSION: usize> {
+    pub walls: [[InlineCellValueWallType; 2]; DIMENSION],
+    pub marked: bool,
+}
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub enum InlineCellValueWallType {
@@ -29,18 +32,26 @@ pub enum InlineCellValueWallType {
 
 impl <const DIMENSION: usize> CellValue for InlineCellValue<DIMENSION> {
     fn is_fully_visited(&self) -> bool {
-        self.0.into_iter().flat_map(|dim| dim.into_iter()).all(|edge| edge != UNVISITED)
+        self.walls.into_iter().flat_map(|dim| dim.into_iter()).all(|edge| edge != UNVISITED)
+    }
+
+    fn is_marked(&self) -> bool {
+        self.marked
+    }
+
+    fn set_marked(&mut self, marked: bool) {
+        self.marked = marked
     }
 }
 
 impl <const DIMENSION: usize> InlineCellValue<DIMENSION> {
     pub fn is_fully_unvisited(&self) -> bool {
-        self.0.into_iter().flat_map(|dim| dim.into_iter()).all(|edge| edge == UNVISITED)
+        self.walls.into_iter().flat_map(|dim| dim.into_iter()).all(|edge| edge == UNVISITED)
     }
 }
 
 impl <const DIMENSION: usize> Default for InlineCellValue<DIMENSION> {
     fn default() -> Self {
-        Self([[InlineCellValueWallType::UNVISITED; 2]; DIMENSION])
+        Self { walls: [[UNVISITED; 2]; DIMENSION], marked: false }
     }
 }

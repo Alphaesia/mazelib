@@ -3,7 +3,7 @@ use std::io::{Write, Result};
 use std::time::SystemTime;
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::render::MazeRendererNonSeeking;
-use crate::implm::cell::block::{BoxSpaceBlockCellManager, BlockCellValue};
+use crate::implm::cell::block::{BoxSpaceBlockCellManager, BlockCellValue, BlockCellValueType};
 use crate::implm::render::minecraft::{BoxSpaceSchematicMazeRenderer, SchematicMazeRenderer};
 use crate::implm::render::minecraft::schem::{SpongeSchematicV3, SpongeSchematicV3SchematicObject, SpongeSchematicV3MetadataObject, SpongeSchematicV3BlockContainer};
 
@@ -34,17 +34,17 @@ impl <Buffer: MazeBuffer<BlockCellValue>> MazeRendererNonSeeking<BoxSpaceBlockCe
 
         for z in 0..length_usize {
             for x in 0..width_usize {
-                match maze.get_cell([x, z].into()) {
-                    BlockCellValue::PASSAGE => {
+                match maze.get_cell_value([x, z].into()).cell_type {
+                    BlockCellValueType::PASSAGE => {
                         // y = 0
                         data[x + z * width_usize] = FLOOR_BLOCK;
                     },
-                    BlockCellValue::WALL | BlockCellValue::BOUNDARY => {
+                    BlockCellValueType::WALL | BlockCellValueType::BOUNDARY => {
                         for y in 0..4 {
                             data[x + z * width_usize + y * width_usize * length_usize] = WALL_BLOCK;
                         }
                     },
-                    BlockCellValue::UNVISITED => {},
+                    BlockCellValueType::UNVISITED => {},
                 }
             }
         }

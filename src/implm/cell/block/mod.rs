@@ -4,5 +4,6 @@ mod manager;
 
 pub use self::cell::BlockCell;
 pub use self::value::BlockCellValue;
+pub use self::value::BlockCellValueType;
 pub use self::manager::BoxSpaceBlockCellManager;
 pub use self::manager::BoxSpaceBlockCellManagerBuilder;

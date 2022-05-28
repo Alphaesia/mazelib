@@ -22,6 +22,10 @@ impl <CellVal: CellValue, const CELLS: usize> MazeBuffer<CellVal> for ArrayBuffe
         self.buf[loc.0]
     }
 
+    fn get_mut(&mut self, loc: BufferLocation) -> &mut CellVal {
+        &mut self.buf[loc.0]
+    }
+
     fn set(&mut self, loc: BufferLocation, new_value: CellVal) {
         self.buf[loc.0] = new_value
     }

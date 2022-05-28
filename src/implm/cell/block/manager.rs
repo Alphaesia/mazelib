@@ -6,9 +6,10 @@ use crate::interface::point::CoordinateSpace;
 use std::fmt::{Debug, Formatter};
 use crate::internal::array_util::{Product, Sum};
 use crate::implm::render::text::BoxSpaceTextMazeRenderer;
-use crate::implm::cell::block::BlockCellValue;
+use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
 use crate::implm::cell::block::cell::BlockCell;
 use std::marker::PhantomData;
+use crate::implm::cell::block::value::BlockCellValueType::{UNVISITED, BOUNDARY, WALL, PASSAGE};
 use crate::interface::render::MazeRendererNonSeeking;
 
 /// TODO write a description
@@ -94,8 +95,8 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
             })
     }
 
-    /// Map a point to a cell.
-    pub fn map_pt(&self, pt: pt!()) -> BlockCell<DIMENSION> {
+    /// Map a point to a cell location.
+    pub fn map_pt_to_cell_loc(&self, pt: pt!()) -> BlockCell<DIMENSION> {
         let mut pt: [usize; DIMENSION] = pt.into();
 
         #[allow(clippy::needless_range_loop)]
@@ -107,13 +108,43 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
         BlockCell(pt.into())
     }
 
+    /// Get the value of the point `pt` for mutation.
+    ///
+    /// See also: [`Self::get()`].
+    pub fn get_mut(&mut self, pt: pt!()) -> &mut <Self as CellManager>::CellVal {
+        self.get_cell_value_mut(self.map_pt_to_cell_loc(pt))
+    }
+
+    /// Sugar for
+    /// ```ignore
+    /// self.get_mut(pt).cell_type = cell_type;
+    /// ```
+    ///
+    /// Modifies the cell's type but keeps its mark status intact.
+    ///
+    /// Please see [`Self::get_mut()`] for details.
+    pub fn set_type(&mut self, pt: pt!(), cell_type: BlockCellValueType) {
+        self.get_mut(pt).cell_type = cell_type;
+    }
+
     /// Get the value of any cell.
     ///
-    /// In most cases you should use the methods on [CellManager::get()]. The only
+    /// In most cases you should use the methods on [`CellManager::get()`]. The only
     /// reason you should use this method is to access a cell that is not mapped by
     /// the coordinated space.
-    pub fn get_cell(&self, cell: BlockCell<DIMENSION>) -> BlockCellValue {
-        self.buffer.get(self.cell_to_buffer_loc(cell))
+    pub fn get_cell_value(&self, loc: BlockCell<DIMENSION>) -> BlockCellValue {
+        self.buffer.get(self.cell_loc_to_buffer_loc(loc))
+    }
+
+    /// Get the value of any cell for mutation.
+    ///
+    /// In most cases you should use the methods on [`Self::get_mut()`]. The only
+    /// reason you should use this method is to access a cell that is not mapped by
+    /// the coordinated space.
+    ///
+    /// See also: [`Self::get_cell_value()`].
+    pub fn get_cell_value_mut(&mut self, loc: BlockCell<DIMENSION>) -> &mut BlockCellValue {
+        self.buffer.get_mut(self.cell_loc_to_buffer_loc(loc))
     }
 
     /// Set the value of any cell, including ones not mapped by the coordinate space
@@ -124,8 +155,18 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// In most cases you should use the methods on [CellManager]. The only reason
     /// you should use this method is to access a cell that is not mapped by the
     /// coordinated space.
-    pub fn set_cell(&mut self, cell: BlockCell<DIMENSION>, value: BlockCellValue) {
-        self.buffer.set(self.cell_to_buffer_loc(cell), value)
+    pub fn set_cell_value(&mut self, loc: BlockCell<DIMENSION>, value: BlockCellValue) {
+        self.buffer.set(self.cell_loc_to_buffer_loc(loc), value)
+    }
+
+    /// Sugar for
+    /// ```ignore
+    /// self.get_cell_value_mut(loc).cell_type = cell_type;
+    /// ```
+    ///
+    /// Please see [`Self::get_cell_value_mut()`] for details.
+    pub fn set_cell_value_type(&mut self, loc: BlockCell<DIMENSION>, cell_type: BlockCellValueType) {
+        self.get_cell_value_mut(loc).cell_type = cell_type;
     }
 }
 
@@ -136,7 +177,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     ///
     /// The number represents the order of the axis (e.g.
     /// x is 0, y is 1, etc.). This is the same as in the index
-    /// of the axis for the point (pt[index] gives the position of
+    /// of the axis for the point (`pt[index]` gives the position of
     /// the point along that axis).
     ///
     /// Returns None if the points are identical or not adjacent.
@@ -150,32 +191,32 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
         return None
     }
 
-    fn cell_to_buffer_loc(&self, pt: BlockCell<DIMENSION>) -> BufferLocation {
-        let mut offset = pt[0];
+    /// Convert a [`crate::interface::cell::CellLocation`] to a [`BufferLocation`]
+    fn cell_loc_to_buffer_loc(&self, cell_loc: BlockCell<DIMENSION>) -> BufferLocation {
+        let mut offset = cell_loc[0];
 
         for i in 1..DIMENSION {
-            offset += pt[i] * self.full_dimensions[i - 1];
+            offset += cell_loc[i] * self.full_dimensions[i - 1];
         }
 
         BufferLocation(offset)
     }
 
-    fn set_unvisited_neighbours_to_wall(&mut self, pt: BlockCell<DIMENSION>) {
+    fn set_unvisited_neighbours_to_wall(&mut self, cell_loc: BlockCell<DIMENSION>) {
         for i in 0..DIMENSION {
-            if pt[i] > 0 {
-                let neighbour = pt.offset(i, -1);
+            if cell_loc[i] > 0 {
+                let neighbour = self.get_cell_value_mut(cell_loc.offset(i, -1));
 
-                // We don't overwrite boundaries
-                if self.get_cell(neighbour) == BlockCellValue::UNVISITED {
-                    self.set_cell(neighbour, BlockCellValue::WALL)
+                if neighbour.cell_type == UNVISITED {
+                    neighbour.cell_type = WALL;
                 }
             }
 
-            if pt[i] + 1 < self.full_dimensions[i] {
-                let neighbour = pt.offset(i, 1);
+            if cell_loc[i] + 1 < self.full_dimensions[i] {
+                let neighbour = self.get_cell_value_mut(cell_loc.offset(i, 1));
 
-                if self.get_cell(neighbour) == BlockCellValue::UNVISITED {
-                    self.set_cell(neighbour, BlockCellValue::WALL)
+                if neighbour.cell_type == UNVISITED {
+                    neighbour.cell_type = WALL;
                 }
             }
         }
@@ -191,38 +232,38 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> CellManager fo
     }
 
     fn get(&self, pt: pt!()) -> Self::CellVal {
-        self.get_cell(self.map_pt(pt))
+        self.get_cell_value(self.map_pt_to_cell_loc(pt))
     }
 
     fn get_connection(&self, from: pt!(), to: pt!()) -> ConnectionType {
-        match [self.get(from), self.get(to)] {
-            [Self::CellVal::BOUNDARY,  _] | [_, Self::CellVal::BOUNDARY ] => ConnectionType::BOUNDARY,
-            [Self::CellVal::UNVISITED, _] | [_, Self::CellVal::UNVISITED] => ConnectionType::UNVISITED,
-            [Self::CellVal::WALL,      _] | [_, Self::CellVal::WALL     ] => ConnectionType::WALL,
-            [Self::CellVal::PASSAGE,  Self::CellVal::PASSAGE]             => ConnectionType::PASSAGE,
+        match [self.get(from).cell_type, self.get(to).cell_type] {
+            [BOUNDARY,  _] | [_, BOUNDARY ] => ConnectionType::BOUNDARY,
+            [UNVISITED, _] | [_, UNVISITED] => ConnectionType::UNVISITED,
+            [WALL,      _] | [_, WALL     ] => ConnectionType::WALL,
+            [PASSAGE,            PASSAGE  ] => ConnectionType::PASSAGE,
         }
     }
 
-    /// Set `pt` to [super::BlockCellValue::PASSAGE].
+    /// Set `pt` to [`BlockCellValueType::PASSAGE`].
     fn make_passage(&mut self, pt: pt!()) {
-        let pt = self.map_pt(pt);
+        let cell_loc = self.map_pt_to_cell_loc(pt);
 
-        self.set_cell(pt, BlockCellValue::PASSAGE);
-        self.set_unvisited_neighbours_to_wall(pt);
+        self.set_cell_value_type(cell_loc, PASSAGE);
+        self.set_unvisited_neighbours_to_wall(cell_loc);
     }
 
-    /// Set `from` and `to` to [super::BlockCellValue::PASSAGE]. If the resolution is greater than
+    /// Set `from` and `to` to [`BlockCellValueType::PASSAGE`]. If the resolution is greater than
     /// one along the axis of adjacency, then all intermediate cells will be set to walls too.
     ///
     /// All cells that are adjacent to from, or any of the intermediate cells, and are unvisited,
-    /// will be set to [super::BlockCellValue::WALL]. Note that this excludes `to`, so that
+    /// will be set to [`BlockCellValueType::WALL`]. Note that this excludes `to`, so that
     /// maze carvers will be able to progress. If you wish for `to` to also be surrounded by
-    /// walls, simply call [Self::make_passage] on `to` as well.
+    /// walls, simply call [`Self::make_passage()`] on `to` as well.
     fn make_passage_between(&mut self, from: pt!(), to: pt!()) {
         let axis_of_adjacency = Self::get_axis_of_adjacency(from, to).expect("from and to are not adjacent");
 
-        let from = self.map_pt(from);
-        let to = self.map_pt(to);
+        let from = self.map_pt_to_cell_loc(from);
+        let to = self.map_pt_to_cell_loc(to);
 
         let from_pos = from[axis_of_adjacency];
         let to_pos = to[axis_of_adjacency];
@@ -230,74 +271,74 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> CellManager fo
         if from_pos < to_pos {
             // Skip out on the end so we don't add walls around it
             for i in from_pos..to_pos {
-                let pt = from.at(axis_of_adjacency, i);
+                let cell = from.at(axis_of_adjacency, i);
 
-                self.set_cell(pt, BlockCellValue::PASSAGE);
-                self.set_unvisited_neighbours_to_wall(pt);
+                self.set_cell_value_type(cell, PASSAGE);
+                self.set_unvisited_neighbours_to_wall(cell);
             }
         } else {
             // Skip out on the end so we don't add walls around it
             for i in (to_pos + 1)..=from_pos {
-                let pt = from.at(axis_of_adjacency, i);
+                let cell = from.at(axis_of_adjacency, i);
 
-                self.set_cell(pt, BlockCellValue::PASSAGE);
-                self.set_unvisited_neighbours_to_wall(pt);
+                self.set_cell_value_type(cell, PASSAGE);
+                self.set_unvisited_neighbours_to_wall(cell);
             }
         }
 
-        self.set_cell(to, BlockCellValue::PASSAGE);
+        self.set_cell_value_type(to, PASSAGE);
     }
 
-    /// Set `pt` to [super::BlockCellValue::WALL].
+    /// Set `pt` to [`BlockCellValueType::WALL`].
     fn make_wall(&mut self, pt: pt!()) {
-        self.set_cell(self.map_pt(pt), BlockCellValue::WALL)
+        self.set_type(pt, WALL);
     }
 
-    /// Set `from` and `to` to [super::BlockCellValue::WALL]. If the resolution is greater than
+    /// Set `from` and `to` to [`BlockCellValueType::WALL`]. If the resolution is greater than
     /// one along the axis of adjacency, then all intermediate cells will be set to walls too.
     fn make_wall_between(&mut self, from: pt!(), to: pt!()) {
         let axis_of_adjacency = Self::get_axis_of_adjacency(from, to).expect("from and to are not adjacent");
 
-        let from = self.map_pt(from);
-        let to = self.map_pt(to);
+        let from = self.map_pt_to_cell_loc(from);
+        let to = self.map_pt_to_cell_loc(to);
 
         let from_pos = from[axis_of_adjacency];
         let to_pos = to[axis_of_adjacency];
 
         if from_pos < to_pos {
             for i in from_pos..=to_pos {
-                self.set_cell(from.at(axis_of_adjacency, i), BlockCellValue::WALL);
+                self.set_cell_value_type(from.at(axis_of_adjacency, i), WALL);
             }
         } else {
             for i in to_pos..=from_pos {
-                self.set_cell(from.at(axis_of_adjacency, i), BlockCellValue::WALL);
+                self.set_cell_value_type(from.at(axis_of_adjacency, i), WALL);
             }
         }
     }
 
-    /// Set `pt` to [super::BlockCellValue::BOUNDARY].
+    /// Set `pt` to [`BlockCellValueType::BOUNDARY`].
     fn make_boundary(&mut self, pt: pt!()) {
-        self.set_cell(self.map_pt(pt), BlockCellValue::BOUNDARY)
+        self.set_type(pt, BOUNDARY);
     }
 
-    /// Set `from` and `to` to [super::BlockCellValue::BOUNDARY]. If the resolution is greater than
+    /// Set `from` and `to` to [`BlockCellValueType::BOUNDARY`]. If the resolution is greater than
     /// one along the axis of adjacency, then all intermediate cells will be set to boundaries too.
     fn make_boundary_between(&mut self, from: pt!(), to: pt!()) {
         let axis_of_adjacency = Self::get_axis_of_adjacency(from, to).expect("from and to are not adjacent");
 
-        let from = self.map_pt(from);
-        let to = self.map_pt(to);
+        let from = self.map_pt_to_cell_loc(from);
+        let to = self.map_pt_to_cell_loc(to);
 
         let from_pos = from[axis_of_adjacency];
         let to_pos = to[axis_of_adjacency];
 
         if from_pos < to_pos {
             for i in from_pos..=to_pos {
-                self.set_cell(from.at(axis_of_adjacency, i), BlockCellValue::BOUNDARY);
+                self.set_cell_value_type(from.at(axis_of_adjacency, i), BOUNDARY);
             }
         } else {
             for i in to_pos..=from_pos {
-                self.set_cell(from.at(axis_of_adjacency, i), BlockCellValue::BOUNDARY);
+                self.set_cell_value_type(from.at(axis_of_adjacency, i), BOUNDARY);
             }
         }
     }

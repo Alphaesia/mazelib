@@ -1,23 +1,33 @@
 use crate::interface::cell::CellValue;
 
-/// A cell where walls and passages do not overlap,
-/// and instead are separate cells.
-///
-/// *See also: [BlockCell][super::value::BlockCellValue]*
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
-pub enum BlockCellValue {
+pub struct BlockCellValue {
+    pub cell_type: BlockCellValueType,
+    pub marked: bool,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
+pub enum BlockCellValueType {
     UNVISITED,
     BOUNDARY,
     WALL,
-    PASSAGE
+    PASSAGE,
 }
 
 impl CellValue for BlockCellValue {
     fn is_fully_visited(&self) -> bool {
-        self != &Self::UNVISITED
+        self.cell_type != BlockCellValueType::UNVISITED
+    }
+
+    fn is_marked(&self) -> bool {
+        self.marked
+    }
+
+    fn set_marked(&mut self, marked: bool) {
+        self.marked = marked
     }
 }
 
 impl Default for BlockCellValue {
-    fn default() -> Self { Self::UNVISITED }
+    fn default() -> Self { Self { cell_type: BlockCellValueType::UNVISITED, marked: false } }
 }

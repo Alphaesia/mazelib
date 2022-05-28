@@ -32,7 +32,9 @@ impl <Buffer: MazeBuffer<InlineCellValue<2>>> MazeRendererNonSeeking<BoxSpaceInl
             for x in 0..width {
                 let pt = BufferLocation(x + y * width);
 
-                let walls = maze.buffer().get(pt).0;
+                let cell_value = maze.buffer().get(pt);
+
+                let walls = cell_value.walls;
 
                 let left_wall_actual = match (walls[0][0], wall_previously) {
                     (WallType::BOUNDARY, _) | (_, WallType::BOUNDARY) => WallType::BOUNDARY,
@@ -101,7 +103,9 @@ impl <Buffer: MazeBuffer<InlineCellValue<2>>> MazeRendererNonSeeking<BoxSpaceInl
             for x in 0..width {
                 let pt = BufferLocation(x + (height - 1) * width);  // We're iterating over the last row
 
-                let walls = maze.buffer().get(pt).0;
+                let cell_value = maze.buffer().get(pt);
+
+                let walls = cell_value.walls;
 
                 line.push(Self::get_box_char(wall_connections[x][0], walls[0][0], walls[1][1], WallType::PASSAGE));
 
