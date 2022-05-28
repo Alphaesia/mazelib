@@ -99,7 +99,6 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     pub fn map_pt_to_cell_loc(&self, pt: pt!()) -> BlockCell<DIMENSION> {
         let mut pt: [usize; DIMENSION] = pt.into();
 
-        #[allow(clippy::needless_range_loop)]
         for i in 0..DIMENSION {
             pt[i] *= self.scale_factor[i];
             pt[i] += self.padding[i][0];

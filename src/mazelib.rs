@@ -16,7 +16,8 @@
 //! use mazelib::implm::point::boxy::BoxCoordinateSpace;
 //! use mazelib::implm::render::text::BoxSpaceTextMazeRenderer;
 //! use mazelib::implm::template::boxy::SolidBorderTemplate;
-//! use mazelib::interface::render::MazeRendererNonSeeking;
+//! use mazelib::interface::generate::DefaultMazeGenerator;
+//! use mazelib::interface::render::DefaultMazeRendererNonSeeking;
 //! use mazelib::interface::template::Template;
 //!
 //! // 2 for a 2D maze, 3 for a 3D maze, etc.
@@ -41,7 +42,7 @@
 //! HuntAndKillGenerator::generate(&mut maze);
 //!
 //! // Print the maze as text
-//! let maze_as_text = BoxSpaceTextMazeRenderer::new().render(&maze, &mut std::io::stdout());
+//! let maze_as_text = BoxSpaceTextMazeRenderer::render(&maze, &mut std::io::stdout());
 //! ```
 //! produces
 //! ```text
@@ -174,7 +175,7 @@
 
 #![deny(rustdoc::broken_intra_doc_links)]
 
-#![allow(clippy::needless_return, clippy::bool_comparison)]  // Stylistic choices
+#![allow(clippy::needless_return, clippy::needless_range_loop, clippy::bool_comparison)]  // Stylistic choices
 
 pub mod interface;
 pub mod implm;

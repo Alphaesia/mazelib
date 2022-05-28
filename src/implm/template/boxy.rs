@@ -41,7 +41,6 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> Template<BoxSp
                 }
             }
 
-            #[allow(clippy::needless_range_loop)]
             for i in 0..DIMENSION {
                 cell[i] += 1;
 
@@ -74,6 +73,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Te
                     walls[i][0] = InlineCellValueWallType::BOUNDARY;
                     on_boundary = true;
                 }
+
                 if *dim == maze.coord_space().dimensions()[i] - 1 {
                     walls[i][1] = InlineCellValueWallType::BOUNDARY;
                     on_boundary = true;
@@ -84,7 +84,6 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Te
                 maze.set(cell.into(), InlineCellValue { walls, marked: false });
             }
 
-            #[allow(clippy::needless_range_loop)]
             for i in 0..DIMENSION {
                 cell[i] += 1;
 

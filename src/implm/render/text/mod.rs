@@ -12,10 +12,16 @@ pub struct BoxSpaceTextMazeRenderer {
     _private: ()
 }
 
+pub trait TextMazeRenderer<CellSpace: CellManager> : MazeRendererNonSeeking<CellSpace> {}
+
 impl BoxSpaceTextMazeRenderer {
     pub fn new() -> Self {
         Self { _private: () }
     }
 }
 
-pub trait TextMazeRenderer<CellSpace: CellManager> : MazeRendererNonSeeking<CellSpace> {}
+impl Default for BoxSpaceTextMazeRenderer {
+    fn default() -> Self {
+        Self::new()
+    }
+}

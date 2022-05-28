@@ -10,18 +10,6 @@ pub struct NAryTreeGenerator {
     _private: ()
 }
 
-impl NAryTreeGenerator {
-    pub fn new() -> Self
-    {
-        Self { _private: () }
-    }
-
-    /// Sugar for `NAryTreeGenerator::new().generate(maze)`
-    pub fn generate<Maze: CellManager<CoordSpace=BoxCoordinateSpace<DIMENSION>>, const DIMENSION: usize>(maze: &mut Maze) {
-        Self::new().generate(maze)
-    }
-}
-
 impl <Maze: CellManager<CoordSpace=BoxCoordinateSpace<DIMENSION>>, const DIMENSION: usize> MazeGenerator<Maze> for NAryTreeGenerator {
     fn generate_with_rng<R: Rng + ?Sized>(&mut self, maze: &mut Maze, rng: &mut R) {
         // For every point in the maze,
@@ -40,7 +28,7 @@ impl <Maze: CellManager<CoordSpace=BoxCoordinateSpace<DIMENSION>>, const DIMENSI
                 } else {
                     None
                 };
-            }).map(|candidate| Into::<CoordinateTuplet<DIMENSION>>::into(candidate))
+            }).map(Into::<CoordinateTuplet<DIMENSION>>::into)
               // and pick one at random,
               .choose(rng);
 
@@ -50,5 +38,17 @@ impl <Maze: CellManager<CoordSpace=BoxCoordinateSpace<DIMENSION>>, const DIMENSI
                 None => maze.make_passage(pt)
             }
         })
+    }
+}
+
+impl NAryTreeGenerator {
+    pub fn new() -> Self {
+        Self { _private: () }
+    }
+}
+
+impl Default for NAryTreeGenerator {
+    fn default() -> Self {
+        Self::new()
     }
 }

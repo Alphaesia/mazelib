@@ -9,6 +9,7 @@
 //! 1. [`MazeGenerator`] --- the generator interface.
 //! 2. [`crate::implm::generate`] --- a comparison of the builtin generators.
 
+use rand::Rng;
 use crate::interface::cell::CellManager;
 
 /// A maze generator.
@@ -62,5 +63,49 @@ pub trait MazeGenerator<Maze: CellManager> {
     /// * `rng`  --- The sole source of randomness for a generator. Given a
     ///              [`rand::SeedableRng`] with a fixed seed, the generator's behaviour
     ///              is deterministic.
-    fn generate_with_rng<R: rand::Rng + ?Sized>(&mut self, maze: &mut Maze, rng: &mut R);
+    fn generate_with_rng<R: Rng + ?Sized>(&mut self, maze: &mut Maze, rng: &mut R);
+}
+
+/// Simple sugar for [`MazeGenerator`]s.
+///
+/// Lets you elide constructing generators with parameterless constructors (specifically,
+/// generators that implement [`Default`]).
+///
+/// ```
+/// # use mazelib::interface::generate::MazeGenerator;
+/// # use mazelib::implm::buffer::VecBuffer;
+/// # use mazelib::implm::cell::block::{BlockCellValue, BoxSpaceBlockCellManagerBuilder};
+/// # use mazelib::implm::generate::HuntAndKillGenerator;
+/// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
+/// # let mut maze = BoxSpaceBlockCellManagerBuilder::<VecBuffer<BlockCellValue>, 1>::new(BoxCoordinateSpace::new([1])).build();
+/// #
+/// HuntAndKillGenerator::new().generate(&mut maze);
+/// ```
+/// becomes
+/// ```
+/// # use mazelib::interface::generate::DefaultMazeGenerator;
+/// # use mazelib::implm::buffer::VecBuffer;
+/// # use mazelib::implm::cell::block::{BlockCellValue, BoxSpaceBlockCellManagerBuilder};
+/// # use mazelib::implm::generate::HuntAndKillGenerator;
+/// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
+/// # let mut maze = BoxSpaceBlockCellManagerBuilder::<VecBuffer<BlockCellValue>, 1>::new(BoxCoordinateSpace::new([1])).build();
+/// #
+/// HuntAndKillGenerator::generate(&mut maze);
+/// ```
+pub trait DefaultMazeGenerator<Maze: CellManager>: MazeGenerator<Maze> {
+    /// *See [`MazeGenerator::generate()`].*
+    fn generate(maze: &mut Maze);
+
+    /// *See [`MazeGenerator::generate_with_rng()`].*
+    fn generate_with_rng<R: Rng + ?Sized>(maze: &mut Maze, rng: &mut R);
+}
+
+impl <Maze: CellManager, T: MazeGenerator<Maze> + Default> DefaultMazeGenerator<Maze> for T {
+    fn generate(maze: &mut Maze) {
+        Self::default().generate(maze)
+    }
+
+    fn generate_with_rng<R: Rng + ?Sized>(maze: &mut Maze, rng: &mut R) {
+        Self::default().generate_with_rng(maze, rng)
+    }
 }

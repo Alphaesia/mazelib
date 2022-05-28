@@ -8,17 +8,6 @@ pub struct RecursiveBacktrackerGenerator {
     _private: ()
 }
 
-impl RecursiveBacktrackerGenerator {
-    pub fn new() -> Self {
-        Self { _private: () }
-    }
-
-    /// Sugar for `RecursiveBacktrackerGenerator::new().generate(maze)`
-    pub fn generate<Maze: CellManager>(maze: &mut Maze) {
-        Self::new().generate(maze)
-    }
-}
-
 impl <Maze: CellManager> MazeGenerator<Maze> for RecursiveBacktrackerGenerator {
     fn generate_with_rng<R: Rng + ?Sized>(&mut self, maze: &mut Maze, rng: &mut R) {
         // Start at the origin
@@ -37,5 +26,17 @@ impl <Maze: CellManager> MazeGenerator<Maze> for RecursiveBacktrackerGenerator {
                 None => current_pt = stack.pop().unwrap()
             }
         }
+    }
+}
+
+impl RecursiveBacktrackerGenerator {
+    pub fn new() -> Self {
+        Self { _private: () }
+    }
+}
+
+impl Default for RecursiveBacktrackerGenerator {
+    fn default() -> Self {
+        Self::new()
     }
 }

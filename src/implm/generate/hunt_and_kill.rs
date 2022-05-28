@@ -9,17 +9,6 @@ pub struct HuntAndKillGenerator {
     _private: ()
 }
 
-impl HuntAndKillGenerator {
-    pub fn new() -> Self {
-        Self { _private: () }
-    }
-
-    /// Sugar for `HuntAndKillGenerator::new().generate(maze)`
-    pub fn generate<Maze: CellManager>(maze: &mut Maze) {
-        Self::new().generate(maze)
-    }
-}
-
 impl <Maze: CellManager> MazeGenerator<Maze> for HuntAndKillGenerator {
     fn generate_with_rng<R: Rng + ?Sized>(&mut self, maze: &mut Maze, rng: &mut R) {
         'hunt: for pt in maze.coord_space().into_iter() {
@@ -34,7 +23,7 @@ impl <Maze: CellManager> MazeGenerator<Maze> for HuntAndKillGenerator {
 
                     neighbours.retain(|&neighbour| maze.get(neighbour).is_fully_visited());
 
-                    if neighbours.len() > 0 {
+                    if neighbours.is_empty() == false {
                         // unwrap() is safe by virtue of the algorithm
                         let selected_pt = *neighbours.choose(rng).unwrap();  // Already checked length
 
@@ -56,5 +45,17 @@ impl <Maze: CellManager> MazeGenerator<Maze> for HuntAndKillGenerator {
                 }
             }
         }
+    }
+}
+
+impl HuntAndKillGenerator {
+    pub fn new() -> Self {
+        Self { _private: () }
+    }
+}
+
+impl Default for HuntAndKillGenerator {
+    fn default() -> Self {
+        Self::new()
     }
 }
