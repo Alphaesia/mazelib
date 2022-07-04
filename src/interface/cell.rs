@@ -8,7 +8,7 @@
 //! necessary information for interpreting cells.
 //!
 //! # Recommended Reading
-//! 
+//!
 //! 1. [`crate::interface`'s section on cells][crate::interface#cell] --- a detailed introduction
 //! to cells and what they are.
 //! 2. [`ConnectionType`] --- the ways that points can be connected.
@@ -173,9 +173,6 @@ pub enum ConnectionType {
     /// from within the maze itself after generation is complete.
     UNVISITED
 }
-
-/// Graph theory nomenclature alias for [`ConnectionType`].
-pub type EdgeType = ConnectionType;
 
 /// A unique identifier for a cell within a given maze.
 ///
