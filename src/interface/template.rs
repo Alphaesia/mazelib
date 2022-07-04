@@ -1,5 +1,5 @@
-use crate::interface::cell::CellManager;
+use crate::interface::maze::Maze;
 
-pub trait Template<Maze: CellManager> {
-    fn apply(maze: &mut Maze);
+pub trait Template<M: Maze> {
+    fn apply(maze: &mut M);
 }

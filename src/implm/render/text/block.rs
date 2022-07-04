@@ -1,12 +1,13 @@
 use std::io::{Result, Write};
 use crate::interface::buffer::{MazeBuffer, BufferLocation};
 use crate::interface::render::MazeRendererNonSeeking;
-use crate::implm::cell::block::{BoxSpaceBlockCellManager, BlockCellValue, BlockCellValueType};
+use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
+use crate::implm::maze::block::BoxSpaceBlockCellMaze;
 use crate::implm::render::text::{TextMazeRenderer, BoxSpaceTextMazeRenderer};
 use crate::implm::render::text::line_break::WriteLineBreak;
 
-impl <Buffer: MazeBuffer<BlockCellValue>> MazeRendererNonSeeking<BoxSpaceBlockCellManager<Buffer, 2>> for BoxSpaceTextMazeRenderer {
-    fn render<Output: Write>(&self, maze: &BoxSpaceBlockCellManager<Buffer, 2>, output: &mut Output) -> Result<()> {
+impl <Buffer: MazeBuffer<BlockCellValue>> MazeRendererNonSeeking<BoxSpaceBlockCellMaze<Buffer, 2>> for BoxSpaceTextMazeRenderer {
+    fn render<Output: Write>(&self, maze: &BoxSpaceBlockCellMaze<Buffer, 2>, output: &mut Output) -> Result<()> {
         let [width, height] = maze.get_full_dimensions();
 
         for y in 0..height {
@@ -30,4 +31,4 @@ impl <Buffer: MazeBuffer<BlockCellValue>> MazeRendererNonSeeking<BoxSpaceBlockCe
     }
 }
 
-impl <Buffer: MazeBuffer<BlockCellValue>> TextMazeRenderer<BoxSpaceBlockCellManager<Buffer, 2>> for BoxSpaceTextMazeRenderer {}
+impl <Buffer: MazeBuffer<BlockCellValue>> TextMazeRenderer<BoxSpaceBlockCellMaze<Buffer, 2>> for BoxSpaceTextMazeRenderer {}

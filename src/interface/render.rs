@@ -6,7 +6,7 @@
 
 use std::io;
 use std::io::{Seek, Write};
-use crate::interface::cell::CellManager;
+use crate::interface::maze::Maze;
 
 /// Render (export) a maze into another format.
 ///
@@ -82,7 +82,7 @@ use crate::interface::cell::CellManager;
 /// If an implementation does not require a writer to support seeking, it
 /// should implement [`MazeRendererNonSeeking`] instead. Implementing that
 /// trait will also automatically implement this one.
-pub trait MazeRenderer<Maze: CellManager> {
+pub trait MazeRenderer<M: Maze> {
     /// Render the maze `maze` to writer `output`.
     ///
     /// The format the maze is rendered to (and thus the type of data that
@@ -95,7 +95,7 @@ pub trait MazeRenderer<Maze: CellManager> {
     ///
     /// It is recommended to wrap `output` in a [`BufWriter`][std::io::BufWriter]
     /// if it not already buffered.
-    fn render<Output: Write + Seek>(&self, maze: &Maze, output: &mut Output) -> io::Result<()>;
+    fn render<Output: Write + Seek>(&self, maze: &M, output: &mut Output) -> io::Result<()>;
 }
 
 /// Like [`MazeRenderer`], but supports writers that do not support seeking.
@@ -104,14 +104,14 @@ pub trait MazeRenderer<Maze: CellManager> {
 ///
 /// If you have a writer that requires this trait, make sure you import
 /// this trait and not `MazeRenderer`.
-pub trait MazeRendererNonSeeking<Maze: CellManager>: MazeRenderer<Maze> {
-    fn render<Output: Write>(&self, maze: &Maze, output: &mut Output) -> io::Result<()>;
+pub trait MazeRendererNonSeeking<M: Maze>: MazeRenderer<M> {
+    fn render<Output: Write>(&self, maze: &M, output: &mut Output) -> io::Result<()>;
 }
 
 // Blanket implementation of MazeRenderer for all MazeRendererNonSeeking-s
-impl <Maze: CellManager, T: MazeRendererNonSeeking<Maze>> MazeRenderer<Maze> for T {
-    fn render<Output: Write + Seek>(&self, maze: &Maze, output: &mut Output) -> io::Result<()> {
-        MazeRendererNonSeeking::<Maze>::render(self, maze, output)
+impl <M: Maze, T: MazeRendererNonSeeking<M>> MazeRenderer<M> for T {
+    fn render<Output: Write + Seek>(&self, maze: &M, output: &mut Output) -> io::Result<()> {
+        MazeRendererNonSeeking::<M>::render(self, maze, output)
     }
 }
 
@@ -125,15 +125,16 @@ impl <Maze: CellManager, T: MazeRendererNonSeeking<Maze>> MazeRenderer<Maze> for
 /// # use std::path::Path;
 /// # use mazelib::interface::generate::MazeGenerator;
 /// # use mazelib::implm::buffer::VecBuffer;
-/// # use mazelib::implm::cell::block::{BlockCellValue, BoxSpaceBlockCellManagerBuilder};
+/// # use mazelib::implm::cell::block::BlockCellValue;
 /// # use mazelib::implm::generate::HuntAndKillGenerator;
+/// # use mazelib::implm::maze::block::BoxSpaceBlockCellMazeBuilder;
 /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
 /// # use mazelib::implm::render::text::BoxSpaceTextMazeRenderer;
 /// # use mazelib::interface::render::MazeRenderer;
 /// #
 /// # fn test() -> std::io::Result<()> {
 /// #
-/// # let mut maze = BoxSpaceBlockCellManagerBuilder::<VecBuffer<BlockCellValue>, 2>::new(BoxCoordinateSpace::new([1, 1])).build();
+/// # let mut maze = BoxSpaceBlockCellMazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(BoxCoordinateSpace::new([1, 1])).build();
 /// # let mut output = File::create(Path::new("")).unwrap();
 /// #
 /// BoxSpaceTextMazeRenderer::new().render(&mut maze, &mut output)
@@ -145,27 +146,28 @@ impl <Maze: CellManager, T: MazeRendererNonSeeking<Maze>> MazeRenderer<Maze> for
 /// # use std::path::Path;
 /// # use mazelib::interface::generate::MazeGenerator;
 /// # use mazelib::implm::buffer::VecBuffer;
-/// # use mazelib::implm::cell::block::{BlockCellValue, BoxSpaceBlockCellManagerBuilder};
+/// # use mazelib::implm::cell::block::BlockCellValue;
 /// # use mazelib::implm::generate::HuntAndKillGenerator;
+/// # use mazelib::implm::maze::block::BoxSpaceBlockCellMazeBuilder;
 /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
 /// # use mazelib::implm::render::text::BoxSpaceTextMazeRenderer;
 /// # use mazelib::interface::render::DefaultMazeRenderer;
 /// #
 /// # fn test() -> std::io::Result<()> {
 /// #
-/// # let mut maze = BoxSpaceBlockCellManagerBuilder::<VecBuffer<BlockCellValue>, 2>::new(BoxCoordinateSpace::new([1, 1])).build();
+/// # let mut maze = BoxSpaceBlockCellMazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(BoxCoordinateSpace::new([1, 1])).build();
 /// # let mut output = File::create(Path::new("")).unwrap();
 /// #
 /// BoxSpaceTextMazeRenderer::render(&mut maze, &mut output)
 /// # }
 /// ```
-pub trait DefaultMazeRenderer<Maze: CellManager>: MazeRenderer<Maze> {
+pub trait DefaultMazeRenderer<M: Maze>: MazeRenderer<M> {
     /// *See [`MazeRenderer::render()`].*
-    fn render<Output: Write + Seek>(maze: &Maze, output: &mut Output) -> io::Result<()>;
+    fn render<Output: Write + Seek>(maze: &M, output: &mut Output) -> io::Result<()>;
 }
 
-impl <Maze: CellManager, T: MazeRenderer<Maze> + Default> DefaultMazeRenderer<Maze> for T {
-    fn render<Output: Write + Seek>(maze: &Maze, output: &mut Output) -> io::Result<()> {
+impl <M: Maze, T: MazeRenderer<M> + Default> DefaultMazeRenderer<M> for T {
+    fn render<Output: Write + Seek>(maze: &M, output: &mut Output) -> io::Result<()> {
         Self::default().render(maze, output)
     }
 }
@@ -180,15 +182,16 @@ impl <Maze: CellManager, T: MazeRenderer<Maze> + Default> DefaultMazeRenderer<Ma
 /// # use std::path::Path;
 /// # use mazelib::interface::generate::MazeGenerator;
 /// # use mazelib::implm::buffer::VecBuffer;
-/// # use mazelib::implm::cell::block::{BlockCellValue, BoxSpaceBlockCellManagerBuilder};
+/// # use mazelib::implm::cell::block::BlockCellValue;
 /// # use mazelib::implm::generate::HuntAndKillGenerator;
+/// # use mazelib::implm::maze::block::BoxSpaceBlockCellMazeBuilder;
 /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
 /// # use mazelib::implm::render::text::BoxSpaceTextMazeRenderer;
 /// # use mazelib::interface::render::MazeRendererNonSeeking;
 /// #
 /// # fn test() -> std::io::Result<()> {
 /// #
-/// # let mut maze = BoxSpaceBlockCellManagerBuilder::<VecBuffer<BlockCellValue>, 2>::new(BoxCoordinateSpace::new([1, 1])).build();
+/// # let mut maze = BoxSpaceBlockCellMazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(BoxCoordinateSpace::new([1, 1])).build();
 /// # let mut output = File::create(Path::new("")).unwrap();
 /// #
 /// BoxSpaceTextMazeRenderer::new().render(&mut maze, &mut output)
@@ -200,27 +203,28 @@ impl <Maze: CellManager, T: MazeRenderer<Maze> + Default> DefaultMazeRenderer<Ma
 /// # use std::path::Path;
 /// # use mazelib::interface::generate::MazeGenerator;
 /// # use mazelib::implm::buffer::VecBuffer;
-/// # use mazelib::implm::cell::block::{BlockCellValue, BoxSpaceBlockCellManagerBuilder};
+/// # use mazelib::implm::cell::block::BlockCellValue;
 /// # use mazelib::implm::generate::HuntAndKillGenerator;
+/// # use mazelib::implm::maze::block::BoxSpaceBlockCellMazeBuilder;
 /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
 /// # use mazelib::implm::render::text::BoxSpaceTextMazeRenderer;
 /// # use mazelib::interface::render::DefaultMazeRendererNonSeeking;
 /// #
 /// # fn test() -> std::io::Result<()> {
 /// #
-/// # let mut maze = BoxSpaceBlockCellManagerBuilder::<VecBuffer<BlockCellValue>, 2>::new(BoxCoordinateSpace::new([1, 1])).build();
+/// # let mut maze = BoxSpaceBlockCellMazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(BoxCoordinateSpace::new([1, 1])).build();
 /// # let mut output = File::create(Path::new("")).unwrap();
 /// #
 /// BoxSpaceTextMazeRenderer::render(&mut maze, &mut output)
 /// # }
 /// ```
-pub trait DefaultMazeRendererNonSeeking<Maze: CellManager>: MazeRendererNonSeeking<Maze> {
+pub trait DefaultMazeRendererNonSeeking<M: Maze>: MazeRendererNonSeeking<M> {
     /// *See [`MazeRenderer::render()`].*
-    fn render<Output: Write>(maze: &Maze, output: &mut Output) -> io::Result<()>;
+    fn render<Output: Write>(maze: &M, output: &mut Output) -> io::Result<()>;
 }
 
-impl <Maze: CellManager, T: MazeRendererNonSeeking<Maze> + Default> DefaultMazeRendererNonSeeking<Maze> for T {
-    fn render<Output: Write>(maze: &Maze, output: &mut Output) -> io::Result<()> {
-        MazeRendererNonSeeking::<Maze>::render(&Self::default(), maze, output)
+impl <M: Maze, T: MazeRendererNonSeeking<M> + Default> DefaultMazeRendererNonSeeking<M> for T {
+    fn render<Output: Write>(maze: &M, output: &mut Output) -> io::Result<()> {
+        MazeRendererNonSeeking::<M>::render(&Self::default(), maze, output)
     }
 }

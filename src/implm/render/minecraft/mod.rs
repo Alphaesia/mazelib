@@ -1,7 +1,7 @@
 #![cfg(any(feature = "minecraft", doc))]
 #![doc(cfg(feature = "minecraft"))]
 
-use crate::interface::cell::CellManager;
+use crate::interface::maze::Maze;
 use crate::interface::render::MazeRenderer;
 
 mod block;
@@ -29,4 +29,4 @@ impl BoxSpaceSchematicMazeRenderer {
     }
 }
 
-pub trait SchematicMazeRenderer<CellSpace: CellManager> : MazeRenderer<CellSpace> {}
+pub trait SchematicMazeRenderer<M: Maze> : MazeRenderer<M> {}

@@ -1,10 +1,10 @@
 use std::io::{Write, Result};
 use crate::interface::render::MazeRendererNonSeeking;
-use crate::interface::cell::CellManager;
 use crate::implm::cell::inline::{BoxSpaceInlineCellManager, InlineCellValue, InlineCellValueWallType as WallType};
 use crate::interface::buffer::{MazeBuffer, BufferLocation};
 use crate::implm::render::text::{TextMazeRenderer, BoxSpaceTextMazeRenderer};
 use crate::implm::render::text::line_break::WriteLineBreak;
+use crate::interface::cell::CellManager;
 
 impl <Buffer: MazeBuffer<InlineCellValue<2>>> MazeRendererNonSeeking<BoxSpaceInlineCellManager<Buffer, 2>> for BoxSpaceTextMazeRenderer {
     fn render<Output: Write>(&self, maze: &BoxSpaceInlineCellManager<Buffer, 2>, output: &mut Output) -> Result<()> {

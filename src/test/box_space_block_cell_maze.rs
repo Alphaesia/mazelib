@@ -1,8 +1,9 @@
-use crate::implm::point::boxy::BoxCoordinateSpace;
-use crate::implm::cell::block::{BoxSpaceBlockCellManagerBuilder as MazeBuilder, BlockCellValue, BlockCellValueType};
 use crate::implm::buffer::VecBuffer;
-use crate::interface::cell::CellManager;
+use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
+use crate::implm::maze::block::{BoxSpaceBlockCellMazeBuilder as MazeBuilder};
+use crate::implm::point::boxy::BoxCoordinateSpace;
 use crate::interface::buffer::{BufferLocation, MazeBuffer};
+use crate::interface::cell::CellManager;
 
 // We test both at a cell-manager level and a buffer level
 // (i.e. ignoring and taking into account the resolution)

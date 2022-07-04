@@ -2,7 +2,7 @@
 #![doc(cfg(feature = "img"))]
 
 use image::ImageFormat;
-use crate::interface::cell::CellManager;
+use crate::interface::maze::Maze;
 use crate::interface::render::MazeRenderer;
 
 mod block;
@@ -18,4 +18,4 @@ impl BoxSpaceImageMazeRenderer {
     }
 }
 
-pub trait ImageMazeRenderer<CellSpace: CellManager> : MazeRenderer<CellSpace> {}
+pub trait ImageMazeRenderer<M: Maze> : MazeRenderer<M> {}

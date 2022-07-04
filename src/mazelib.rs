@@ -10,9 +10,10 @@
 //!
 //! ```
 //! use mazelib::implm::buffer::VecBuffer;
-//! use mazelib::implm::cell::block::{BlockCellValue, BoxSpaceBlockCellManagerBuilder};
+//! use mazelib::implm::cell::block::BlockCellValue;
 //! use mazelib::implm::cell::inline::{BoxSpaceInlineCellManager, InlineCellValue};
 //! use mazelib::implm::generate::HuntAndKillGenerator;
+//! use mazelib::implm::maze::block::BoxSpaceBlockCellMazeBuilder;
 //! use mazelib::implm::point::boxy::BoxCoordinateSpace;
 //! use mazelib::implm::render::text::BoxSpaceTextMazeRenderer;
 //! use mazelib::implm::template::boxy::SolidBorderTemplate;
@@ -30,10 +31,10 @@
 //!
 //! type Buffer = VecBuffer<BlockCellValue>;
 //!
-//! // Create the maze "object"
-//! // The "BoxSpace" in BoxSpaceBlockCellManagerBuilder lines up with our BoxCoordinateSpace
-//! // "BlockCell" means that this CellManager will use BlockCells
-//! let mut maze = BoxSpaceBlockCellManagerBuilder::<Buffer, DIMENSION>::new(coord_space).build();
+//! // Create the maze "object". The name of the maze type hints at what it supports:
+//! // "BoxSpace" means it expects a BoxCoordinateSpace.
+//! // "BlockCell" means it will use BlockCells for cells.
+//! let mut maze = BoxSpaceBlockCellMazeBuilder::<Buffer, DIMENSION>::new(coord_space).build();
 //!
 //! // Give our maze a nice thick border
 //! SolidBorderTemplate::apply(&mut maze);
@@ -68,12 +69,13 @@
 //! of the generated maze in different ways.
 //!
 //! For example, changing `BlockCellValue` to `InlineCellValue<DIMENSION>` will change how the
-//! cells look. (Note you wll have to replace `BoxSpaceBlockCellManagerBuilder` with
-//! `BoxSpaceInlineCellManager` and remove the trailing `.build()`).
+//! cells look. (Note you wll have to replace `BoxSpaceBlockCellMazeBuilder` with
+//! `BoxSpaceInlineCellMaze` and remove the trailing `.build()`).
 //!
 //! ```
 //! # use mazelib::implm::buffer::VecBuffer;
 //! # use mazelib::implm::cell::inline::{BoxSpaceInlineCellManager, InlineCellValue};
+//! # use mazelib::implm::maze::inline::BoxSpaceInlineCellMaze;
 //! # use mazelib::implm::point::boxy::BoxCoordinateSpace;
 //! #
 //! # const DIMENSION: usize = 2;
@@ -81,7 +83,7 @@
 //! #
 //! type Buffer = VecBuffer<InlineCellValue<DIMENSION>>;
 //!
-//! let mut maze = BoxSpaceInlineCellManager::<Buffer, DIMENSION>::new(coord_space);
+//! let mut maze = BoxSpaceInlineCellMaze::<Buffer, DIMENSION>::new(coord_space);
 //! ```
 //! produces
 //! ```text

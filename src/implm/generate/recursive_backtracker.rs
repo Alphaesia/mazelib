@@ -1,15 +1,15 @@
 use rand::Rng;
 use crate::implm::generate::util::carve_to_unvisited_neighbour;
-use crate::interface::cell::CellManager;
 use crate::interface::generate::MazeGenerator;
+use crate::interface::maze::Maze;
 use crate::interface::point::CoordinateSpace;
 
 pub struct RecursiveBacktrackerGenerator {
     _private: ()
 }
 
-impl <Maze: CellManager> MazeGenerator<Maze> for RecursiveBacktrackerGenerator {
-    fn generate_with_rng<R: Rng + ?Sized>(&mut self, maze: &mut Maze, rng: &mut R) {
+impl <M: Maze> MazeGenerator<M> for RecursiveBacktrackerGenerator {
+    fn generate_with_rng<R: Rng + ?Sized>(&mut self, maze: &mut M, rng: &mut R) {
         // Start at the origin
         let mut current_pt = maze.coord_space().choose(rng);
 

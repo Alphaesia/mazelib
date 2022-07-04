@@ -3,12 +3,13 @@ use std::io::{Write, Result};
 use std::time::SystemTime;
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::render::MazeRendererNonSeeking;
-use crate::implm::cell::block::{BoxSpaceBlockCellManager, BlockCellValue, BlockCellValueType};
+use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
+use crate::implm::maze::block::BoxSpaceBlockCellMaze;
 use crate::implm::render::minecraft::{BoxSpaceSchematicMazeRenderer, SchematicMazeRenderer};
 use crate::implm::render::minecraft::schem::{SpongeSchematicV3, SpongeSchematicV3SchematicObject, SpongeSchematicV3MetadataObject, SpongeSchematicV3BlockContainer};
 
-impl <Buffer: MazeBuffer<BlockCellValue>> MazeRendererNonSeeking<BoxSpaceBlockCellManager<Buffer, 2>> for BoxSpaceSchematicMazeRenderer {
-    fn render<Output: Write>(&self, maze: &BoxSpaceBlockCellManager<Buffer, 2>, output: &mut Output) -> Result<()> {
+impl <Buffer: MazeBuffer<BlockCellValue>> MazeRendererNonSeeking<BoxSpaceBlockCellMaze<Buffer, 2>> for BoxSpaceSchematicMazeRenderer {
+    fn render<Output: Write>(&self, maze: &BoxSpaceBlockCellMaze<Buffer, 2>, output: &mut Output) -> Result<()> {
         // Spec: https://github.com/SpongePowered/Schematic-Specification/blob/master/versions/schematic-3.md
 
         let [width, length] = maze.get_full_dimensions().map(|dim| TryInto::<u16>::try_into(dim).expect("Cannot render mazes with dimensions larger than u16"));
@@ -83,4 +84,4 @@ impl <Buffer: MazeBuffer<BlockCellValue>> MazeRendererNonSeeking<BoxSpaceBlockCe
     }
 }
 
-impl <Buffer: MazeBuffer<BlockCellValue>> SchematicMazeRenderer<BoxSpaceBlockCellManager<Buffer, 2>> for BoxSpaceSchematicMazeRenderer {}
+impl <Buffer: MazeBuffer<BlockCellValue>> SchematicMazeRenderer<BoxSpaceBlockCellMaze<Buffer, 2>> for BoxSpaceSchematicMazeRenderer {}

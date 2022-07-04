@@ -10,7 +10,7 @@
 //! 2. [`crate::implm::generate`] --- a comparison of the builtin generators.
 
 use rand::Rng;
-use crate::interface::cell::CellManager;
+use crate::interface::maze::Maze;
 
 /// A maze generator.
 ///
@@ -25,14 +25,13 @@ use crate::interface::cell::CellManager;
 /// Most implementations will define a static `Implementation::generate(maze: &mut Maze)`
 /// that will generate a maze using some default generator parameters. It also saves you
 /// having to construct the generator struct yourself.
-pub trait MazeGenerator<Maze: CellManager> {
+pub trait MazeGenerator<M: Maze> {
     /// Generate a random maze.
     ///
     /// Mazes are operated upon in-place. Should for whatever reason a generator panic
     /// during execution, the maze may be left in a partially-generated state
     /// (different from what it started as). It will however not be left in an inconsistent
-    /// state (i.e. it would be unsafe to read), unless the panic originates from within
-    /// the [`CellManager`].
+    /// state, unless the panic originates from within the [`Maze`] itself.
     ///
     /// # Parameters
     /// * `maze` --- the maze to be filled in. The maze may be partially or completely
@@ -40,7 +39,7 @@ pub trait MazeGenerator<Maze: CellManager> {
     ///              points and work them into its generation. Any
     ///              <abbr title="A connection between points">edge</abbr> that is not
     ///              a boundary may be overwritten as part of the generation process.
-    fn generate(&mut self, maze: &mut Maze) {
+    fn generate(&mut self, maze: &mut M) {
         self.generate_with_rng(maze, &mut rand::thread_rng());
     }
 
@@ -48,9 +47,8 @@ pub trait MazeGenerator<Maze: CellManager> {
     ///
     /// Mazes are operated upon in-place. Should for whatever reason a generator panic
     /// during execution, the maze may be left in a partially-generated state
-    /// (different from what it started as). It will however not be left in an inconsistent
-    /// state (i.e. it would be unsafe to read), unless the panic originates from within
-    /// the [`CellManager`].
+    /// (different from what it started as).  It will however not be left in an inconsistent
+    /// state, unless the panic originates from within the [`Maze`] itself.
     ///
     /// You should prefer [`generate()`][Self::generate`] to this method.
     ///
@@ -63,7 +61,7 @@ pub trait MazeGenerator<Maze: CellManager> {
     /// * `rng`  --- The sole source of randomness for a generator. Given a
     ///              [`rand::SeedableRng`] with a fixed seed, the generator's behaviour
     ///              is deterministic.
-    fn generate_with_rng<R: Rng + ?Sized>(&mut self, maze: &mut Maze, rng: &mut R);
+    fn generate_with_rng<R: Rng + ?Sized>(&mut self, maze: &mut M, rng: &mut R);
 }
 
 /// Simple sugar for [`MazeGenerator`]s.
@@ -74,10 +72,11 @@ pub trait MazeGenerator<Maze: CellManager> {
 /// ```
 /// # use mazelib::interface::generate::MazeGenerator;
 /// # use mazelib::implm::buffer::VecBuffer;
-/// # use mazelib::implm::cell::block::{BlockCellValue, BoxSpaceBlockCellManagerBuilder};
+/// # use mazelib::implm::cell::block::BlockCellValue;
 /// # use mazelib::implm::generate::HuntAndKillGenerator;
+/// # use mazelib::implm::maze::block::BoxSpaceBlockCellMazeBuilder;
 /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
-/// # let mut maze = BoxSpaceBlockCellManagerBuilder::<VecBuffer<BlockCellValue>, 1>::new(BoxCoordinateSpace::new([1])).build();
+/// # let mut maze = BoxSpaceBlockCellMazeBuilder::<VecBuffer<BlockCellValue>, 1>::new(BoxCoordinateSpace::new([1])).build();
 /// #
 /// HuntAndKillGenerator::new().generate(&mut maze);
 /// ```
@@ -85,27 +84,28 @@ pub trait MazeGenerator<Maze: CellManager> {
 /// ```
 /// # use mazelib::interface::generate::DefaultMazeGenerator;
 /// # use mazelib::implm::buffer::VecBuffer;
-/// # use mazelib::implm::cell::block::{BlockCellValue, BoxSpaceBlockCellManagerBuilder};
+/// # use mazelib::implm::cell::block::BlockCellValue;
 /// # use mazelib::implm::generate::HuntAndKillGenerator;
+/// # use mazelib::implm::maze::block::BoxSpaceBlockCellMazeBuilder;
 /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
-/// # let mut maze = BoxSpaceBlockCellManagerBuilder::<VecBuffer<BlockCellValue>, 1>::new(BoxCoordinateSpace::new([1])).build();
+/// # let mut maze = BoxSpaceBlockCellMazeBuilder::<VecBuffer<BlockCellValue>, 1>::new(BoxCoordinateSpace::new([1])).build();
 /// #
 /// HuntAndKillGenerator::generate(&mut maze);
 /// ```
-pub trait DefaultMazeGenerator<Maze: CellManager>: MazeGenerator<Maze> {
+pub trait DefaultMazeGenerator<M: Maze>: MazeGenerator<M> {
     /// *See [`MazeGenerator::generate()`].*
-    fn generate(maze: &mut Maze);
+    fn generate(maze: &mut M);
 
     /// *See [`MazeGenerator::generate_with_rng()`].*
-    fn generate_with_rng<R: Rng + ?Sized>(maze: &mut Maze, rng: &mut R);
+    fn generate_with_rng<R: Rng + ?Sized>(maze: &mut M, rng: &mut R);
 }
 
-impl <Maze: CellManager, T: MazeGenerator<Maze> + Default> DefaultMazeGenerator<Maze> for T {
-    fn generate(maze: &mut Maze) {
+impl <M: Maze, T: MazeGenerator<M> + Default> DefaultMazeGenerator<M> for T {
+    fn generate(maze: &mut M) {
         Self::default().generate(maze)
     }
 
-    fn generate_with_rng<R: Rng + ?Sized>(maze: &mut Maze, rng: &mut R) {
+    fn generate_with_rng<R: Rng + ?Sized>(maze: &mut M, rng: &mut R) {
         Self::default().generate_with_rng(maze, rng)
     }
 }

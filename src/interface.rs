@@ -13,6 +13,8 @@
 //! 4. [Buffers]
 //! 5. [Cell Managers]
 //!
+//! These components are all held together in one bundle by [Maze Carriers].
+//!
 //! There are also external components that interact with mazes but do not constitute them:
 //! * [Renderers]
 //! * [Generators]
@@ -103,8 +105,9 @@
 //! You may notice that on the figure the entrances and exits are not marked as points. This is
 //! because the maze was modified after creation to add gaps in the outer boundary to indicate
 //! the entrance and exit. Since these are visual indicators for humans, they're only a part of
-//! the . For the purposes of analysis, when start and end points are required, the closest points
-//! are used. In this case, they are the upper-left-most and bottom-right-most points respectively.
+//! the cell space. For the purposes of analysis, when start and end points are required, the closest
+//! points are used. In this case, they are the upper-left-most and bottom-right-most points
+//! respectively.
 //!
 //! There does not need to exist a one-to-one mapping between points. A point might be mapped to
 //! multiple cells, and a cell might not be mapped to a point at all. We'll come to how points
@@ -147,7 +150,14 @@
 //!
 //! Due to their role in handling conversions to and from cells, CellManager implementations
 //! are often specific to only a specific combination of CoordinateSpace and type of cell
-//! ([CellValue][self::cell::CellValue]).
+//! ([`CellValue`][self::cell::CellValue]).
+//!
+//! # Maze Carrier
+//!
+//! A [Maze Carrier][self::maze::Maze] holds the five core components of a maze together.
+//! They are represented by the [`Maze`][self::maze::Maze] trait.
+//!
+//! They are used as references to the maze as a whole.
 //!
 //! # External Components
 //!
@@ -172,6 +182,7 @@
 //! [Coordinate Spaces]: #coordinate-space
 //! [Buffers]: #buffer
 //! [Cell Managers]: #cell-manager
+//! [Maze Carriers]: #maze-carrier
 //! [Renderers]: #renderer
 //! [Generators]: #generator
 //! [Solvers]: #solver
@@ -184,6 +195,7 @@
 pub mod buffer;
 pub mod point;
 pub mod cell;
+pub mod maze;
 pub mod render;
 pub mod template;
 pub mod generate;

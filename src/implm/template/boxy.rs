@@ -3,8 +3,9 @@ use crate::interface::template::Template;
 use crate::interface::cell::CellManager;
 use crate::implm::point::boxy::BoxCoordinateSpace;
 use crate::interface::point::CoordinateSpace;
-use crate::implm::cell::block::{BoxSpaceBlockCellManager, BlockCellValue, BlockCellValueType};
+use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
 use crate::implm::cell::inline::{BoxSpaceInlineCellManager, InlineCellValue, InlineCellValueWallType};
+use crate::implm::maze::block::BoxSpaceBlockCellMaze;
 
 pub struct SolidBorderTemplate {}
 
@@ -27,8 +28,8 @@ impl <Maze: CellManager<CoordSpace=BoxCoordinateSpace<DIMENSION>>, const DIMENSI
 
 // We operate on cells directly here so we can ignore any padding
 // or scaling effects.
-impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> Template<BoxSpaceBlockCellManager<Buffer, DIMENSION>> for SolidBorderTemplate {
-    fn apply(maze: &mut BoxSpaceBlockCellManager<Buffer, DIMENSION>) {
+impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> Template<BoxSpaceBlockCellMaze<Buffer, DIMENSION>> for SolidBorderTemplate {
+    fn apply(maze: &mut BoxSpaceBlockCellMaze<Buffer, DIMENSION>) {
         // TODO this can probably be optimised even further
         //  and rewritten to not be ugly
         let mut cell = [0usize; DIMENSION];

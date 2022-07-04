@@ -1,9 +1,10 @@
 use rand::SeedableRng;
 use rand_chacha::ChaCha8Rng;
 use crate::implm::buffer::VecBuffer;
-use crate::implm::cell::block::{BlockCellValue, BoxSpaceBlockCellManager, BoxSpaceBlockCellManagerBuilder};
+use crate::implm::cell::block::{BlockCellValue};
 use crate::implm::cell::inline::{BoxSpaceInlineCellManager, InlineCellValue};
 use crate::implm::generate::{HuntAndKillGenerator, NAryTreeGenerator, RecursiveBacktrackerGenerator};
+use crate::implm::maze::block::{BoxSpaceBlockCellMaze, BoxSpaceBlockCellMazeBuilder};
 use crate::implm::point::boxy::BoxCoordinateSpace;
 use crate::implm::render::text::BoxSpaceTextMazeRenderer;
 use crate::interface::generate::MazeGenerator;
@@ -230,15 +231,15 @@ fn get_test_rng() -> ChaCha8Rng {
     ChaCha8Rng::seed_from_u64(0)
 }
 
-fn get_new_block_cell_maze() -> BoxSpaceBlockCellManager<VecBuffer<BlockCellValue>, 2> {
-    BoxSpaceBlockCellManagerBuilder::<VecBuffer<BlockCellValue>, 2>::new(BoxCoordinateSpace::<2>::new([9, 9])).build()
+fn get_new_block_cell_maze() -> BoxSpaceBlockCellMaze<VecBuffer<BlockCellValue>, 2> {
+    BoxSpaceBlockCellMazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(BoxCoordinateSpace::<2>::new([9, 9])).build()
 }
 
 fn get_new_inline_cell_maze() -> BoxSpaceInlineCellManager::<VecBuffer<InlineCellValue<2>>, 2> {
     BoxSpaceInlineCellManager::<VecBuffer<InlineCellValue<2>>, 2>::new(BoxCoordinateSpace::<2>::new([9, 9]))
 }
 
-fn render_block_cell_maze(maze: &BoxSpaceBlockCellManager<VecBuffer<BlockCellValue>, 2>) -> String {
+fn render_block_cell_maze(maze: &BoxSpaceBlockCellMaze<VecBuffer<BlockCellValue>, 2>) -> String {
     let mut str_buffer = Vec::<u8>::new();
 
     BoxSpaceTextMazeRenderer::new().render(maze, &mut str_buffer).unwrap();
