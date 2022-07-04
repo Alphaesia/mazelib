@@ -8,7 +8,7 @@
 //! necessary information for interpreting cells.
 //!
 //! # Recommended Reading
-//! *(In order)*
+//! 
 //! 1. [`crate::interface`'s section on cells][crate::interface#cell] --- a detailed introduction
 //! to cells and what they are.
 //! 2. [`ConnectionType`] --- the ways that points can be connected.
@@ -18,9 +18,8 @@ use std::fmt::Debug;
 use crate::interface::point::CoordinateSpace;
 use crate::internal::noise_util::pt;
 
-/// Translates between [points][crate::interface::point::Point], [cells][super], and
-/// [buffer locations][crate::interface::buffer::BufferLocation]. Executes queries
-/// on mazes and modifications to mazes.
+/// Translates between [points][crate::interface::point::Point], [cell locations][CellLocation],
+/// and [cell identifiers][CellID]. Executes queries on mazes and modifications to mazes.
 ///
 /// [Cells have no inherent meaning][crate::interface]. They must be interpreted in context.
 /// This is exactly what a Cell Manager does.
@@ -177,3 +176,15 @@ pub enum ConnectionType {
 
 /// Graph theory nomenclature alias for [`ConnectionType`].
 pub type EdgeType = ConnectionType;
+
+/// A unique identifier for a cell within a given maze.
+///
+/// Identifiers are sequential and start from zero.
+///
+/// They are primarily used by [buffers][crate::interface::buffer::MazeBuffer]
+/// for the purposes of storing mazes.
+///
+/// The exact semantics of how cells are given their identifiers is
+/// unspecified and up to each [`CellManager`][crate::interface::cell::CellManager].
+/// Typically it will differ between implementations, and is not API.
+pub struct CellID(pub usize);

@@ -1,6 +1,6 @@
-use crate::interface::buffer::{MazeBuffer, BufferLocation};
-use crate::interface::cell::{CellManager, ConnectionType};
-use crate::implm::point::boxy::{BoxCoordinateSpace};
+use crate::interface::buffer::MazeBuffer;
+use crate::interface::cell::{CellID, CellManager, ConnectionType};
+use crate::implm::point::boxy::BoxCoordinateSpace;
 use crate::internal::noise_util::pt;
 use crate::interface::point::CoordinateSpace;
 use std::fmt::{Debug, Formatter};
@@ -9,7 +9,7 @@ use crate::implm::render::text::BoxSpaceTextMazeRenderer;
 use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
 use crate::implm::cell::block::cell::BlockCell;
 use std::marker::PhantomData;
-use crate::implm::cell::block::value::BlockCellValueType::{UNVISITED, BOUNDARY, WALL, PASSAGE};
+use crate::implm::cell::block::value::BlockCellValueType::{BOUNDARY, PASSAGE, UNVISITED, WALL};
 use crate::interface::render::MazeRendererNonSeeking;
 
 /// TODO write a description
@@ -132,7 +132,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// reason you should use this method is to access a cell that is not mapped by
     /// the coordinated space.
     pub fn get_cell_value(&self, loc: BlockCell<DIMENSION>) -> BlockCellValue {
-        self.buffer.get(self.cell_loc_to_buffer_loc(loc))
+        self.buffer.get(self.cell_loc_to_id(loc))
     }
 
     /// Get the value of any cell for mutation.
@@ -143,7 +143,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     ///
     /// See also: [`Self::get_cell_value()`].
     pub fn get_cell_value_mut(&mut self, loc: BlockCell<DIMENSION>) -> &mut BlockCellValue {
-        self.buffer.get_mut(self.cell_loc_to_buffer_loc(loc))
+        self.buffer.get_mut(self.cell_loc_to_id(loc))
     }
 
     /// Set the value of any cell, including ones not mapped by the coordinate space
@@ -155,7 +155,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// you should use this method is to access a cell that is not mapped by the
     /// coordinated space.
     pub fn set_cell_value(&mut self, loc: BlockCell<DIMENSION>, value: BlockCellValue) {
-        self.buffer.set(self.cell_loc_to_buffer_loc(loc), value)
+        self.buffer.set(self.cell_loc_to_id(loc), value)
     }
 
     /// Sugar for
@@ -190,15 +190,15 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
         return None
     }
 
-    /// Convert a [`crate::interface::cell::CellLocation`] to a [`BufferLocation`]
-    fn cell_loc_to_buffer_loc(&self, cell_loc: BlockCell<DIMENSION>) -> BufferLocation {
+    /// Convert a [`crate::interface::cell::CellLocation`] to a [`crate::interface::cell::CellID`]
+    fn cell_loc_to_id(&self, cell_loc: BlockCell<DIMENSION>) -> CellID {
         let mut offset = cell_loc[0];
 
         for i in 1..DIMENSION {
             offset += cell_loc[i] * self.full_dimensions[i - 1];
         }
 
-        BufferLocation(offset)
+        CellID(offset)
     }
 
     fn set_unvisited_neighbours_to_wall(&mut self, cell_loc: BlockCell<DIMENSION>) {

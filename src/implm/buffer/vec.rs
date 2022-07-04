@@ -1,5 +1,5 @@
-use crate::interface::cell::CellValue;
-use crate::interface::buffer::{MazeBuffer, BufferLocation};
+use crate::interface::cell::{CellID, CellValue};
+use crate::interface::buffer::MazeBuffer;
 use std::fmt::{Debug, Formatter};
 
 /// A [MazeBuffer] that stores its cells in a [Vec] allocated on the heap.
@@ -14,16 +14,16 @@ impl <CellVal: CellValue> MazeBuffer<CellVal> for VecBuffer<CellVal> {
         Self { buf: vec![CellVal::default(); cell_count] }
     }
 
-    fn get(&self, loc: BufferLocation) -> CellVal {
-        self.buf[loc.0]
+    fn get(&self, cell: CellID) -> CellVal {
+        self.buf[cell.0]
     }
 
-    fn get_mut(&mut self, loc: BufferLocation) -> &mut CellVal {
-        &mut self.buf[loc.0]
+    fn get_mut(&mut self, cell: CellID) -> &mut CellVal {
+        &mut self.buf[cell.0]
     }
 
-    fn set(&mut self, loc: BufferLocation, new_value: CellVal) {
-        self.buf[loc.0] = new_value
+    fn set(&mut self, cell: CellID, new_value: CellVal) {
+        self.buf[cell.0] = new_value
     }
 }
 

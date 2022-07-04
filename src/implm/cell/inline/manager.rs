@@ -3,17 +3,17 @@ use crate::implm::cell::inline::InlineCellValue;
 use crate::implm::cell::inline::value::InlineCellValueWallType;
 use crate::implm::point::boxy::BoxCoordinateSpace;
 use crate::implm::render::text::BoxSpaceTextMazeRenderer;
-use crate::interface::buffer::{BufferLocation, MazeBuffer};
-use crate::interface::cell::{CellManager, ConnectionType};
+use crate::interface::buffer::MazeBuffer;
+use crate::interface::cell::{CellID, CellManager, ConnectionType};
 use crate::interface::point::CoordinateSpace;
 use crate::interface::render::MazeRendererNonSeeking;
 use crate::internal::array_util::Product;
 use crate::pt;
 
 /// As this manager implements a one-to-one mapping between points and cells, there is
-/// no separate [CellLocation][crate::interface::cell::CellLocation] struct.
-/// [CoordinateTuplet][crate::implm::point::boxy::CoordinateTuplet]s are converted directly
-/// into [BufferLocation]s.
+/// no separate [`CellLocation`][crate::interface::cell::CellLocation] struct.
+/// [`CoordinateTuplet`][crate::implm::point::boxy::CoordinateTuplet]s are converted directly
+/// into [`CellID`]s.
 pub struct BoxSpaceInlineCellManager<Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> {
     buffer: Buffer,
     space: BoxCoordinateSpace<DIMENSION>,
@@ -38,7 +38,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Bo
     ///
     /// In most cases you should use the methods on [CellManager] instead of this.
     pub fn set(&mut self, cell: pt!(), value: <Self as CellManager>::CellVal) {
-        self.buffer.set(self.pt_to_buffer_loc(cell), value)
+        self.buffer.set(self.pt_to_cell_id(cell), value)
     }
 }
 
@@ -63,18 +63,18 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Bo
         return None
     }
 
-    fn pt_to_buffer_loc(&self, pt: pt!()) -> BufferLocation {
+    fn pt_to_cell_id(&self, pt: pt!()) -> CellID {
         let mut offset = pt[0];
 
         for i in 1..DIMENSION {
             offset += pt[i] * self.coord_space().dimensions()[i - 1];
         }
 
-        BufferLocation(offset)
+        CellID(offset)
     }
 
     fn get_mut(&mut self, pt: pt!()) -> &mut <Self as CellManager>::CellVal {
-        self.buffer.get_mut(self.pt_to_buffer_loc(pt))
+        self.buffer.get_mut(self.pt_to_cell_id(pt))
     }
 
     fn set_unvisited_edges_to_wall(cell: &mut [[InlineCellValueWallType; 2]; DIMENSION]) {
@@ -134,7 +134,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Ce
     }
 
     fn get(&self, pt: pt!()) -> Self::CellVal {
-        self.buffer.get(self.pt_to_buffer_loc(pt))
+        self.buffer.get(self.pt_to_cell_id(pt))
     }
 
     fn get_connection(&self, from: pt!(), to: pt!()) -> ConnectionType {

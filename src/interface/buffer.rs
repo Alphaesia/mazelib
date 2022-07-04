@@ -9,7 +9,7 @@
 //! 1. [`MazeBuffer`] -- the buffer trait.
 
 use std::fmt::Debug;
-use crate::interface::cell::CellValue;
+use crate::interface::cell::{CellID, CellValue};
 
 /// Maze cell container.
 ///
@@ -42,30 +42,20 @@ pub trait MazeBuffer<CellVal: CellValue> : Debug + Send {
     ///
     /// # Panics
     ///
-    /// Panics if `loc` out of bounds (is greater than or equal to this buffer's size).
-    fn get(&self, loc: BufferLocation) -> CellVal;
+    /// Panics if `cell` out of bounds (is greater than or equal to this buffer's size).
+    fn get(&self, cell: CellID) -> CellVal;
 
     /// Get the value of a given cell for mutation.
     ///
     /// # Panics
     ///
-    /// Panics if `loc` out of bounds (is greater than or equal to this buffer's size).
-    fn get_mut(&mut self, loc: BufferLocation) -> &mut CellVal;
+    /// Panics if `cell` out of bounds (is greater than or equal to this buffer's size).
+    fn get_mut(&mut self, cell: CellID) -> &mut CellVal;
 
     /// Set the value of a given cell.
     ///
     /// # Panics
     ///
-    /// Panics if `loc` out of bounds (is greater than or equal to this buffer's size).
-    fn set(&mut self, loc: BufferLocation, new_value: CellVal);
+    /// Panics if `cell` out of bounds (is greater than or equal to this buffer's size).
+    fn set(&mut self, cell: CellID, new_value: CellVal);
 }
-
-/// Universal cell identifier for interacting with [`MazeBuffer`]s.
-///
-/// A BufferLocation represents the position of a cell in a buffer. It is a
-/// unique sequential ID assigned to each cell.
-///
-/// The exact semantics of how points and cells map to BufferLocations is
-/// unspecified and up to each [`CellManager`][crate::interface::cell::CellManager].
-/// Typically it will differ between implementations, and is not API.
-pub struct BufferLocation(pub usize);

@@ -1,10 +1,10 @@
-use std::io::{Write, Result};
+use std::io::{Result, Write};
 use crate::interface::render::MazeRendererNonSeeking;
 use crate::implm::cell::inline::{BoxSpaceInlineCellManager, InlineCellValue, InlineCellValueWallType as WallType};
-use crate::interface::buffer::{MazeBuffer, BufferLocation};
-use crate::implm::render::text::{TextMazeRenderer, BoxSpaceTextMazeRenderer};
+use crate::interface::buffer::MazeBuffer;
+use crate::implm::render::text::{BoxSpaceTextMazeRenderer, TextMazeRenderer};
 use crate::implm::render::text::line_break::WriteLineBreak;
-use crate::interface::cell::CellManager;
+use crate::interface::cell::{CellID, CellManager};
 
 impl <Buffer: MazeBuffer<InlineCellValue<2>>> MazeRendererNonSeeking<BoxSpaceInlineCellManager<Buffer, 2>> for BoxSpaceTextMazeRenderer {
     fn render<Output: Write>(&self, maze: &BoxSpaceInlineCellManager<Buffer, 2>, output: &mut Output) -> Result<()> {
@@ -30,7 +30,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<2>>> MazeRendererNonSeeking<BoxSpaceInl
             let mut wall_previously = WallType::PASSAGE;
 
             for x in 0..width {
-                let pt = BufferLocation(x + y * width);
+                let pt = CellID(x + y * width);
 
                 let cell_value = maze.buffer().get(pt);
 
@@ -101,7 +101,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<2>>> MazeRendererNonSeeking<BoxSpaceInl
             let mut line: String = String::with_capacity(width * 2 + 1);
 
             for x in 0..width {
-                let pt = BufferLocation(x + (height - 1) * width);  // We're iterating over the last row
+                let pt = CellID(x + (height - 1) * width);  // We're iterating over the last row
 
                 let cell_value = maze.buffer().get(pt);
 

@@ -14,13 +14,16 @@ use mazelib::implm::render::text::BoxSpaceTextMazeRenderer;
 use mazelib::interface::render::DefaultMazeRendererNonSeeking;
 use mazelib::implm::template::boxy::SolidBorderTemplate;
 use mazelib::interface::template::Template;
-use mazelib::implm::generate::{NAryTreeGenerator, HuntAndKillGenerator, RecursiveBacktrackerGenerator};
+use mazelib::implm::generate::{HuntAndKillGenerator, NAryTreeGenerator, RecursiveBacktrackerGenerator};
 use mazelib::interface::generate::DefaultMazeGenerator;
 use mazelib::implm::cell::inline::{InlineCellValue, InlineCellValueWallType};
 use mazelib::implm::maze::block::BoxSpaceBlockCellMazeBuilder;
 //use mazelib::implm::render::img::BoxSpaceImageMazeRenderer;
 //use mazelib::implm::render::minecraft::BoxSpaceSchematicMazeRenderer;
-use mazelib::interface::buffer::{BufferLocation, MazeBuffer};
+use mazelib::interface::buffer::MazeBuffer;
+//use mazelib::implm::render::img::BoxSpaceImageMazeRenderer;
+//use mazelib::implm::render::minecraft::BoxSpaceSchematicMazeRenderer;
+use mazelib::interface::cell::CellID;
 
 fn main() {
     const DIMENSION: usize = 2;
