@@ -11,8 +11,8 @@
 //! *(In order)*
 //! 1. [`crate::interface`'s section on cells][crate::interface#cell] --- a detailed introduction
 //! to cells and what they are.
-//! 2. [ConnectionType] --- the ways that points can be connected.
-//! 3. [CellManager] --- the unifying glue and centre of the maze model.
+//! 2. [`ConnectionType`] --- the ways that points can be connected.
+//! 3. [`CellManager`] --- the unifying glue and centre of the maze model.
 
 use std::fmt::Debug;
 use crate::interface::point::CoordinateSpace;

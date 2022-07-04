@@ -1,12 +1,12 @@
 //! Working maze storage.
 //!
 //! Mazes are typically stored in memory, but do not have to be. It
-//! is up to the implementation of the [MazeBuffer].
+//! is up to the implementation of the [`MazeBuffer`].
 //!
-//! For exporting mazes to persistent forms (like images), see [crate::interface::render].
+//! For exporting mazes to persistent forms (like images), see [`super::render`].
 //!
 //! # Recommended Reading
-//! * [MazeBuffer]
+//! 1. [`MazeBuffer`] -- the buffer trait.
 
 use std::fmt::Debug;
 use crate::interface::cell::CellValue;
@@ -60,12 +60,12 @@ pub trait MazeBuffer<CellVal: CellValue> : Debug + Send {
     fn set(&mut self, loc: BufferLocation, new_value: CellVal);
 }
 
-/// Universal cell ID for interacting with [`MazeBuffer`]s.
+/// Universal cell identifier for interacting with [`MazeBuffer`]s.
 ///
-/// A BufferLocation represents the position of a cell in a [MazeBuffer]. It is a
+/// A BufferLocation represents the position of a cell in a buffer. It is a
 /// unique sequential ID assigned to each cell.
 ///
 /// The exact semantics of how points and cells map to BufferLocations is
-/// unspecified and up to each [CellManager][crate::interface::cell::CellManager].
+/// unspecified and up to each [`CellManager`][crate::interface::cell::CellManager].
 /// Typically it will differ between implementations, and is not API.
 pub struct BufferLocation(pub usize);

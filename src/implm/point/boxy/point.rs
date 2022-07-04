@@ -10,10 +10,10 @@ use std::convert::TryInto;
 ///
 /// # Implementing
 ///
-/// Note: While the trait requires an implementation [Into<\[usize; DIMENSION\]>][Into],
+///  While the trait requires an implementation [`Into<[usize; DIMENSION]>`][Into],
 /// as per the trait's documentation it is recommended that you implement
-/// [From\<YourCoordinateTuplet\>][From] for `[usize; DIMENSION]` instead, as it provides an
-/// implementation of [Into<\[usize; DIMENSION\]>][Into] for YourCoordinateTuplet.
+/// [`From<YourCoordinateTuplet>`][From] for `[usize; DIMENSION]` instead, as it provides an
+/// implementation of [`Into<[usize; DIMENSION]>`][Into] for `YourCoordinateTuplet`.
 /// This will save you pain later on.
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub struct CoordinateTuplet<const DIMENSION: usize> {

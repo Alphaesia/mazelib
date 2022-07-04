@@ -46,7 +46,7 @@
 //! handled by points, which we'll come to next. Rather, *cells represent the physical structure
 //! of the maze*. If you were to build the maze, cells tell you what materials you need to place
 //! where --- "Do I need a piece of wall here, or a path?" (And we do indeed build the maze, using
-//! Renderers, which will also be discussed later).
+//! renderers, which will also be discussed later).
 //!
 //! Cells are primarily defined and identified by way they connect to other cells. Each type of
 //! cell is called a *cell class*. Each maze only has cells from a single class.
@@ -58,7 +58,7 @@
 //! [different shapes in the same maze](https://www.astrolog.org/labyrnth/maze/upsilon.gif),
 //! [and worse](https://www.astrolog.org/labyrnth/maze/crack.gif).
 //!
-//! Cell classes are generally designed to be paired up with specific (types of) coordinate
+//! Cell classes are generally designed to be paired up with specific (classes of) coordinate
 //! spaces.
 //!
 //! A cell has two components: a location and a value.
@@ -73,6 +73,8 @@
 //! cell space somehow).
 //!
 //! Cell locations are represented by the [`CellLocation`][self::cell::CellLocation] trait.
+//! There is no trait for cell spaces - they are implicitly derived from a maze's
+//! cell class-coordinate space pair.
 //!
 //! ### Cell Value
 //!
@@ -83,7 +85,7 @@
 //!
 //! ## Point
 //!
-//! A [Point][self::point::Point] is a *potential junction* of a maze. This includes features
+//! A [point][self::point::Point] is a *potential junction* of a maze. This includes features
 //! such as intersections, junctions, and straight hallways. Passages are simply two connected
 //! points.
 //!
@@ -113,36 +115,46 @@
 //! multiple cells, and a cell might not be mapped to a point at all. We'll come to how points
 //! influence cells later.
 //!
+//! Points are represented by the [`Point`][self::point::Point] trait, though it's not particularly
+//! useful on its own.
+//!
 //! ## Coordinate Space
 //!
-//! The [CoordinateSpace][self::point::CoordinateSpace] sits at the highest level of abstraction.
-//! They carry the size and shape of the maze, and know all possible positions
-//! ([Point][self::point::Point]s) within.
+//! The [coordinate space][self::point::CoordinateSpace] sits at the highest level of abstraction.
+//! They carry the size and shape of the maze, and know all possible semantic positions (points)
+//! within.
 //!
-//! It is fundamentally a graph, with each [Point][self::point::Point] (vertex) on the graph
-//! representing a "room" in a maze, or a potential intersection of passages. When thinking
-//! about generating or solving mazes, [Point][self::point::Point]s are the basic logical unit.
-//! The [CoordinateSpace][self::point::CoordinateSpace] dictates how [Point][self::point::Point]s
-//! are connected to one another - the potential passages between rooms in a maze.
+//! It is fundamentally a [graph](https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)),
+//! with points as its vertices. The edges between vertices represent *possible* passages between
+//! points.
+//!
+//! When generating, solving, or analysing mazes, the coordinate space is used. It declares how
+//! points are connected to one another -- the potential passages that could exist between junctions.
+//!
+//! Here, the turquoise lines between points represent the potential ways one could move between
+//! points. Note that however not all of these potential routes end up as passages in the final maze.
 //!
 //! ![The pixelated maze with the grid of blue dots, but now with a grid of turquoise lines. The dots lie at all intersections of the lines.][example-maze-points-connected]
 //!
-//! [Maze generators][self::generate::MazeGenerator] and solvers also operate at this level.
+//! While the coordinate space declares the connections between points, it does not carry the state
+//! of the connection (e.g. if it's a passage or not). One way to think about it is that it describes
+//! the maze as if there were no walls. Whether a connection is a passage or wall is determined by
+//! the cells at the location.
 //!
-//! Note that the [CoordinateSpace][self::point::CoordinateSpace] does not carry any information
-//! about the placement of walls and passages. Rather, it describes the maze as if there were
-//! no walls. Passage and wall placement is handled at other levels of the abstraction stack.
-//!
-//! If you think about mazes as
-//! [mathematical graphs](https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)), points
-//! are nodes in the graph (vertices).
+//! Coordinate spaces are represented by the [`CoordinateSpace`][self::point::CoordinateSpace] trait.
 //!
 //! ## Buffer
 //!
-//! The [Buffer][self::buffer::MazeBuffer] handles storing mazes while they are being worked on.
-//! They carry the raw data of the maze. They only know cells by their unique sequential IDs
-//! ([BufferLocation][self::buffer::BufferLocation]), and have no knowledge of the higher-order
-//! structure of the maze.
+//! The [buffer][self::buffer::MazeBuffer] handles storing mazes while they are being worked on.
+//! They carry the raw data of the maze.
+//!
+//! They only store the mazes cells, indexed by their unique sequential IDs. They have no knowledge
+//! of the higher-order structure of the maze.
+//!
+//! Typically buffers will just be something like a [`Vec`][crate::implm::buffer::VecBuffer], though
+//! there's no requirement for this to be the case.
+//!
+//! Buffers are represented by the [`MazeBuffer`][self::buffer::MazeBuffer] trait.
 //!
 //! ## Cell Manager
 //!

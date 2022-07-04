@@ -22,21 +22,22 @@ use crate::interface::maze::Maze;
 /// Generators do not consider mazes at the cellular level. They only jump from point to
 /// point.
 ///
-/// Most implementations will define a static `Implementation::generate(maze: &mut Maze)`
-/// that will generate a maze using some default generator parameters. It also saves you
-/// having to construct the generator struct yourself.
+/// Most implementations will define a static
+/// [`Implementation::generate(maze: &mut Maze)`][DefaultMazeGenerator::generate] that
+/// will generate a maze using some default generator parameters. It also saves you having
+/// to construct the generator struct yourself.
 pub trait MazeGenerator<M: Maze> {
     /// Generate a random maze.
     ///
     /// Mazes are operated upon in-place. Should for whatever reason a generator panic
-    /// during execution, the maze may be left in a partially-generated state
-    /// (different from what it started as). It will however not be left in an inconsistent
-    /// state, unless the panic originates from within the [`Maze`] itself.
+    /// during execution, the maze may be left in a partially-generated state (different
+    /// from what it started as). It will however not be left in an inconsistent state
+    /// (provided that the panic originates from within the [`Maze`] itself).
     ///
     /// # Parameters
     /// * `maze` --- the maze to be filled in. The maze may be partially or completely
     ///              filled in beforehand. The generator will consider any existing
-    ///              points and work them into its generation. Any
+    ///              cells and work them into its generation. Any
     ///              <abbr title="A connection between points">edge</abbr> that is not
     ///              a boundary may be overwritten as part of the generation process.
     fn generate(&mut self, maze: &mut M) {
@@ -46,19 +47,19 @@ pub trait MazeGenerator<M: Maze> {
     /// Generate a maze using a given random number generator.
     ///
     /// Mazes are operated upon in-place. Should for whatever reason a generator panic
-    /// during execution, the maze may be left in a partially-generated state
-    /// (different from what it started as).  It will however not be left in an inconsistent
-    /// state, unless the panic originates from within the [`Maze`] itself.
+    /// during execution, the maze may be left in a partially-generated state (different
+    /// from what it started as).  It will however not be left in an inconsistent state
+    /// (provided that the panic originates from within the [`Maze`] itself).
     ///
     /// You should prefer [`generate()`][Self::generate`] to this method.
     ///
     /// # Parameters
     /// * `maze` --- the maze to be filled in. The maze may be partially or completely
     ///              filled in beforehand. The generator will consider any existing
-    ///              points and work them into its generation. Any
+    ///              cells and work them into its generation. Any
     ///              <abbr title="A connection between points">edge</abbr> that is not
     ///              a boundary may be overwritten as part of the generation process.
-    /// * `rng`  --- The sole source of randomness for a generator. Given a
+    /// * `rng`  --- The sole source of randomness for the generator. Given a
     ///              [`rand::SeedableRng`] with a fixed seed, the generator's behaviour
     ///              is deterministic.
     fn generate_with_rng<R: Rng + ?Sized>(&mut self, maze: &mut M, rng: &mut R);
