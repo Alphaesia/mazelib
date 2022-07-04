@@ -5,13 +5,22 @@ use crate::implm::point::boxy::BoxCoordinateSpace;
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::CellManager;
 use crate::interface::point::CoordinateSpace;
-use crate::interface::template::Template;
 
-pub struct SolidBorderTemplate {}
+pub fn solid_border<M: CellManager<CoordSpace=BoxCoordinateSpace<DIMENSION>>, const DIMENSION: usize>(maze: &mut M) {
+    <FixSpecialisationPls as SolidBorder<M>>::apply(maze);
+}
+
+// Let's play Twister® because we can't specialise standalone functions
+
+trait SolidBorder<M: CellManager> {
+    fn apply(maze: &mut M);
+}
+
+struct FixSpecialisationPls {}
 
 // TODO specialise one day because this is hideously inefficient
-impl <Maze: CellManager<CoordSpace=BoxCoordinateSpace<DIMENSION>>, const DIMENSION: usize> Template<Maze> for SolidBorderTemplate {
-    default fn apply(maze: &mut Maze) {
+impl <M: CellManager<CoordSpace=BoxCoordinateSpace<DIMENSION>>, const DIMENSION: usize> SolidBorder<M> for FixSpecialisationPls {
+    default fn apply(maze: &mut M) {
         for pt in maze.coord_space() {
             if maze.coord_space().is_adjacent_to_edge(pt) == false {
                 continue
@@ -28,7 +37,7 @@ impl <Maze: CellManager<CoordSpace=BoxCoordinateSpace<DIMENSION>>, const DIMENSI
 
 // We operate on cells directly here so we can ignore any padding
 // or scaling effects.
-impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> Template<BoxSpaceBlockCellMaze<Buffer, DIMENSION>> for SolidBorderTemplate {
+impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> SolidBorder<BoxSpaceBlockCellMaze<Buffer, DIMENSION>> for FixSpecialisationPls {
     fn apply(maze: &mut BoxSpaceBlockCellMaze<Buffer, DIMENSION>) {
         // TODO this can probably be optimised even further
         //  and rewritten to not be ugly
@@ -57,7 +66,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> Template<BoxSp
     }
 }
 
-impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Template<BoxSpaceInlineCellManager<Buffer, DIMENSION>> for SolidBorderTemplate {
+impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> SolidBorder<BoxSpaceInlineCellManager<Buffer, DIMENSION>> for FixSpecialisationPls {
     fn apply(maze: &mut BoxSpaceInlineCellManager<Buffer, DIMENSION>) {
         // TODO this can probably be optimised even further
         //  and rewritten to not be ugly

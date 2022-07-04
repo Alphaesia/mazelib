@@ -18,12 +18,11 @@ use mazelib::implm::point::boxy::BoxCoordinateSpace;
 #[cfg(feature = "img")] use mazelib::implm::render::img::BoxSpaceImageMazeRenderer;
 #[cfg(feature = "minecraft")] use mazelib::implm::render::minecraft::BoxSpaceSchematicMazeRenderer;
 use mazelib::implm::render::text::BoxSpaceTextMazeRenderer;
-use mazelib::implm::template::boxy::SolidBorderTemplate;
 use mazelib::interface::buffer::MazeBuffer;
 use mazelib::interface::cell::CellID;
 use mazelib::interface::generate::DefaultMazeGenerator;
 use mazelib::interface::render::DefaultMazeRendererNonSeeking;
-use mazelib::interface::template::Template;
+use mazelib::util::solid_border;
 
 fn main() {
     const DIMENSION: usize = 2;
@@ -32,7 +31,6 @@ fn main() {
     type CellType = BlockCellValue;
     type BufferType = VecBuffer<CellType>;
     type Maze = BoxSpaceBlockCellMazeBuilder<BufferType, DIMENSION>;
-    type Template = SolidBorderTemplate;
     type Generator = HuntAndKillGenerator;
     type Renderer = BoxSpaceTextMazeRenderer;
 
@@ -42,7 +40,7 @@ fn main() {
 
     let mut maze = Maze::new(space).build();
 
-    //Template::apply(&mut maze);
+    solid_border(&mut maze);
 
     Generator::generate_with_rng(&mut maze, &mut rng);
 

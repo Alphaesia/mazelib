@@ -16,10 +16,9 @@
 //! use mazelib::implm::maze::block::BoxSpaceBlockCellMazeBuilder;
 //! use mazelib::implm::point::boxy::BoxCoordinateSpace;
 //! use mazelib::implm::render::text::BoxSpaceTextMazeRenderer;
-//! use mazelib::implm::template::boxy::SolidBorderTemplate;
 //! use mazelib::interface::generate::DefaultMazeGenerator;
 //! use mazelib::interface::render::DefaultMazeRendererNonSeeking;
-//! use mazelib::interface::template::Template;
+//! use mazelib::util::solid_border;
 //!
 //! // 2 for a 2D maze, 3 for a 3D maze, etc.
 //! const DIMENSION: usize = 2;
@@ -37,7 +36,7 @@
 //! let mut maze = BoxSpaceBlockCellMazeBuilder::<Buffer, DIMENSION>::new(coord_space).build();
 //!
 //! // Give our maze a nice thick border
-//! SolidBorderTemplate::apply(&mut maze);
+//! solid_border(&mut maze);
 //!
 //! // Generate the maze
 //! HuntAndKillGenerator::generate(&mut maze);
@@ -181,5 +180,6 @@
 
 pub mod interface;
 pub mod implm;
+pub mod util;
 pub(crate) mod internal;
 #[cfg(test)] mod test;

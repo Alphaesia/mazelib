@@ -47,7 +47,7 @@ pub use self::point::CoordinateTuplet;
 /// A 2D coordinate space will produce mazes you can print out on paper.
 ///
 /// While it is optimised for square mazes, you can use whatever maze outline you want.
-/// See [templates][crate::interface::template] for more information.
+/// (You can create custom outlines by mutating the maze before passing it into a generator).
 ///
 /// *This is a specialisation of [BoxCoordinateSpace] for two dimensions. See
 /// [CoordinateSpace][crate::interface::point::CoordinateSpace] and [BoxCoordinateSpace] for
@@ -64,7 +64,7 @@ pub type CoordinatePair = CoordinateTuplet<2>;
 /// Like [TwoDimensionalBoxCoordinateSpace], but 3D.
 ///
 /// While this is optimised for cuboid mazes, you can use whatever maze outline you want.
-/// See [templates][crate::interface::template] for more information.
+/// (You can create custom outlines by mutating the maze before passing it into a generator).
 ///
 /// *This is a specialisation of [BoxCoordinateSpace] for three dimensions. See
 /// [CoordinateSpace][crate::interface::point::CoordinateSpace] and [BoxCoordinateSpace] for
