@@ -1,12 +1,13 @@
 use std::collections::HashMap;
-use std::io::{Write, Result};
+use std::io::{Result, Write};
 use std::time::SystemTime;
-use crate::interface::buffer::MazeBuffer;
-use crate::interface::render::MazeRendererNonSeeking;
+
 use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
 use crate::implm::maze::block::BoxSpaceBlockCellMaze;
 use crate::implm::render::minecraft::{BoxSpaceSchematicMazeRenderer, SchematicMazeRenderer};
-use crate::implm::render::minecraft::schem::{SpongeSchematicV3, SpongeSchematicV3SchematicObject, SpongeSchematicV3MetadataObject, SpongeSchematicV3BlockContainer};
+use crate::implm::render::minecraft::schem::{SpongeSchematicV3, SpongeSchematicV3BlockContainer, SpongeSchematicV3MetadataObject, SpongeSchematicV3SchematicObject};
+use crate::interface::buffer::MazeBuffer;
+use crate::interface::render::MazeRendererNonSeeking;
 
 impl <Buffer: MazeBuffer<BlockCellValue>> MazeRendererNonSeeking<BoxSpaceBlockCellMaze<Buffer, 2>> for BoxSpaceSchematicMazeRenderer {
     fn render<Output: Write>(&self, maze: &BoxSpaceBlockCellMaze<Buffer, 2>, output: &mut Output) -> Result<()> {

@@ -1,4 +1,5 @@
 use std::ops::{Index, IndexMut};
+
 use crate::implm::point::boxy::CoordinateTuplet;
 
 impl <const DIMENSION: usize> Index<usize> for CoordinateTuplet<DIMENSION> {

@@ -1,5 +1,6 @@
 use rand::Rng;
 use rand::seq::SliceRandom;
+
 use crate::implm::generate::util::carve_to_unvisited_neighbour;
 use crate::interface::cell::CellValue;
 use crate::interface::generate::MazeGenerator;

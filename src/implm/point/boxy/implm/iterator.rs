@@ -1,4 +1,5 @@
 use std::iter::FusedIterator;
+
 use crate::implm::point::boxy::{BoxCoordinateSpace, CoordinateTuplet};
 use crate::interface::point::CoordinateSpace;
 use crate::internal::array_util::Product;

@@ -1,5 +1,6 @@
-use std::fmt::{Debug, Formatter, Display};
-use crate::implm::point::boxy::{CoordinateTuplet, BoxCoordinateSpace};
+use std::fmt::{Debug, Display, Formatter};
+
+use crate::implm::point::boxy::{BoxCoordinateSpace, CoordinateTuplet};
 
 impl <const DIMENSION: usize> Debug for CoordinateTuplet<DIMENSION> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {

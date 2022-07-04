@@ -1,6 +1,7 @@
-use crate::interface::cell::{CellID, CellValue};
-use crate::interface::buffer::MazeBuffer;
 use std::fmt::{Debug, Formatter};
+
+use crate::interface::buffer::MazeBuffer;
+use crate::interface::cell::{CellID, CellValue};
 
 /// A [MazeBuffer] that stores its cells in a [Vec] allocated on the heap.
 ///

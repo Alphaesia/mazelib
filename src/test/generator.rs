@@ -1,7 +1,8 @@
 use rand::SeedableRng;
 use rand_chacha::ChaCha8Rng;
+
 use crate::implm::buffer::VecBuffer;
-use crate::implm::cell::block::{BlockCellValue};
+use crate::implm::cell::block::BlockCellValue;
 use crate::implm::cell::inline::{BoxSpaceInlineCellManager, InlineCellValue};
 use crate::implm::generate::{HuntAndKillGenerator, NAryTreeGenerator, RecursiveBacktrackerGenerator};
 use crate::implm::maze::block::{BoxSpaceBlockCellMaze, BoxSpaceBlockCellMazeBuilder};

@@ -1,4 +1,5 @@
 use std::fmt::{Debug, Formatter};
+
 use crate::implm::cell::inline::InlineCellValue;
 use crate::implm::cell::inline::value::InlineCellValueWallType;
 use crate::implm::point::boxy::BoxCoordinateSpace;

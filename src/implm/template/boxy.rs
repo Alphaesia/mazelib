@@ -1,11 +1,11 @@
-use crate::interface::buffer::MazeBuffer;
-use crate::interface::template::Template;
-use crate::interface::cell::CellManager;
-use crate::implm::point::boxy::BoxCoordinateSpace;
-use crate::interface::point::CoordinateSpace;
 use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
 use crate::implm::cell::inline::{BoxSpaceInlineCellManager, InlineCellValue, InlineCellValueWallType};
 use crate::implm::maze::block::BoxSpaceBlockCellMaze;
+use crate::implm::point::boxy::BoxCoordinateSpace;
+use crate::interface::buffer::MazeBuffer;
+use crate::interface::cell::CellManager;
+use crate::interface::point::CoordinateSpace;
+use crate::interface::template::Template;
 
 pub struct SolidBorderTemplate {}
 

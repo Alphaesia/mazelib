@@ -1,9 +1,11 @@
-use crate::interface::point::CoordinateSpace;
+use std::ops::Index;
+
+use rand::Rng;
+
 use crate::implm::point::boxy::CoordinateTuplet;
 use crate::implm::point::boxy::implm::BoxCoordinateSpaceIterator;
+use crate::interface::point::CoordinateSpace;
 use crate::internal::array_util::Product;
-use std::ops::Index;
-use rand::Rng;
 
 /// An n-dimensional coordinate space shaped like a box.
 ///

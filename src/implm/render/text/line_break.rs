@@ -1,4 +1,5 @@
 use std::io::{Result, Write};
+
 use crate::internal::util::get_line_sep;
 
 pub(super) trait WriteLineBreak: Write {

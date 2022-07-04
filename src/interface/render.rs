@@ -6,6 +6,7 @@
 
 use std::io;
 use std::io::{Seek, Write};
+
 use crate::interface::maze::Maze;
 
 /// Render (export) a maze into another format.

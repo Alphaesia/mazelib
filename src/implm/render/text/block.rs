@@ -1,11 +1,12 @@
 use std::io::{Result, Write};
-use crate::interface::buffer::MazeBuffer;
-use crate::interface::render::MazeRendererNonSeeking;
+
 use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
 use crate::implm::maze::block::BoxSpaceBlockCellMaze;
 use crate::implm::render::text::{BoxSpaceTextMazeRenderer, TextMazeRenderer};
 use crate::implm::render::text::line_break::WriteLineBreak;
+use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::CellID;
+use crate::interface::render::MazeRendererNonSeeking;
 
 impl <Buffer: MazeBuffer<BlockCellValue>> MazeRendererNonSeeking<BoxSpaceBlockCellMaze<Buffer, 2>> for BoxSpaceTextMazeRenderer {
     fn render<Output: Write>(&self, maze: &BoxSpaceBlockCellMaze<Buffer, 2>, output: &mut Output) -> Result<()> {

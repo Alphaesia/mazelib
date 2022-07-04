@@ -1,4 +1,5 @@
 use rand::Rng;
+
 use crate::implm::generate::util::carve_to_unvisited_neighbour;
 use crate::interface::generate::MazeGenerator;
 use crate::interface::maze::Maze;

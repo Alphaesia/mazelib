@@ -1,5 +1,7 @@
 extern crate serde;
+
 use std::collections::HashMap;
+
 use serde::Serialize;
 
 #[allow(non_snake_case)] // using the spec's names

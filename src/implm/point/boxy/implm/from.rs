@@ -1,5 +1,6 @@
-use crate::implm::point::boxy::CoordinateTuplet;
 use std::convert::TryInto;
+
+use crate::implm::point::boxy::CoordinateTuplet;
 
 impl <const DIMENSION: usize> From<[usize; DIMENSION]> for CoordinateTuplet<DIMENSION> {
     fn from(coordinates: [usize; DIMENSION]) -> Self {

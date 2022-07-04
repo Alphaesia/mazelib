@@ -9,6 +9,7 @@
 //! 1. [`MazeBuffer`] -- the buffer trait.
 
 use std::fmt::Debug;
+
 use crate::interface::cell::{CellID, CellValue};
 
 /// Maze cell container.

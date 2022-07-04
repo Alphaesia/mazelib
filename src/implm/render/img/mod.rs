@@ -2,6 +2,7 @@
 #![doc(cfg(feature = "img"))]
 
 use image::ImageFormat;
+
 use crate::interface::maze::Maze;
 use crate::interface::render::MazeRenderer;
 

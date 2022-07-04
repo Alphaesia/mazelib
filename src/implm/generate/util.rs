@@ -1,5 +1,6 @@
 use rand::Rng;
 use rand::seq::SliceRandom;
+
 use crate::interface::cell::{CellManager, CellValue};
 use crate::interface::maze::Maze;
 use crate::interface::point::CoordinateSpace;

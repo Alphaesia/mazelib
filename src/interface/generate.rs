@@ -10,6 +10,7 @@
 //! 2. [`crate::implm::generate`] --- a comparison of the builtin generators.
 
 use rand::Rng;
+
 use crate::interface::maze::Maze;
 
 /// A maze generator.

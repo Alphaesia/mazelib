@@ -1,7 +1,8 @@
 use rand::Rng;
 use rand::seq::IteratorRandom;
-use crate::interface::generate::MazeGenerator;
+
 use crate::implm::point::boxy::{BoxCoordinateSpace, CoordinateTuplet};
+use crate::interface::generate::MazeGenerator;
 use crate::interface::maze::Maze;
 
 /// A BinaryTreeGenerator, but instead of an arity of 2 it has an arity of `DIMENSION`.

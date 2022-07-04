@@ -1,5 +1,6 @@
-use crate::interface::point::Point;
 use std::convert::TryInto;
+
+use crate::interface::point::Point;
 
 /// A tuplet of unsigned integers that uniquely represent a point in n-dimensional space.
 ///

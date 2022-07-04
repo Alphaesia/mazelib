@@ -1,16 +1,17 @@
-use crate::interface::buffer::MazeBuffer;
-use crate::interface::cell::{CellID, CellManager, ConnectionType};
-use crate::implm::point::boxy::BoxCoordinateSpace;
-use crate::internal::noise_util::pt;
-use crate::interface::point::CoordinateSpace;
 use std::fmt::{Debug, Formatter};
-use crate::internal::array_util::{Product, Sum};
-use crate::implm::render::text::BoxSpaceTextMazeRenderer;
+use std::marker::PhantomData;
+
 use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
 use crate::implm::cell::block::cell::BlockCell;
-use std::marker::PhantomData;
 use crate::implm::cell::block::value::BlockCellValueType::{BOUNDARY, PASSAGE, UNVISITED, WALL};
+use crate::implm::point::boxy::BoxCoordinateSpace;
+use crate::implm::render::text::BoxSpaceTextMazeRenderer;
+use crate::interface::buffer::MazeBuffer;
+use crate::interface::cell::{CellID, CellManager, ConnectionType};
+use crate::interface::point::CoordinateSpace;
 use crate::interface::render::MazeRendererNonSeeking;
+use crate::internal::array_util::{Product, Sum};
+use crate::internal::noise_util::pt;
 
 /// TODO write a description
 ///

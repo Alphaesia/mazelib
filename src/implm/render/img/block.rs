@@ -1,10 +1,12 @@
-use std::io::{Write, Result, Seek};
+use std::io::{Result, Seek, Write};
+
 use image::{ImageError, Rgba, RgbaImage};
-use crate::interface::buffer::MazeBuffer;
-use crate::interface::render::MazeRenderer;
+
 use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
 use crate::implm::maze::block::BoxSpaceBlockCellMaze;
 use crate::implm::render::img::{BoxSpaceImageMazeRenderer, ImageMazeRenderer};
+use crate::interface::buffer::MazeBuffer;
+use crate::interface::render::MazeRenderer;
 
 impl <Buffer: MazeBuffer<BlockCellValue>> MazeRenderer<BoxSpaceBlockCellMaze<Buffer, 2>> for BoxSpaceImageMazeRenderer {
     fn render<Output: Write + Seek>(&self, maze: &BoxSpaceBlockCellMaze<Buffer, 2>, output: &mut Output) -> Result<()> {

@@ -15,6 +15,7 @@
 //! 3. [`CellManager`] --- the unifying glue and centre of the maze model.
 
 use std::fmt::Debug;
+
 use crate::interface::point::CoordinateSpace;
 use crate::internal::noise_util::pt;
 

@@ -4,26 +4,26 @@
 use std::fs::File;
 use std::io;
 use std::io::BufWriter;
+
+#[cfg(feature = "img")] use image::ImageFormat;
 use rand::{SeedableRng, thread_rng};
 use rand::rngs::{StdRng, ThreadRng};
-//use image::ImageFormat;
-use mazelib::implm::point::boxy::BoxCoordinateSpace;
+
 use mazelib::implm::buffer::VecBuffer;
 use mazelib::implm::cell::block::BlockCellValue;
-use mazelib::implm::render::text::BoxSpaceTextMazeRenderer;
-use mazelib::interface::render::DefaultMazeRendererNonSeeking;
-use mazelib::implm::template::boxy::SolidBorderTemplate;
-use mazelib::interface::template::Template;
-use mazelib::implm::generate::{HuntAndKillGenerator, NAryTreeGenerator, RecursiveBacktrackerGenerator};
-use mazelib::interface::generate::DefaultMazeGenerator;
 use mazelib::implm::cell::inline::{InlineCellValue, InlineCellValueWallType};
+use mazelib::implm::generate::{HuntAndKillGenerator, NAryTreeGenerator, RecursiveBacktrackerGenerator};
 use mazelib::implm::maze::block::BoxSpaceBlockCellMazeBuilder;
-//use mazelib::implm::render::img::BoxSpaceImageMazeRenderer;
-//use mazelib::implm::render::minecraft::BoxSpaceSchematicMazeRenderer;
+use mazelib::implm::point::boxy::BoxCoordinateSpace;
+#[cfg(feature = "img")] use mazelib::implm::render::img::BoxSpaceImageMazeRenderer;
+#[cfg(feature = "minecraft")] use mazelib::implm::render::minecraft::BoxSpaceSchematicMazeRenderer;
+use mazelib::implm::render::text::BoxSpaceTextMazeRenderer;
+use mazelib::implm::template::boxy::SolidBorderTemplate;
 use mazelib::interface::buffer::MazeBuffer;
-//use mazelib::implm::render::img::BoxSpaceImageMazeRenderer;
-//use mazelib::implm::render::minecraft::BoxSpaceSchematicMazeRenderer;
 use mazelib::interface::cell::CellID;
+use mazelib::interface::generate::DefaultMazeGenerator;
+use mazelib::interface::render::DefaultMazeRendererNonSeeking;
+use mazelib::interface::template::Template;
 
 fn main() {
     const DIMENSION: usize = 2;
