@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":[["BlockCellValueType",""]],"struct":[["BlockCell","TODO rewrite"],["BlockCellValue",""],["BoxSpaceBlockCellManager","TODO write a description"],["BoxSpaceBlockCellManagerBuilder",""]]};

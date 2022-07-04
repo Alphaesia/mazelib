@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["BoxSpaceInlineCellMaze","As this manager implements a one-to-one mapping between points and cells, there is no separate [`CellLocation`][crate::interface::cell::CellLocation] struct. [`CoordinateTuplet`][crate::implm::point::boxy::CoordinateTuplet]s are converted directly into [`CellID`]s."]]};

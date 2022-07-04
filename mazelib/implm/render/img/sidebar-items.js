@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["BoxSpaceImageMazeRenderer","Render a two-dimensional maze (i.e. `BoxCoordinateSpace<2>`) into an image and return it."]],"trait":[["ImageMazeRenderer",""]]};

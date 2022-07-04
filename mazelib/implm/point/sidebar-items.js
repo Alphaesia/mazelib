@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":[["boxy","Box coordinate spaces. This includes square mazes, rectangular mazes, cuboid mazes, and other hyperrectangular constructions."]]};

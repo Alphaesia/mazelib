@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["HuntAndKillGenerator",""],["NAryTreeGenerator","A BinaryTreeGenerator, but instead of an arity of 2 it has an arity of `DIMENSION`. Only works with [BoxCoordinateSpace][crate::implm::point::boxy::BoxCoordinateSpace]s."],["RecursiveBacktrackerGenerator",""]]};

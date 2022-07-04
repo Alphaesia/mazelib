@@ -1,0 +1,138 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Mazes are inherently complex. However, most programs give you very limited options in dealing with mazes. Whether being restricted to 2D square mazes, or only supporting one type of output. This library aims to unlock and expose mazes fully and completely, allowing you to create, manipulate, and solve mazes however you desire."><meta name="keywords" content="rust, rustlang, rust-lang, mazelib"><title>mazelib - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../dark.css" disabled><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../storage.js"></script><script defer src="../crates.js"></script><script defer src="../main.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="stylesheet" type="text/css" href="../theme.css"><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../mazelib/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"></h2>
+    </nav>
+    <nav class="sidebar"><a class="sidebar-logo" href="../mazelib/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"><a href="#">Crate mazelib</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 0.1.0</li><li><a id="all-types" href="all.html">All Items</a></li></ul></div><section><div class="block"><ul><li><a href="#modules">Modules</a></li></ul></div></section></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../mazelib/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1">
+                                <a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div>
+                        </div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
+    <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">mazelib</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/mazelib/mazelib.rs.html#1-185">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Mazes are inherently complex. However, most programs give you very limited options
+in dealing with mazes. Whether being restricted to 2D square mazes, or only supporting
+one type of output. This library aims to unlock and expose mazes fully and completely,
+allowing you to create, manipulate, and solve mazes however you desire.</p>
+<h2 id="quick-start"><a href="#quick-start">Quick Start</a></h2>
+<p>For those who want to jump straight into playing around. Do come back and read the docs
+though!</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">mazelib::implm::buffer::VecBuffer</span>;
+<span class="kw">use</span> <span class="ident">mazelib::implm::cell::block::BlockCellValue</span>;
+<span class="kw">use</span> <span class="ident">mazelib::implm::cell::inline</span>::{<span class="ident">BoxSpaceInlineCellManager</span>, <span class="ident">InlineCellValue</span>};
+<span class="kw">use</span> <span class="ident">mazelib::implm::generate::HuntAndKillGenerator</span>;
+<span class="kw">use</span> <span class="ident">mazelib::implm::maze::block::BoxSpaceBlockCellMazeBuilder</span>;
+<span class="kw">use</span> <span class="ident">mazelib::implm::point::boxy::BoxCoordinateSpace</span>;
+<span class="kw">use</span> <span class="ident">mazelib::implm::render::text::BoxSpaceTextMazeRenderer</span>;
+<span class="kw">use</span> <span class="ident">mazelib::interface::generate::DefaultMazeGenerator</span>;
+<span class="kw">use</span> <span class="ident">mazelib::interface::render::DefaultMazeRendererNonSeeking</span>;
+<span class="kw">use</span> <span class="ident">mazelib::util::solid_border</span>;
+
+<span class="comment">// 2 for a 2D maze, 3 for a 3D maze, etc.</span>
+<span class="kw">const</span> <span class="ident">DIMENSION</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2</span>;
+
+<span class="kw">let</span> [<span class="ident">width</span>, <span class="ident">height</span>] <span class="op">=</span> [<span class="number">5</span>, <span class="number">5</span>];
+
+<span class="comment">// Determine the size of the maze</span>
+<span class="kw">let</span> <span class="ident">coord_space</span> <span class="op">=</span> <span class="ident">BoxCoordinateSpace::new</span>([<span class="ident">width</span>, <span class="ident">height</span>]);
+
+<span class="kw">type</span> <span class="ident">Buffer</span> <span class="op">=</span> <span class="ident">VecBuffer</span><span class="op">&lt;</span><span class="ident">BlockCellValue</span><span class="op">&gt;</span>;
+
+<span class="comment">// Create the maze &quot;object&quot;. The name of the maze type hints at what it supports:</span>
+<span class="comment">// &quot;BoxSpace&quot; means it expects a BoxCoordinateSpace.</span>
+<span class="comment">// &quot;BlockCell&quot; means it will use BlockCells for cells.</span>
+<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">maze</span> <span class="op">=</span> <span class="ident">BoxSpaceBlockCellMazeBuilder</span>::<span class="op">&lt;</span><span class="ident">Buffer</span>, <span class="ident">DIMENSION</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">coord_space</span>).<span class="ident">build</span>();
+
+<span class="comment">// Give our maze a nice thick border</span>
+<span class="ident">solid_border</span>(<span class="kw-2">&amp;mut</span> <span class="ident">maze</span>);
+
+<span class="comment">// Generate the maze</span>
+<span class="ident">HuntAndKillGenerator::generate</span>(<span class="kw-2">&amp;mut</span> <span class="ident">maze</span>);
+
+<span class="comment">// Print the maze as text</span>
+<span class="kw">let</span> <span class="ident">maze_as_text</span> <span class="op">=</span> <span class="ident">BoxSpaceTextMazeRenderer::render</span>(<span class="kw-2">&amp;</span><span class="ident">maze</span>, <span class="kw-2">&amp;mut</span> <span class="ident">std::io::stdout</span>());</code></pre></div>
+<p>produces</p>
+<div class="example-wrap"><pre class="language-text"><code>███████████████
+█ █   █       █
+█ █ █ █ █████ █
+█   █ █   █   █
+█████ █████ █ █
+█   █   █   █ █
+█ █ ███ █ ███ █
+█ █ █   █   █ █
+█ █ █ █████ █ █
+█ █ █       █ █
+█ █ █████████ █
+█ █       █   █
+█ ███████ █ ███
+█       █     █
+███████████████</code></pre></div>
+<p>All of the implementations in this example (<code>BoxCoordinateSpace</code>, <code>BlockCellValue</code>, etc.)
+can be swapped out for other implementations. Different implementations will affect an aspect
+of the generated maze in different ways.</p>
+<p>For example, changing <code>BlockCellValue</code> to <code>InlineCellValue&lt;DIMENSION&gt;</code> will change how the
+cells look. (Note you wll have to replace <code>BoxSpaceBlockCellMazeBuilder</code> with
+<code>BoxSpaceInlineCellMaze</code> and remove the trailing <code>.build()</code>).</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">type</span> <span class="ident">Buffer</span> <span class="op">=</span> <span class="ident">VecBuffer</span><span class="op">&lt;</span><span class="ident">InlineCellValue</span><span class="op">&lt;</span><span class="ident">DIMENSION</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+
+<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">maze</span> <span class="op">=</span> <span class="ident">BoxSpaceInlineCellMaze</span>::<span class="op">&lt;</span><span class="ident">Buffer</span>, <span class="ident">DIMENSION</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">coord_space</span>);</code></pre></div>
+<p>produces</p>
+<div class="example-wrap"><pre class="language-text"><code>┏━━━━━┯━━━━━━━━━━━┯━━┓
+┃     │           │  ┃
+┠──┐  └─────╴  ╷  ╵  ┃
+┃  │           │     ┃
+┃  └───────────┼──╴  ┃
+┃              │     ┃
+┠──╴  ╷  ┌─────┤  ╶──┨
+┃     │  │     │     ┃
+┃  ╶──┤  │  ╷  └──┐  ┃
+┃     │  │  │     │  ┃
+┃  ╷  └──┘  │  ╷  │  ┃
+┃  │        │  │  │  ┃
+┃  └────────┤  └──┘  ┃
+┃           │        ┃
+┗━━━━━━━━━━━┷━━━━━━━━┛</code></pre></div><h2 id="architecture"><a href="#architecture">Architecture</a></h2>
+<p>The library is split into two halves:</p>
+<p><a href="interface/index.html" title="crate::interface">crate::interface</a> holds the key abstractions and defines the model of mazes the library
+uses. It’s very important.</p>
+<p><a href="implm/index.html" title="crate::implm">crate::implm</a> has a bunch of built-in implementations of the aforementioned
+interfaces for your convenience. While you’re probably want to use them in most cases,
+you’re not obligated to use all (or any) of them. Feel free to implement any of the
+interfaces yourself!</p>
+<h2 id="reading-order"><a href="#reading-order">Reading Order</a></h2>
+<p>Firstly, read the previous section in this page on the <a href="#architecture">crate architecture</a>.</p>
+<p>Then, you should read the module-level docs of <a href="interface/index.html" title="crate::interface">crate::interface</a>. It explains all of the
+key interfaces and their role in our maze model.</p>
+<p>After that, you’ll probably want to check out <a href="interface/cell/trait.CellManager.html" title="crate::interface::cell::CellManager">crate::interface::cell::CellManager</a>.
+This is the central trait which all of the machinery interacts with, and is the main
+interface between you and the maze. The documentation for
+<a href="interface/generate/trait.MazeGenerator.html" title="crate::interface::generate::MazeGenerator">crate::interface::generate::MazeGenerator</a> will likely be of use. The details of the
+other interfaces are not too important unless you’re implementing an interface.</p>
+<p>Lastly, explore <a href="implm/index.html" title="crate::implm">crate::implm</a>. It contains standard implementations of all of the
+interfaces. You’ll almost certainly want to use some of them, so have a look around.</p>
+<h3 id="further-reading"><a href="#further-reading">Further Reading</a></h3>
+<p>If you want to learn more about mazes, like how many of the algorithms included here
+actually work, Walter D. Pullen and Jamis Buck have some great information on the
+subject.</p>
+<h4 id="think-labyrinth"><a href="#think-labyrinth">Think Labyrinth!</a></h4>
+<p><a href="https://www.astrolog.org/labyrnth.htm"><img src="https://www.astrolog.org/labyrnth/labyrnth.gif"></a></p>
+<p>Walter D. Pullen’s <a href="https://www.astrolog.org/labyrnth.htm">Think Labyrinth!</a> has a very
+comprehensive reference on all aspects of mazes, including the various characteristics
+of different algorithms and a glossary of maze-related terms.</p>
+<h4 id="buckblog--mazes-for-programmers"><a href="#buckblog--mazes-for-programmers">Buckblog &amp; Mazes for Programmers</a></h4>
+<p><a href="http://www.mazesforprogrammers.com/"><img src="https://imagery.pragprog.com/products/439/jbmaze_largecover.jpg?1421259509"></a></p>
+<p>For precise information about how maze generation algorithms actually work and how to
+implement them yourself, Jamis Buck has some great blog entries on the subject.
+They all come with visualisers you can run in the browser!</p>
+<p><a href="https://weblog.jamisbuck.org/2011/2/7/maze-generation-algorithm-recap">https://weblog.jamisbuck.org/2011/2/7/maze-generation-algorithm-recap</a>.</p>
+<p>He has also written a full book on maze algorithms,
+<a href="https://pragprog.com/titles/jbmaze/mazes-for-programmers/">Mazes for Programmers</a>.</p>
+<p>It discusses generating mazes, solving mazes, mazes on cubes, spheres, cylinders,
+and mobius strips, and more.</p>
+<p><a href="http://www.mazesforprogrammers.com">http://www.mazesforprogrammers.com</a>.</p>
+<h2 id="glossary"><a href="#glossary">Glossary</a></h2>
+<p><a href="implm/index.html" title="crate::implm">crate::implm</a> defines some core concepts such as “cell” and “point”. For all other jargon,
+<a href="http://www.astrolog.org/labyrnth.htm%3E">Think Labyrinth!</a> has a great glossary on technical
+maze terms that you can find at <a href="http://www.astrolog.org/labyrnth/glossary.htm">http://www.astrolog.org/labyrnth/glossary.htm</a>.</p>
+</div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="implm/index.html" title="mazelib::implm mod">implm</a></div><div class="item-right docblock-short"><p>A variety of built-in implementations of the interfaces defined in <a href="interface/index.html" title="crate::interface">crate::interface</a>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="interface/index.html" title="mazelib::interface mod">interface</a></div><div class="item-right docblock-short"><p>The core abstractions of our maze model.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="util/index.html" title="mazelib::util mod">util</a></div><div class="item-right docblock-short"></div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="mazelib" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0-nightly (495b21669 2022-07-03)" ></div>
+</body></html>

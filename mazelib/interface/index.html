@@ -1,0 +1,145 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="The core abstractions of our maze model."><meta name="keywords" content="rust, rustlang, rust-lang, interface"><title>mazelib::interface - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="sidebar-items.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="stylesheet" type="text/css" href="../../theme.css"><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mazelib/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"></h2>
+    </nav>
+    <nav class="sidebar"><a class="sidebar-logo" href="../../mazelib/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"><a href="#">Module interface</a></h2><div class="sidebar-elems"><section><div class="block"><ul><li><a href="#modules">Modules</a></li></ul></div></section></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mazelib/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1">
+                                <a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div>
+                        </div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
+    <h1 class="fqn"><span class="in-band">Module <a href="../index.html">mazelib</a>::<wbr><a class="mod" href="#">interface</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../../src/mazelib/interface/mod.rs.html#3-212">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>The core abstractions of our maze model.</p>
+<p>This crate splits up mazes into distinct parts, all at different levels of abstraction.
+It is important to understand these, as these divisions are the foundation for the library
+and will dictate how you call and interact with it.</p>
+<p>There are five core components that combined make up a maze:</p>
+<ol>
+<li><a href="#cell">Cells</a></li>
+<li><a href="#points">Points</a></li>
+<li><a href="#coordinate-space">Coordinate Spaces</a></li>
+<li><a href="#buffer">Buffers</a></li>
+<li><a href="#cell-manager">Cell Managers</a></li>
+</ol>
+<p>These components are all held together in one bundle by <a href="#maze-carrier">Maze Carriers</a>.</p>
+<p>There are also external components that interact with mazes but do not constitute them:</p>
+<ul>
+<li><a href="#renderer">Renderers</a></li>
+<li><a href="#generator">Generators</a></li>
+<li><a href="#solver">Solvers</a></li>
+<li><a href="#template">Templates</a></li>
+</ul>
+<p>This page explains the key concepts you will need to understand the library, so you should
+read this top to bottom completely before reading the rest of the documentation.</p>
+<h2 id="core-components"><a href="#core-components">Core Components</a></h2>
+<p>The core components of a maze. It is the combination of all of these components together that
+constitute a maze.</p>
+<h3 id="cell"><a href="#cell">Cell</a></h3>
+<p>Mazes are fundamentally a collection of cells. A cell is the smallest indivisible unit
+of a maze, like a passage segment or a wall segment.</p>
+<p>Cells are best understood visually. Consider this maze:</p>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEsAQMAAABDsxw2AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAGUExURQAAAP///6XZn90AAAAJcEhZcwAADsIAAA7CARUoSoAAAAB9SURBVGje7dWxDYNAEEXBdQUu6Upza5RCGZcdRkgYBDqcWGaledEGk65+vHu1NsR1GIalYL1GDMMyseXrn63V2FcwDMMwDLsFe3w34hiG3ZatzWy5CoZhGIZh/2FrFcOwzOzYh3XDMAzDMOxHbDviJ40YhqVhvQqGYTlYxAR936QXowZtigAAAABJRU5ErkJggg==" alt="An image of a pixelated maze." /></p>
+<p>Here are all the cells of the maze outlined in red:</p>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEsAgMAAAAEE2bmAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJUExURf8AAAAAAP///8qSw5kAAAAJcEhZcwAADsEAAA7BAbiRa+0AAAEJSURBVHja7dxBCsIwEAXQKLhx30t4ih7Bhd7Ho7gsnlJaC2mgEaZQkPj+YihE32ISSAjW9A853Mek15g0PfefgW58vh1yvfddrtdTrvOHVq3FV1gsFovViiWxFL2f6uOS63DMtRh4nnMdVueRxWKxWM1aEkv1nHNZtLV6zvkyjywWi8X6KUtisb5YLBaLZa/dN5Heh+4UWCwWi9WsJbFUe9/lrpe933BmYrFYLFZTlsRifbFYLBbLXrtvit5Ptfgt2fZ5ZLFYLFazlsQy935RI+ec1fetWCwWi9W4JbFYXywWi8Wy1+6bufe1OwXvXLNYLJb/jPjLRM4mi4Fv9/csFovFatxqPim9AY7LuJp/XWuCAAAAAElFTkSuQmCC" alt="The same maze from before, but all the pixels are outlined in red." /></p>
+<p>Cells are too small to hold any semantic meaning useful enough for analysis. That job is
+handled by points, which we’ll come to next. Rather, <em>cells represent the physical structure
+of the maze</em>. If you were to build the maze, cells tell you what materials you need to place
+where — “Do I need a piece of wall here, or a path?” (And we do indeed build the maze, using
+renderers, which will also be discussed later).</p>
+<p>Cells are primarily defined and identified by way they connect to other cells. Each type of
+cell is called a <em>cell class</em>. Each maze only has cells from a single class.</p>
+<p>Cells are not restricted to being square. They can be
+<a href="https://www.astrolog.org/labyrnth/maze/delta.gif">triangles</a>,
+<a href="https://www.astrolog.org/labyrnth/maze/sigma.gif">hexagons</a>,
+<a href="https://www.astrolog.org/labyrnth/maze/theta.gif">circular sectors</a>,
+<a href="https://www.astrolog.org/labyrnth/maze/upsilon.gif">different shapes in the same maze</a>,
+<a href="https://www.astrolog.org/labyrnth/maze/crack.gif">and worse</a>.</p>
+<p>Cell classes are generally designed to be paired up with specific (classes of) coordinate
+spaces.</p>
+<p>A cell has two components: a location and a value.</p>
+<h4 id="cell-location"><a href="#cell-location">Cell Location</a></h4>
+<p>A cell’s location defines its absolute position in the maze and serves as the cell’s ID.
+Each cell has a unique location. The structure (e.g. 2-tuple, 3-tuple, UUID) of a cell
+location is specific to each cell class. The set of all legal cell locations in the context
+of a maze is known as the maze’s <em>cell space</em>. The size of the cell space is proportional
+to the size of the maze’s coordinate space (since the coordinate space must be mapped to the
+cell space somehow).</p>
+<p>Cell locations are represented by the <a href="cell/trait.CellLocation.html" title="self::cell::CellLocation"><code>CellLocation</code></a> trait.
+There is no trait for cell spaces - they are implicitly derived from a maze’s
+cell class-coordinate space pair.</p>
+<h4 id="cell-value"><a href="#cell-value">Cell Value</a></h4>
+<p>A cell’s value determines the <a href="cell/enum.ConnectionType.html" title="self::cell::ConnectionType">state</a> of its connections to
+other cells. The values a cell can take on differ between different cell classes.</p>
+<p>Cell values are represented by the <a href="cell/trait.CellValue.html" title="self::cell::CellValue"><code>CellValue</code></a> trait.</p>
+<h3 id="point"><a href="#point">Point</a></h3>
+<p>A <a href="point/trait.Point.html" title="self::point::Point">point</a> is a <em>potential junction</em> of a maze. This includes features
+such as intersections, junctions, and straight hallways. Passages are simply two connected
+points.</p>
+<p>Here are all the points annotated on the maze from before:</p>
+<p><img src="data:image/png;base64,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" alt="The pixelated maze, wth a grid of blue dots overlaid." /></p>
+<p>The key difference compared to cells is that points have <em>semantic meaning</em>. The relationship
+between points is especially important. Moving from point to point is equivalent to moving from
+junction to junction in a maze. They’re the basis for analysing mazes (such as generating them
+and solving them).</p>
+<p>It is easier to think about mazes in terms of points, both for humans and computers. For
+humans, it is easier to consider junctions, intersections, and turns than it is to single
+out specific cells. For computers, there can be far less cells than points, which makes
+it easier (and faster) to compute things. For example, our example maze has 144 cells, but
+only 16 points – an order of magnitude less.</p>
+<p>You may notice that on the figure the entrances and exits are not marked as points. This is
+because the maze was modified after creation to add gaps in the outer boundary to indicate
+the entrance and exit. Since these are visual indicators for humans, they’re only a part of
+the cell space. For the purposes of analysis, when start and end points are required, the closest
+points are used. In this case, they are the upper-left-most and bottom-right-most points
+respectively.</p>
+<p>There does not need to exist a one-to-one mapping between points. A point might be mapped to
+multiple cells, and a cell might not be mapped to a point at all. We’ll come to how points
+influence cells later.</p>
+<p>Points are represented by the <a href="point/trait.Point.html" title="self::point::Point"><code>Point</code></a> trait, though it’s not particularly
+useful on its own.</p>
+<h3 id="coordinate-space"><a href="#coordinate-space">Coordinate Space</a></h3>
+<p>The <a href="point/trait.CoordinateSpace.html" title="self::point::CoordinateSpace">coordinate space</a> sits at the highest level of abstraction.
+They carry the size and shape of the maze, and know all possible semantic positions (points)
+within.</p>
+<p>It is fundamentally a <a href="https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)">graph</a>,
+with points as its vertices. The edges between vertices represent <em>possible</em> passages between
+points.</p>
+<p>When generating, solving, or analysing mazes, the coordinate space is used. It declares how
+points are connected to one another – the potential passages that could exist between junctions.</p>
+<p>Here, the turquoise lines between points represent the potential ways one could move between
+points. Note that however not all of these potential routes end up as passages in the final maze.</p>
+<p><img src="data:image/png;base64,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" alt="The pixelated maze with the grid of blue dots, but now with a grid of turquoise lines. The dots lie at all intersections of the lines." /></p>
+<p>While the coordinate space declares the connections between points, it does not carry the state
+of the connection (e.g. if it’s a passage or not). One way to think about it is that it describes
+the maze as if there were no walls. Whether a connection is a passage or wall is determined by
+the cells at the location.</p>
+<p>Coordinate spaces are represented by the <a href="point/trait.CoordinateSpace.html" title="self::point::CoordinateSpace"><code>CoordinateSpace</code></a> trait.</p>
+<h3 id="buffer"><a href="#buffer">Buffer</a></h3>
+<p>The <a href="buffer/trait.MazeBuffer.html" title="self::buffer::MazeBuffer">buffer</a> handles storing mazes while they are being worked on.
+They carry the raw data of the maze.</p>
+<p>They only store the mazes cells, indexed by their unique sequential IDs. They have no knowledge
+of the higher-order structure of the maze.</p>
+<p>Typically buffers will just be something like a <a href="../implm/buffer/struct.VecBuffer.html" title="crate::implm::buffer::VecBuffer"><code>Vec</code></a>, though
+there’s no requirement for this to be the case.</p>
+<p>Buffers are represented by the <a href="buffer/trait.MazeBuffer.html" title="self::buffer::MazeBuffer"><code>MazeBuffer</code></a> trait.</p>
+<h3 id="cell-manager"><a href="#cell-manager">Cell Manager</a></h3>
+<p>The <a href="cell/trait.CellManager.html" title="self::cell::CellManager">CellManager</a> manages the cells.</p>
+<p>Due to their role in handling conversions to and from cells, CellManager implementations
+are often specific to only a specific combination of CoordinateSpace and type of cell
+(<a href="cell/trait.CellValue.html" title="self::cell::CellValue"><code>CellValue</code></a>).</p>
+<h2 id="maze-carrier"><a href="#maze-carrier">Maze Carrier</a></h2>
+<p>A <a href="maze/trait.Maze.html" title="self::maze::Maze">Maze Carrier</a> holds the five core components of a maze together.
+They are represented by the <a href="maze/trait.Maze.html" title="self::maze::Maze"><code>Maze</code></a> trait.</p>
+<p>They are used as references to the maze as a whole.</p>
+<h2 id="external-components"><a href="#external-components">External Components</a></h2><h3 id="renderer"><a href="#renderer">Renderer</a></h3>
+<p>…</p>
+<h3 id="generator"><a href="#generator">Generator</a></h3>
+<p>…</p>
+<h3 id="solver"><a href="#solver">Solver</a></h3>
+<p>…</p>
+<h3 id="template"><a href="#template">Template</a></h3>
+<p>…</p>
+</div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="buffer/index.html" title="mazelib::interface::buffer mod">buffer</a></div><div class="item-right docblock-short"><p>Working maze storage.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="cell/index.html" title="mazelib::interface::cell mod">cell</a></div><div class="item-right docblock-short"><p>Reading and manipulating mazes at a high level.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="generate/index.html" title="mazelib::interface::generate mod">generate</a></div><div class="item-right docblock-short"><p>Generating mazes.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="maze/index.html" title="mazelib::interface::maze mod">maze</a></div><div class="item-right docblock-short"><p>Maze carriers.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="point/index.html" title="mazelib::interface::point mod">point</a></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="render/index.html" title="mazelib::interface::render mod">render</a></div><div class="item-right docblock-short"><p>Rendering (exporting) mazes to other formats.</p>
+</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mazelib" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0-nightly (495b21669 2022-07-03)" ></div>
+</body></html>

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["ArrayBuffer","A [MazeBuffer] that stores its cells in a fixed-size array."],["VecBuffer","A [MazeBuffer] that stores its cells in a [Vec] allocated on the heap."]]};

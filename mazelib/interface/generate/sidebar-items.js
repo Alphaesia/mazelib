@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"trait":[["DefaultMazeGenerator","Simple sugar for [`MazeGenerator`]s."],["MazeGenerator","A maze generator."]]};

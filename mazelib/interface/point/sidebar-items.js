@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"trait":[["CoordinateSpace","See Also"],["Point","A logical location in a maze."]]};

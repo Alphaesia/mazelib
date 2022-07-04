@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["mazelib"] = [{"text":"impl&lt;const DIMENSION:&nbsp;<a class=\"primitive\" href=\"https://doc.rust-lang.org/nightly/std/primitive.usize.html\">usize</a>&gt; <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html\" title=\"trait core::fmt::Display\">Display</a> for <a class=\"struct\" href=\"mazelib/implm/point/boxy/struct.CoordinateTuplet.html\" title=\"struct mazelib::implm::point::boxy::CoordinateTuplet\">CoordinateTuplet</a>&lt;DIMENSION&gt;","synthetic":false,"types":["mazelib::implm::point::boxy::point::CoordinateTuplet"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

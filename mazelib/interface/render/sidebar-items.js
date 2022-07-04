@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"trait":[["DefaultMazeRenderer","Simple sugar for [`MazeRenderer`]s."],["DefaultMazeRendererNonSeeking","Simple sugar for [`MazeRendererNonSeeking`]s."],["MazeRenderer","Render (export) a maze into another format."],["MazeRendererNonSeeking","Like [`MazeRenderer`], but supports writers that do not support seeking."]]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["BoxSpaceSchematicMazeRenderer","Render a two-dimensional maze (i.e. `BoxCoordinateSpace<2>`) into a Minecraft schematic and return it."]],"trait":[["SchematicMazeRenderer",""]]};

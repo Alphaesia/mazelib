@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":[["block","Re-exports of [`crate::implm::cell::block`] under different names."],["inline","Re-exports of [`crate::implm::cell::inline`] under different names."]]};

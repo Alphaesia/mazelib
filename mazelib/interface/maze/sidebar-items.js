@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"trait":[["Maze","A maze carrier. Holds [all the components of a maze][crate::interface]."]]};

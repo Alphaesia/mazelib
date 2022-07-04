@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":[["buffer","Some basic built-in [MazeBuffer][crate::interface::buffer::MazeBuffer] implementations."],["cell",""],["generate",""],["maze","Some carriers for common maze types."],["point","Common [CoordinateSpace][crate::interface::point::CoordinateSpace]s."],["render",""]]};

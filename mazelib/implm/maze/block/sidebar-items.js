@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["BoxSpaceBlockCellMaze","TODO write a description"],["BoxSpaceBlockCellMazeBuilder",""]]};
