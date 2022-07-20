@@ -9,7 +9,8 @@ use crate::interface::cell::{CellID, CellManager, ConnectionType};
 use crate::interface::point::CoordinateSpace;
 use crate::interface::render::MazeRendererNonSeeking;
 use crate::internal::array_util::Product;
-use crate::pt;
+use crate::{CellPath, PointPath, pt};
+use crate::implm::cell::block::BlockCell;
 
 /// As this manager implements a one-to-one mapping between points and cells, there is
 /// no separate [`CellLocation`][crate::interface::cell::CellLocation] struct.
@@ -128,6 +129,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Bo
 
 impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> CellManager for BoxSpaceInlineCellManager<Buffer, DIMENSION> {
     type CoordSpace = BoxCoordinateSpace<DIMENSION>;
+    type CellLoc = BlockCell<DIMENSION>;
     type CellVal = InlineCellValue<DIMENSION>;
 
     fn coord_space(&self) -> &Self::CoordSpace {
@@ -204,6 +206,11 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Ce
     /// [InlineCellValueWallType::WALL].
     fn make_boundary_between(&mut self, from: pt!(), to: pt!()) {
         self.make_between(from, to, InlineCellValueWallType::BOUNDARY)
+    }
+
+    fn map_pt_path_to_cell_path(&self, path: &PointPath<Self::CoordSpace>) -> CellPath<Self::CellLoc> {
+        drop(path);
+        todo!()
     }
 }
 

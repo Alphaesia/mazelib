@@ -7,7 +7,7 @@ use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::{CellID, CellManager};
 use crate::interface::render::MazeRendererNonSeeking;
 
-impl <Buffer: MazeBuffer<InlineCellValue<2>>> MazeRendererNonSeeking<BoxSpaceInlineCellManager<Buffer, 2>> for BoxSpaceTextMazeRenderer {
+impl <Buffer: MazeBuffer<InlineCellValue<2>>> MazeRendererNonSeeking<BoxSpaceInlineCellManager<Buffer, 2>> for BoxSpaceTextMazeRenderer<BoxSpaceInlineCellManager<Buffer, 2>> {
     fn render<Output: Write>(&self, maze: &BoxSpaceInlineCellManager<Buffer, 2>, output: &mut Output) -> Result<()> {
         let [width, height] = maze.coord_space().dimensions();
 
@@ -131,7 +131,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<2>>> MazeRendererNonSeeking<BoxSpaceInl
     }
 }
 
-impl BoxSpaceTextMazeRenderer {
+impl <Buffer: MazeBuffer<InlineCellValue<2>>> BoxSpaceTextMazeRenderer<BoxSpaceInlineCellManager<Buffer, 2>> {
     // not recommended reading
     fn get_box_char(left_wall: WallType, top_wall: WallType, right_wall: WallType, bottom_wall: WallType) -> char {
         match (left_wall, top_wall, right_wall, bottom_wall) {
@@ -235,4 +235,4 @@ impl BoxSpaceTextMazeRenderer {
     }
 }
 
-impl <Buffer: MazeBuffer<InlineCellValue<2>>> TextMazeRenderer<BoxSpaceInlineCellManager<Buffer, 2>> for BoxSpaceTextMazeRenderer {}
+impl <Buffer: MazeBuffer<InlineCellValue<2>>> TextMazeRenderer<BoxSpaceInlineCellManager<Buffer, 2>> for BoxSpaceTextMazeRenderer<BoxSpaceInlineCellManager<Buffer, 2>> {}

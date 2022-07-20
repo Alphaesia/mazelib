@@ -1,6 +1,6 @@
 use crate::interface::cell::CellValue;
 
-#[derive(Copy, Clone, Eq, PartialEq, Debug)]
+#[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
 pub struct BlockCellValue {
     pub cell_type: BlockCellValueType,
     pub marked: bool,

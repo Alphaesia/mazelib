@@ -173,6 +173,7 @@
 #![feature(min_specialization)]
 #![feature(label_break_value)]
 #![feature(doc_cfg)]
+#![feature(let_else)]
 
 #![deny(rustdoc::broken_intra_doc_links)]
 
@@ -180,6 +181,7 @@
 
 pub mod interface;
 pub mod implm;
+mod path; pub use self::path::{PointPath, CellPath};
 pub mod util;
 pub(crate) mod internal;
 #[cfg(test)] mod test;

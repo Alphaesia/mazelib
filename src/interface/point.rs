@@ -52,4 +52,4 @@ pub trait CoordinateSpace : Sized + Clone + Copy + Send + Sync + IntoIterator<It
 /// * Cloneable
 /// * Equality must be reflexive, symmetric, transitive, *and anti-symmetric*
 /// * Hashable
-pub trait Point: Sized + Clone + Copy + PartialEq + Eq + Hash + Debug {}
+pub trait Point: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Debug {}

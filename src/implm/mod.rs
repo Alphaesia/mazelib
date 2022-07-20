@@ -12,3 +12,4 @@ pub mod cell;
 pub mod maze;
 pub mod render;
 pub mod generate;
+pub mod solve;

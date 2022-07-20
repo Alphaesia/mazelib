@@ -12,6 +12,7 @@ use crate::interface::point::CoordinateSpace;
 use crate::interface::render::MazeRendererNonSeeking;
 use crate::internal::array_util::{Product, Sum};
 use crate::internal::noise_util::pt;
+use crate::{CellPath, PointPath};
 
 /// TODO write a description
 ///
@@ -108,6 +109,23 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
         BlockCell(pt.into())
     }
 
+    /// Map a cell location to a point.
+    pub fn map_cell_loc_to_pt(&self, cell_loc: BlockCell<DIMENSION>) -> Option<pt!()> {
+        let mut pt: [usize; DIMENSION] = cell_loc.0.into();
+
+        for i in 0..DIMENSION {
+            pt[i] = pt[i].checked_sub(self.padding[i][0])?;
+
+            if pt[i] % self.scale_factor[i] != 0 {
+                return None
+            }
+
+            pt[i] /= self.scale_factor[i];
+        }
+
+        return Some(pt.into())
+    }
+
     /// Get the value of the point `pt` for mutation.
     ///
     /// See also: [`Self::get()`].
@@ -172,6 +190,17 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
 
 // Internal functions
 impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockCellManager<Buffer, DIMENSION> {
+    /// Convert a [`crate::interface::cell::CellLocation`] to a [`crate::interface::cell::CellID`]
+    fn cell_loc_to_id(&self, cell_loc: BlockCell<DIMENSION>) -> CellID {
+        let mut offset = cell_loc[0];
+
+        for i in 1..DIMENSION {
+            offset += cell_loc[i] * self.full_dimensions[i - 1];
+        }
+
+        CellID(offset)
+    }
+
     //noinspection RsSelfConvention
     /// Get the axis in which two points are adjacent.
     ///
@@ -189,17 +218,6 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
         }
 
         return None
-    }
-
-    /// Convert a [`crate::interface::cell::CellLocation`] to a [`crate::interface::cell::CellID`]
-    fn cell_loc_to_id(&self, cell_loc: BlockCell<DIMENSION>) -> CellID {
-        let mut offset = cell_loc[0];
-
-        for i in 1..DIMENSION {
-            offset += cell_loc[i] * self.full_dimensions[i - 1];
-        }
-
-        CellID(offset)
     }
 
     fn set_unvisited_neighbours_to_wall(&mut self, cell_loc: BlockCell<DIMENSION>) {
@@ -223,8 +241,77 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     }
 }
 
+// Internal macros
+
+macro_rules! cells_between_incl_both {
+    ($self:ident, $from:ident, $to:ident) => {
+        {
+            let axis_of_adjacency = Self::get_axis_of_adjacency($from, $to).expect("from and to are not adjacent");
+
+            let from = $self.map_pt_to_cell_loc($from);
+            let to = $self.map_pt_to_cell_loc($to);
+
+            let from_pos = from[axis_of_adjacency];
+            let to_pos = to[axis_of_adjacency];
+
+            let range = if from_pos < to_pos {
+                from_pos..=to_pos
+            } else {
+                to_pos..=from_pos
+            };
+
+            range.into_iter().map(move |i| from.at(axis_of_adjacency, i))
+        }
+    };
+}
+
+macro_rules! cells_between_excl_start {
+    ($self:ident, $from:ident, $to:ident) => {
+        {
+            let axis_of_adjacency = Self::get_axis_of_adjacency($from, $to).expect("from and to are not adjacent");
+
+            let from = $self.map_pt_to_cell_loc($from);
+            let to = $self.map_pt_to_cell_loc($to);
+
+            let from_pos = from[axis_of_adjacency];
+            let to_pos = to[axis_of_adjacency];
+
+            let range = if from_pos < to_pos {
+                (from_pos+1)..(to_pos+1) // Can't use inclusive range here cause it's a different type from normal ranges
+            } else {
+                to_pos..from_pos
+            };
+
+            range.into_iter().map(move |i| from.at(axis_of_adjacency, i))
+        }
+    };
+}
+
+macro_rules! cells_between_excl_end {
+    ($self:ident, $from:ident, $to:ident) => {
+        {
+            let axis_of_adjacency = Self::get_axis_of_adjacency($from, $to).expect("from and to are not adjacent");
+
+            let from = $self.map_pt_to_cell_loc($from);
+            let to = $self.map_pt_to_cell_loc($to);
+
+            let from_pos = from[axis_of_adjacency];
+            let to_pos = to[axis_of_adjacency];
+
+            let range = if from_pos < to_pos {
+                from_pos..to_pos
+            } else {
+                (to_pos+1)..from_pos
+            };
+
+            range.into_iter().map(move |i| from.at(axis_of_adjacency, i))
+        }
+    };
+}
+
 impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> CellManager for BoxSpaceBlockCellManager<Buffer, DIMENSION> {
     type CoordSpace = BoxCoordinateSpace<DIMENSION>;
+    type CellLoc = BlockCell<DIMENSION>;
     type CellVal = BlockCellValue;
 
     fn coord_space(&self) -> &Self::CoordSpace {
@@ -236,11 +323,54 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> CellManager fo
     }
 
     fn get_connection(&self, from: pt!(), to: pt!()) -> ConnectionType {
-        match [self.get(from).cell_type, self.get(to).cell_type] {
-            [BOUNDARY,  _] | [_, BOUNDARY ] => ConnectionType::BOUNDARY,
-            [UNVISITED, _] | [_, UNVISITED] => ConnectionType::UNVISITED,
-            [WALL,      _] | [_, WALL     ] => ConnectionType::WALL,
-            [PASSAGE,            PASSAGE  ] => ConnectionType::PASSAGE,
+        let axis_of_adjacency = Self::get_axis_of_adjacency(from, to).expect("from and to are not adjacent");
+
+        return if self.scale_factor[axis_of_adjacency] == 1 {
+            match (self.get(from).cell_type, self.get(to).cell_type) {
+                (BOUNDARY,  _) | (_, BOUNDARY ) => ConnectionType::BOUNDARY,
+                (UNVISITED, _) | (_, UNVISITED) => ConnectionType::UNVISITED,
+                (WALL,      _) | (_, WALL     ) => ConnectionType::WALL,
+                (PASSAGE,            PASSAGE  ) => ConnectionType::PASSAGE,
+            }
+        } else {
+            let from = self.map_pt_to_cell_loc(from);
+            let to = self.map_pt_to_cell_loc(to);
+
+            let from_pos = from[axis_of_adjacency];
+            let to_pos = to[axis_of_adjacency];
+
+            let mut highest_priority_cell_type_seen = PASSAGE;
+
+            if from_pos < to_pos {
+                for cell_loc in (from_pos..=to_pos).into_iter().map(|i| from.at(axis_of_adjacency, i)) {
+                    let cell_type = self.get_cell_value(cell_loc).cell_type;
+
+                    match (cell_type, highest_priority_cell_type_seen) {
+                        (BOUNDARY, _) => return ConnectionType::BOUNDARY,
+                        (UNVISITED, WALL | PASSAGE) | (WALL, PASSAGE) => highest_priority_cell_type_seen = cell_type,
+                        (_, BOUNDARY) => panic!("BOUNDARY shouldn't have been assigned to highest_priority_cell_type_seen, it should have been returned"),
+                        _ => {},
+                    }
+                }
+            } else {
+                for cell_loc in (to_pos..=from_pos).into_iter().map(|i| from.at(axis_of_adjacency, i)) {
+                    let cell_type = self.get_cell_value(cell_loc).cell_type;
+
+                    match (cell_type, highest_priority_cell_type_seen) {
+                        (BOUNDARY, _) => return ConnectionType::BOUNDARY,
+                        (UNVISITED, WALL | PASSAGE) | (WALL, PASSAGE) => highest_priority_cell_type_seen = cell_type,
+                        (_, BOUNDARY) => panic!("BOUNDARY shouldn't have been assigned to highest_priority_cell_type_seen, it should have been returned"),
+                        _ => {},
+                    }
+                }
+            };
+
+            return match highest_priority_cell_type_seen {
+                BOUNDARY => ConnectionType::BOUNDARY,
+                UNVISITED => ConnectionType::UNVISITED,
+                WALL => ConnectionType::WALL,
+                PASSAGE => ConnectionType::PASSAGE,
+            }
         }
     }
 
@@ -260,33 +390,12 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> CellManager fo
     /// maze carvers will be able to progress. If you wish for `to` to also be surrounded by
     /// walls, simply call [`Self::make_passage()`] on `to` as well.
     fn make_passage_between(&mut self, from: pt!(), to: pt!()) {
-        let axis_of_adjacency = Self::get_axis_of_adjacency(from, to).expect("from and to are not adjacent");
-
-        let from = self.map_pt_to_cell_loc(from);
-        let to = self.map_pt_to_cell_loc(to);
-
-        let from_pos = from[axis_of_adjacency];
-        let to_pos = to[axis_of_adjacency];
-
-        if from_pos < to_pos {
-            // Skip out on the end so we don't add walls around it
-            for i in from_pos..to_pos {
-                let cell = from.at(axis_of_adjacency, i);
-
-                self.set_cell_value_type(cell, PASSAGE);
-                self.set_unvisited_neighbours_to_wall(cell);
-            }
-        } else {
-            // Skip out on the end so we don't add walls around it
-            for i in (to_pos + 1)..=from_pos {
-                let cell = from.at(axis_of_adjacency, i);
-
-                self.set_cell_value_type(cell, PASSAGE);
-                self.set_unvisited_neighbours_to_wall(cell);
-            }
+        for cell_loc in cells_between_excl_end!(self, from, to) {
+            self.set_cell_value_type(cell_loc, PASSAGE);
+            self.set_unvisited_neighbours_to_wall(cell_loc);
         }
 
-        self.set_cell_value_type(to, PASSAGE);
+        self.set_cell_value_type(self.map_pt_to_cell_loc(to), PASSAGE);
     }
 
     /// Set `pt` to [`BlockCellValueType::WALL`].
@@ -297,23 +406,9 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> CellManager fo
     /// Set `from` and `to` to [`BlockCellValueType::WALL`]. If the resolution is greater than
     /// one along the axis of adjacency, then all intermediate cells will be set to walls too.
     fn make_wall_between(&mut self, from: pt!(), to: pt!()) {
-        let axis_of_adjacency = Self::get_axis_of_adjacency(from, to).expect("from and to are not adjacent");
-
-        let from = self.map_pt_to_cell_loc(from);
-        let to = self.map_pt_to_cell_loc(to);
-
-        let from_pos = from[axis_of_adjacency];
-        let to_pos = to[axis_of_adjacency];
-
-        if from_pos < to_pos {
-            for i in from_pos..=to_pos {
-                self.set_cell_value_type(from.at(axis_of_adjacency, i), WALL);
-            }
-        } else {
-            for i in to_pos..=from_pos {
-                self.set_cell_value_type(from.at(axis_of_adjacency, i), WALL);
-            }
-        }
+        for cell_loc in cells_between_incl_both!(self, from, to) {
+            self.set_cell_value_type(cell_loc, WALL)
+        };
     }
 
     /// Set `pt` to [`BlockCellValueType::BOUNDARY`].
@@ -324,23 +419,34 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> CellManager fo
     /// Set `from` and `to` to [`BlockCellValueType::BOUNDARY`]. If the resolution is greater than
     /// one along the axis of adjacency, then all intermediate cells will be set to boundaries too.
     fn make_boundary_between(&mut self, from: pt!(), to: pt!()) {
-        let axis_of_adjacency = Self::get_axis_of_adjacency(from, to).expect("from and to are not adjacent");
-
-        let from = self.map_pt_to_cell_loc(from);
-        let to = self.map_pt_to_cell_loc(to);
-
-        let from_pos = from[axis_of_adjacency];
-        let to_pos = to[axis_of_adjacency];
-
-        if from_pos < to_pos {
-            for i in from_pos..=to_pos {
-                self.set_cell_value_type(from.at(axis_of_adjacency, i), BOUNDARY);
-            }
-        } else {
-            for i in to_pos..=from_pos {
-                self.set_cell_value_type(from.at(axis_of_adjacency, i), BOUNDARY);
-            }
+        for cell_loc in cells_between_incl_both!(self, from, to) {
+            self.set_cell_value_type(cell_loc, BOUNDARY)
         }
+    }
+
+    fn map_pt_path_to_cell_path(&self, path: &PointPath<Self::CoordSpace>) -> CellPath<BlockCell<DIMENSION>> {
+        if path.len() == 0 {
+            return CellPath::new();
+        }
+
+        let pt_path = path;
+        let mut cell_path: CellPath<_> = CellPath::new();
+
+        let mut previous_pt = pt_path[0];
+
+        cell_path.push(self.map_pt_to_cell_loc(previous_pt));
+
+        for pt in &pt_path[1..pt_path.len()] {
+            let pt = *pt;
+
+            for cell_loc in cells_between_excl_start!(self, previous_pt, pt) {
+                cell_path.push(cell_loc)
+            }
+
+            previous_pt = pt;
+        }
+
+        return cell_path;
     }
 }
 

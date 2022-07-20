@@ -15,9 +15,11 @@
 //! 3. [`CellManager`] --- the unifying glue and centre of the maze model.
 
 use std::fmt::Debug;
+use std::hash::Hash;
 
 use crate::interface::point::CoordinateSpace;
 use crate::internal::noise_util::pt;
+use crate::{CellPath, PointPath};
 
 /// Translates between [points][crate::interface::point::Point], [cell locations][CellLocation],
 /// and [cell identifiers][CellID]. Executes queries on mazes and modifications to mazes.
@@ -37,7 +39,10 @@ pub trait CellManager: Debug {
     /// The type of coordinate space this cell manager supports.
     type CoordSpace: CoordinateSpace;
 
-    /// The value of the type of cell this cell manager uses.
+    /// The location type for the cell type this cell manager uses.
+    type CellLoc: CellLocation;
+
+    /// The value type for the cell type this cell manager uses.
     type CellVal: CellValue;
 
     /// Return the coordinate space for this maze.
@@ -113,8 +118,11 @@ pub trait CellManager: Debug {
     /// The order of the arguments is important and has semantic meaning. Swapping
     /// the arguments may produce different results.
     fn make_boundary_between(&mut self, from: pt!(), to: pt!());
+
+    fn map_pt_path_to_cell_path(&self, path: &PointPath<Self::CoordSpace>) -> CellPath<Self::CellLoc>;
 }
 
+// TODO rewrite, is used by CellPath now
 /// Location of a cell.
 ///
 /// Structs that implement this trait are "addresses" for cells. You can
@@ -124,7 +132,7 @@ pub trait CellManager: Debug {
 /// accept them. Rather, it is a signifier of the intent and purpose of structs
 /// that implement it. It allows implementers to clearly delineate to readers
 /// and future code editors what role a struct plays in the maze model.
-pub trait CellLocation {}
+pub trait CellLocation: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Debug {}
 
 /// Value of a cell.
 ///
@@ -132,7 +140,7 @@ pub trait CellLocation {}
 /// no universal interpretation. It is recommended you clean up any marks you make,
 /// as other components may make marks of their own and get confused by pre-existing
 /// marks.
-pub trait CellValue: Copy + Clone + Send + Sync + Sized + PartialEq + Eq + Default + Debug {
+pub trait CellValue: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Default + Debug {
     /// If the cell has not been fully generated (visited). Partially-generated
     /// cells are not considered fully visited. This is because when applying
     /// templates, such as a solid boundary around the edge of the maze, the cells
