@@ -15,6 +15,7 @@
 //! 3. [`CellManager`] --- the unifying glue and centre of the maze model.
 
 use std::fmt::Debug;
+use std::hash::Hash;
 
 use crate::interface::point::CoordinateSpace;
 use crate::internal::noise_util::pt;
@@ -124,7 +125,7 @@ pub trait CellManager: Debug {
 /// accept them. Rather, it is a signifier of the intent and purpose of structs
 /// that implement it. It allows implementers to clearly delineate to readers
 /// and future code editors what role a struct plays in the maze model.
-pub trait CellLocation {}
+pub trait CellLocation: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Debug {}
 
 /// Value of a cell.
 ///
@@ -132,7 +133,7 @@ pub trait CellLocation {}
 /// no universal interpretation. It is recommended you clean up any marks you make,
 /// as other components may make marks of their own and get confused by pre-existing
 /// marks.
-pub trait CellValue: Copy + Clone + Send + Sync + Sized + PartialEq + Eq + Default + Debug {
+pub trait CellValue: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Default + Debug {
     /// If the cell has not been fully generated (visited). Partially-generated
     /// cells are not considered fully visited. This is because when applying
     /// templates, such as a solid boundary around the edge of the maze, the cells

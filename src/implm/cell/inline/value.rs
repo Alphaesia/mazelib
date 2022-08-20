@@ -7,13 +7,13 @@ use crate::interface::cell::CellValue;
 /// the 2nd is the cell in the negative direction.
 /// Even if it is `None` for a particular direction, the
 /// neighbouring cell in that direction may have a wall there.
-#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, Debug)]
 pub struct InlineCellValue<const DIMENSION: usize> {
     pub walls: [[InlineCellValueWallType; 2]; DIMENSION],
     pub marked: bool,
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, Debug)]
 pub enum InlineCellValueWallType {
     /// An edge that permits passage. Note that the neighbouring cell in this direction
     /// may have a wall or boundary, preventing one from moving there.

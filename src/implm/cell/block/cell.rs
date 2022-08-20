@@ -16,7 +16,7 @@ use crate::interface::cell::CellLocation;
 /// there will be no performance penalty.
 ///
 /// *See also: [BlockCellValue][super::value::BlockCellValue]*
-#[derive(Copy, Clone)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub struct BlockCell<const DIMENSION: usize>(pub(super) CoordinateTuplet<DIMENSION>);
 
 impl <const DIMENSION: usize> CellLocation for BlockCell<DIMENSION> {}
@@ -64,7 +64,7 @@ impl <const DIMENSION: usize> IndexMut<usize> for BlockCell<DIMENSION> {
 
 impl <const DIMENSION: usize> Debug for BlockCell<DIMENSION> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "s{:?}", self.0)
+        write!(f, "cl{:?}", self.0)
     }
 }
 
