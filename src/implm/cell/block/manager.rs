@@ -116,8 +116,16 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     }
 
     /// Sugar for
-    /// ```ignore
-    /// self.get_mut(pt).cell_type = cell_type;
+    /// ```
+    /// # use mazelib::implm::buffer::VecBuffer;
+    /// # use mazelib::implm::cell::block::{BlockCellValue, BlockCellValueType, BoxSpaceBlockCellManagerBuilder};
+    /// # use mazelib::implm::cell::inline::InlineCellValue;
+    /// # use mazelib::implm::point::boxy::{BoxCoordinateSpace, CoordinateTuplet};
+    /// # let mut maze = BoxSpaceBlockCellManagerBuilder::<VecBuffer<BlockCellValue>, 1>::new(BoxCoordinateSpace::new([1])).build();
+    /// # let pt: CoordinateTuplet<1> = [0].into();
+    /// # let cell_type = BlockCellValueType::PASSAGE;
+    /// #
+    /// maze.get_mut(pt).cell_type = cell_type;
     /// ```
     ///
     /// Modifies the cell's type but keeps its mark status intact.
@@ -160,8 +168,16 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     }
 
     /// Sugar for
-    /// ```ignore
-    /// self.get_cell_value_mut(loc).cell_type = cell_type;
+    /// ```
+    /// # use mazelib::implm::buffer::VecBuffer;
+    /// # use mazelib::implm::cell::block::{BlockCellLocation, BlockCellValue, BlockCellValueType, BoxSpaceBlockCellManagerBuilder};
+    /// # use mazelib::implm::cell::inline::InlineCellValue;
+    /// # use mazelib::implm::point::boxy::{BoxCoordinateSpace, CoordinateTuplet};
+    /// # let mut maze = BoxSpaceBlockCellManagerBuilder::<VecBuffer<BlockCellValue>, 1>::new(BoxCoordinateSpace::new([1])).build();
+    /// # let loc: BlockCellLocation<1> = [0].into();
+    /// # let cell_type = BlockCellValueType::PASSAGE;
+    /// #
+    /// maze.get_cell_value_mut(loc).cell_type = cell_type;
     /// ```
     ///
     /// Please see [`Self::get_cell_value_mut()`] for details.
