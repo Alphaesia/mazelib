@@ -2,7 +2,7 @@ use std::fmt::{Debug, Formatter};
 use std::marker::PhantomData;
 
 use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
-use crate::implm::cell::block::cell::BlockCell;
+use crate::implm::cell::block::location::BlockCellLocation;
 use crate::implm::cell::block::value::BlockCellValueType::{BOUNDARY, PASSAGE, UNVISITED, WALL};
 use crate::implm::point::boxy::BoxCoordinateSpace;
 use crate::implm::render::text::BoxSpaceTextMazeRenderer;
@@ -97,7 +97,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     }
 
     /// Map a point to a cell location.
-    pub fn map_pt_to_cell_loc(&self, pt: pt!()) -> BlockCell<DIMENSION> {
+    pub fn map_pt_to_cell_loc(&self, pt: pt!()) -> <Self as CellManager>::CellLoc {
         let mut pt: [usize; DIMENSION] = pt.into();
 
         for i in 0..DIMENSION {
@@ -105,7 +105,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
             pt[i] += self.padding[i][0];
         }
 
-        BlockCell(pt.into())
+        BlockCellLocation(pt.into())
     }
 
     /// Get the value of the point `pt` for mutation.
@@ -132,7 +132,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// In most cases you should use the methods on [`CellManager::get()`]. The only
     /// reason you should use this method is to access a cell that is not mapped by
     /// the coordinated space.
-    pub fn get_cell_value(&self, loc: BlockCell<DIMENSION>) -> BlockCellValue {
+    pub fn get_cell_value(&self, loc: <Self as CellManager>::CellLoc) -> BlockCellValue {
         self.buffer.get(self.cell_loc_to_id(loc))
     }
 
@@ -143,7 +143,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// the coordinated space.
     ///
     /// See also: [`Self::get_cell_value()`].
-    pub fn get_cell_value_mut(&mut self, loc: BlockCell<DIMENSION>) -> &mut BlockCellValue {
+    pub fn get_cell_value_mut(&mut self, loc: <Self as CellManager>::CellLoc) -> &mut BlockCellValue {
         self.buffer.get_mut(self.cell_loc_to_id(loc))
     }
 
@@ -155,7 +155,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// In most cases you should use the methods on [CellManager]. The only reason
     /// you should use this method is to access a cell that is not mapped by the
     /// coordinated space.
-    pub fn set_cell_value(&mut self, loc: BlockCell<DIMENSION>, value: BlockCellValue) {
+    pub fn set_cell_value(&mut self, loc: <Self as CellManager>::CellLoc, value: BlockCellValue) {
         self.buffer.set(self.cell_loc_to_id(loc), value)
     }
 
@@ -165,7 +165,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// ```
     ///
     /// Please see [`Self::get_cell_value_mut()`] for details.
-    pub fn set_cell_value_type(&mut self, loc: BlockCell<DIMENSION>, cell_type: BlockCellValueType) {
+    pub fn set_cell_value_type(&mut self, loc: <Self as CellManager>::CellLoc, cell_type: BlockCellValueType) {
         self.get_cell_value_mut(loc).cell_type = cell_type;
     }
 }
@@ -192,7 +192,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     }
 
     /// Convert a [`crate::interface::cell::CellLocation`] to a [`crate::interface::cell::CellID`]
-    fn cell_loc_to_id(&self, cell_loc: BlockCell<DIMENSION>) -> CellID {
+    fn cell_loc_to_id(&self, cell_loc: <Self as CellManager>::CellLoc) -> CellID {
         let mut offset = cell_loc[0];
 
         for i in 1..DIMENSION {
@@ -202,7 +202,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
         CellID(offset)
     }
 
-    fn set_unvisited_neighbours_to_wall(&mut self, cell_loc: BlockCell<DIMENSION>) {
+    fn set_unvisited_neighbours_to_wall(&mut self, cell_loc: <Self as CellManager>::CellLoc) {
         for i in 0..DIMENSION {
             if cell_loc[i] > 0 {
                 let neighbour = self.get_cell_value_mut(cell_loc.offset(i, -1));
@@ -225,6 +225,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
 
 impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> CellManager for BoxSpaceBlockCellManager<Buffer, DIMENSION> {
     type CoordSpace = BoxCoordinateSpace<DIMENSION>;
+    type CellLoc = BlockCellLocation<DIMENSION>;
     type CellVal = BlockCellValue;
 
     fn coord_space(&self) -> &Self::CoordSpace {

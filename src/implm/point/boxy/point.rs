@@ -35,7 +35,18 @@ impl <const DIMENSION: usize> CoordinateTuplet<DIMENSION> {
             new[dimension] -= TryInto::<usize>::try_into(offset.abs()).unwrap();
         }
 
-        return new
+        return new;
+    }
+
+    /// Replace the position along the given axis with a new value.
+    /// Useful when iterating along an axis.
+    /// Suggestions for better names are welcome.
+    pub fn at(&self, axis: usize, position: usize) -> Self {
+        let mut new = *self;
+
+        new[axis] = position;
+
+        return new;
     }
 
     /// Return true if any coordinate is the same as `value`.

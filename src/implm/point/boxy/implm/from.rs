@@ -55,3 +55,27 @@ impl <const DIMENSION: usize> From<CoordinateTuplet<DIMENSION>> for [usize; DIME
         pt.coords
     }
 }
+
+impl From<(i32, i32)> for CoordinateTuplet<2> {
+    fn from(pt: (i32, i32)) -> Self {
+        CoordinateTuplet { coords: [pt.0 as usize, pt.1 as usize] }
+    }
+}
+
+impl From<(usize, usize)> for CoordinateTuplet<2> {
+    fn from(pt: (usize, usize)) -> Self {
+        CoordinateTuplet { coords: [pt.0, pt.1] }
+    }
+}
+
+impl From<(i32, i32, i32)> for CoordinateTuplet<3> {
+    fn from(pt: (i32, i32, i32)) -> Self {
+        CoordinateTuplet { coords: [pt.0 as usize, pt.1 as usize, pt.2 as usize] }
+    }
+}
+
+impl From<(usize, usize, usize)> for CoordinateTuplet<3> {
+    fn from(pt: (usize, usize, usize)) -> Self {
+        CoordinateTuplet { coords: [pt.0, pt.1, pt.2] }
+    }
+}

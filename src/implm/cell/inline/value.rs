@@ -1,12 +1,6 @@
 use crate::implm::cell::inline::InlineCellValueWallType::UNVISITED;
 use crate::interface::cell::CellValue;
 
-/// TODO rewrite
-///
-/// The first element is the cell in the positive direction,
-/// the 2nd is the cell in the negative direction.
-/// Even if it is `None` for a particular direction, the
-/// neighbouring cell in that direction may have a wall there.
 #[derive(Copy, Clone, PartialEq, Eq, Hash, Debug)]
 pub struct InlineCellValue<const DIMENSION: usize> {
     pub walls: [[InlineCellValueWallType; 2]; DIMENSION],

@@ -38,7 +38,10 @@ pub trait CellManager: Debug {
     /// The type of coordinate space this cell manager supports.
     type CoordSpace: CoordinateSpace;
 
-    /// The value of the type of cell this cell manager uses.
+    /// The location type for the cell type this cell manager uses.
+    type CellLoc: CellLocation;
+
+    /// The value type for the cell type this cell manager uses.
     type CellVal: CellValue;
 
     /// Return the coordinate space for this maze.
@@ -118,13 +121,9 @@ pub trait CellManager: Debug {
 
 /// Location of a cell.
 ///
-/// Structs that implement this trait are "addresses" for cells. You can
-/// give them to a [`CellManager`] to retrieve the [value][CellValue] of a cell.
-///
-/// This trait does not have any associated logic, nor does any generic interface
-/// accept them. Rather, it is a signifier of the intent and purpose of structs
-/// that implement it. It allows implementers to clearly delineate to readers
-/// and future code editors what role a struct plays in the maze model.
+/// They are physical positions in a maze. They also act as a cell's "address". For
+/// example, to query a cell's [value][CellValue], you give the cell's `CellLocation`
+/// to the [`CellManager`].
 pub trait CellLocation: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Debug {}
 
 /// Value of a cell.
