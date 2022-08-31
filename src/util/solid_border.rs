@@ -1,5 +1,5 @@
 use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
-use crate::implm::cell::inline::{BoxSpaceInlineCellManager, InlineCellValue, InlineCellValueWallType};
+use crate::implm::cell::inline::{BoxSpaceInlineCellManager, InlineCellValue, InlineCellValueEdgeType};
 use crate::implm::maze::block::BoxSpaceBlockCellMaze;
 use crate::implm::point::boxy::BoxCoordinateSpace;
 use crate::interface::buffer::MazeBuffer;
@@ -75,23 +75,23 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> So
         let mut cell = [0usize; DIMENSION];
 
         'outer: loop {
-            let mut walls = [[InlineCellValueWallType::UNVISITED; 2]; DIMENSION];
+            let mut walls = [[InlineCellValueEdgeType::UNVISITED; 2]; DIMENSION];
             let mut on_boundary = false;
 
             for (i, dim) in cell.iter().enumerate() {
                 if dim == &0 {
-                    walls[i][0] = InlineCellValueWallType::BOUNDARY;
+                    walls[i][0] = InlineCellValueEdgeType::BOUNDARY;
                     on_boundary = true;
                 }
 
                 if *dim == maze.coord_space().dimensions()[i] - 1 {
-                    walls[i][1] = InlineCellValueWallType::BOUNDARY;
+                    walls[i][1] = InlineCellValueEdgeType::BOUNDARY;
                     on_boundary = true;
                 }
             }
 
             if on_boundary {
-                maze.set(cell.into(), InlineCellValue { walls, marked: false });
+                maze.set(cell.into(), InlineCellValue { edges: walls, marked: false });
             }
 
             for i in 0..DIMENSION {

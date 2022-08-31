@@ -11,7 +11,7 @@ use rand::rngs::{StdRng, ThreadRng};
 
 use mazelib::implm::buffer::VecBuffer;
 use mazelib::implm::cell::block::BlockCellValue;
-use mazelib::implm::cell::inline::{InlineCellValue, InlineCellValueWallType};
+use mazelib::implm::cell::inline::{InlineCellValue, InlineCellValueEdgeType};
 use mazelib::implm::generate::{HuntAndKillGenerator, NAryTreeGenerator, RecursiveBacktrackerGenerator};
 use mazelib::implm::maze::block::BoxSpaceBlockCellMazeBuilder;
 use mazelib::implm::point::boxy::BoxCoordinateSpace;

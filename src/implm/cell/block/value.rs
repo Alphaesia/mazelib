@@ -1,8 +1,16 @@
 use crate::interface::cell::CellValue;
 
+/// A cell type where cells are either passage cells or wall
+/// wall cells, with no in between. They are called Block Cells
+/// because the resulting mazes look blocky / pixellated.
 #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
 pub struct BlockCellValue {
+    /// The specific type or value of the cell. For more information
+    /// see [`BlockCellValueType`].
     pub cell_type: BlockCellValueType,
+
+    /// Whether this cell has been marked or flagged. This is a
+    /// general-use field, with no specific meaning.
     pub marked: bool,
 }
 
