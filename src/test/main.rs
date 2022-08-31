@@ -1,5 +1,4 @@
 #![allow(unused_imports)]
-#![feature(generic_arg_infer)]
 
 use std::io::BufWriter;
 
