@@ -22,4 +22,5 @@ pub mod block {
 /// their other names when modelling them as maze components.
 pub mod inline {
     pub use super::super::cell::inline::BoxSpaceInlineCellManager as BoxSpaceInlineCellMaze;
+    pub use super::super::cell::inline::BoxSpaceInlineCellManagerBuilder as BoxSpaceInlineCellMazeBuilder;
 }

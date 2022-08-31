@@ -39,14 +39,15 @@ use crate::interface::maze::Maze;
 /// use std::io::BufWriter;
 /// # use std::io::Result;
 /// # use mazelib::implm::buffer::VecBuffer;
-/// # use mazelib::implm::cell::inline::{BoxSpaceInlineCellManager, InlineCellValue};
+/// # use mazelib::implm::cell::inline::InlineCellValue;
+/// # use mazelib::implm::maze::inline::BoxSpaceInlineCellMazeBuilder;
 /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
 /// use mazelib::implm::render::text::BoxSpaceTextMazeRenderer;
 /// use mazelib::interface::render::MazeRendererNonSeeking;
 /// #
 /// # fn test() -> Result<()> {
 /// #
-/// # let maze = BoxSpaceInlineCellManager::<VecBuffer<InlineCellValue<2>>, 2>::new(BoxCoordinateSpace::new([5, 5]));
+/// # let maze = BoxSpaceInlineCellMazeBuilder::<VecBuffer<InlineCellValue<2>>, 2>::new(BoxCoordinateSpace::new([5, 5])).build();
 ///
 /// // Buffer writes for performance
 /// let mut output = BufWriter::new(std::io::stdout());
@@ -60,21 +61,22 @@ use crate::interface::maze::Maze;
 /// use std::fs::File;
 /// use std::io::BufWriter;
 /// # use mazelib::implm::buffer::VecBuffer;
-/// # use mazelib::implm::cell::inline::{BoxSpaceInlineCellManager, InlineCellValue};
+/// # use mazelib::implm::cell::inline::InlineCellValue;
+/// # use mazelib::implm::maze::inline::BoxSpaceInlineCellMazeBuilder;
 /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
 /// use mazelib::implm::render::text::BoxSpaceTextMazeRenderer;
 /// use mazelib::interface::render::MazeRendererNonSeeking;
 /// #
 /// # fn example() -> std::io::Result<()> {
 /// #
-/// # let maze = BoxSpaceInlineCellManager::<VecBuffer<InlineCellValue<2>>, 2>::new(BoxCoordinateSpace::new([5, 5]));
+/// # let maze = BoxSpaceInlineCellMazeBuilder::<VecBuffer<InlineCellValue<2>>, 2>::new(BoxCoordinateSpace::new([5, 5])).build();
 ///
 /// // Buffer writes for performance
 /// let mut output = BufWriter::new(File::create("maze.txt")?);
 ///
 /// BoxSpaceTextMazeRenderer::new().render(&maze, &mut output)?;
 /// #
-/// # return Ok(())
+/// # return Ok(());
 /// # }
 /// ```
 ///

@@ -1,4 +1,5 @@
 use std::fmt::{Debug, Formatter};
+use std::marker::PhantomData;
 
 use crate::implm::cell::inline::InlineCellValue;
 use crate::implm::cell::inline::value::InlineCellValueEdgeType;
@@ -21,14 +22,17 @@ pub struct BoxSpaceInlineCellManager<Buffer: MazeBuffer<InlineCellValue<DIMENSIO
     space: BoxCoordinateSpace<DIMENSION>,
 }
 
-// Public functions
+// Constructor (private - use the builder)
 impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> BoxSpaceInlineCellManager<Buffer, DIMENSION> {
     /// Construct a new maze from a given coordinate space.
     /// A [crate::interface::buffer::MazeBuffer] will be created from the value of type parameter `Buffer`.
-    pub fn new(space: BoxCoordinateSpace<DIMENSION>) -> Self {
+    fn new(space: BoxCoordinateSpace<DIMENSION>) -> Self {
         Self { buffer: Buffer::new(space.dimensions().product()), space }
     }
+}
 
+// Public functions
+impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> BoxSpaceInlineCellManager<Buffer, DIMENSION> {
     pub fn buffer(&self) -> &Buffer {
         &self.buffer
     }
@@ -206,6 +210,24 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Ce
     /// [InlineCellValueEdgeType::WALL].
     fn make_boundary_between(&mut self, from: pt!(), to: pt!()) {
         self.make_between(from, to, InlineCellValueEdgeType::BOUNDARY)
+    }
+}
+
+pub struct BoxSpaceInlineCellManagerBuilder<Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> {
+    _buffer: PhantomData<Buffer>,
+    space: BoxCoordinateSpace<DIMENSION>,
+}
+
+impl<Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> BoxSpaceInlineCellManagerBuilder<Buffer, DIMENSION> {
+    pub fn new(space: BoxCoordinateSpace<DIMENSION>) -> Self {
+        Self {
+            _buffer: PhantomData,
+            space,
+        }
+    }
+
+    pub fn build(&self) -> BoxSpaceInlineCellManager<Buffer, DIMENSION> {
+        BoxSpaceInlineCellManager::new(self.space)
     }
 }
 

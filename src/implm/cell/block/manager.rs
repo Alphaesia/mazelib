@@ -390,7 +390,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
         return self
     }
 
-    pub fn build(self) -> BoxSpaceBlockCellManager<Buffer, DIMENSION> {
+    pub fn build(&self) -> BoxSpaceBlockCellManager<Buffer, DIMENSION> {
         BoxSpaceBlockCellManager::new(self.space, self.scale_factor, self.padding)
     }
 }

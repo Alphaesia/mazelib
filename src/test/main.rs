@@ -1,25 +1,21 @@
-#![allow(unused, unused_imports, unused_mut)]
+#![allow(unused_imports)]
 #![feature(generic_arg_infer)]
 
-use std::fs::File;
-use std::io;
 use std::io::BufWriter;
 
 #[cfg(feature = "img")] use image::ImageFormat;
-use rand::{SeedableRng, thread_rng};
-use rand::rngs::{StdRng, ThreadRng};
+use rand::thread_rng;
 
 use mazelib::implm::buffer::VecBuffer;
 use mazelib::implm::cell::block::BlockCellValue;
-use mazelib::implm::cell::inline::{InlineCellValue, InlineCellValueEdgeType};
+use mazelib::implm::cell::inline::InlineCellValue;
 use mazelib::implm::generate::{HuntAndKillGenerator, NAryTreeGenerator, RecursiveBacktrackerGenerator};
 use mazelib::implm::maze::block::BoxSpaceBlockCellMazeBuilder;
+use mazelib::implm::maze::inline::BoxSpaceInlineCellMazeBuilder;
 use mazelib::implm::point::boxy::BoxCoordinateSpace;
 #[cfg(feature = "img")] use mazelib::implm::render::img::BoxSpaceImageMazeRenderer;
 #[cfg(feature = "minecraft")] use mazelib::implm::render::minecraft::BoxSpaceSchematicMazeRenderer;
 use mazelib::implm::render::text::BoxSpaceTextMazeRenderer;
-use mazelib::interface::buffer::MazeBuffer;
-use mazelib::interface::cell::CellID;
 use mazelib::interface::generate::DefaultMazeGenerator;
 use mazelib::interface::render::DefaultMazeRendererNonSeeking;
 use mazelib::util::solid_border;
@@ -28,9 +24,9 @@ fn main() {
     const DIMENSION: usize = 2;
 
     type Space = BoxCoordinateSpace<DIMENSION>;
-    type CellType = BlockCellValue;
+    type CellType = InlineCellValue<DIMENSION>;
     type BufferType = VecBuffer<CellType>;
-    type Maze = BoxSpaceBlockCellMazeBuilder<BufferType, DIMENSION>;
+    type Maze = BoxSpaceInlineCellMazeBuilder<BufferType, DIMENSION>;
     type Generator = HuntAndKillGenerator;
     type Renderer = BoxSpaceTextMazeRenderer;
 

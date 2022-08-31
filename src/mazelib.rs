@@ -11,7 +11,6 @@
 //! ```
 //! use mazelib::implm::buffer::VecBuffer;
 //! use mazelib::implm::cell::block::BlockCellValue;
-//! use mazelib::implm::cell::inline::{BoxSpaceInlineCellManager, InlineCellValue};
 //! use mazelib::implm::generate::HuntAndKillGenerator;
 //! use mazelib::implm::maze::block::BoxSpaceBlockCellMazeBuilder;
 //! use mazelib::implm::point::boxy::BoxCoordinateSpace;
@@ -69,12 +68,12 @@
 //!
 //! For example, changing `BlockCellValue` to `InlineCellValue<DIMENSION>` will change how the
 //! cells look. (Note you wll have to replace `BoxSpaceBlockCellMazeBuilder` with
-//! `BoxSpaceInlineCellMaze` and remove the trailing `.build()`).
+//! `BoxSpaceInlineCellMazeBuilder`).
 //!
 //! ```
 //! # use mazelib::implm::buffer::VecBuffer;
-//! # use mazelib::implm::cell::inline::{BoxSpaceInlineCellManager, InlineCellValue};
-//! # use mazelib::implm::maze::inline::BoxSpaceInlineCellMaze;
+//! # use mazelib::implm::cell::inline::InlineCellValue;
+//! # use mazelib::implm::maze::inline::BoxSpaceInlineCellMazeBuilder;
 //! # use mazelib::implm::point::boxy::BoxCoordinateSpace;
 //! #
 //! # const DIMENSION: usize = 2;
@@ -82,7 +81,7 @@
 //! #
 //! type Buffer = VecBuffer<InlineCellValue<DIMENSION>>;
 //!
-//! let mut maze = BoxSpaceInlineCellMaze::<Buffer, DIMENSION>::new(coord_space);
+//! let mut maze = BoxSpaceInlineCellMazeBuilder::<Buffer, DIMENSION>::new(coord_space).build();
 //! ```
 //! produces
 //! ```text
