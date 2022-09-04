@@ -17,9 +17,7 @@ use crate::interface::point::Point;
 /// implementation of [`Into<[usize; DIMENSION]>`][Into] for `YourCoordinateTuplet`.
 /// This will save you pain later on.
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct CoordinateTuplet<const DIMENSION: usize> {
-    pub(super) coords: [usize; DIMENSION]
-}
+pub struct CoordinateTuplet<const DIMENSION: usize>(pub [usize; DIMENSION]);
 
 impl <const DIMENSION: usize> Point for CoordinateTuplet<DIMENSION> {}
 
@@ -51,6 +49,6 @@ impl <const DIMENSION: usize> CoordinateTuplet<DIMENSION> {
 
     /// Return true if any coordinate is the same as `value`.
     pub fn any(&self, value: usize) -> bool {
-        self.coords.contains(&value)
+        self.0.contains(&value)
     }
 }

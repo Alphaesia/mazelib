@@ -8,7 +8,7 @@ use crate::interface::cell::CellLocation;
 ///
 /// *See also: [BlockCellValue][super::BlockCellValue]*
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct BlockCellLocation<const DIMENSION: usize>(pub(super) CoordinateTuplet<DIMENSION>);
+pub struct BlockCellLocation<const DIMENSION: usize>(pub CoordinateTuplet<DIMENSION>);
 
 impl <const DIMENSION: usize> CellLocation for BlockCellLocation<DIMENSION> {}
 

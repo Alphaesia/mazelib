@@ -7,7 +7,7 @@ use crate::interface::cell::CellLocation;
 ///
 /// *See also: [InlineCellValue][super::InlineCellValue]*
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct InlineCellLocation<const DIMENSION: usize>(pub(super) CoordinateTuplet<DIMENSION>);
+pub struct InlineCellLocation<const DIMENSION: usize>(pub CoordinateTuplet<DIMENSION>);
 
 impl <const DIMENSION: usize> CellLocation for InlineCellLocation<DIMENSION> {}
 
