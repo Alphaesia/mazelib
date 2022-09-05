@@ -7,26 +7,65 @@ use crate::implm::point::boxy::implm::BoxCoordinateSpaceIterator;
 use crate::interface::point::CoordinateSpace;
 use crate::internal::array_util::Product;
 
-/// An n-dimensional coordinate space shaped like a box.
+/// An `n`-dimensional coordinate space shaped like a box with box-like points.
 ///
-/// Basically just think of your regular 2D and 3D cartesian planes/spaces,
-/// but generalised to n-dimensions.
+/// It is a generalisation of the common two-dimensional and three-dimensional
+/// Cartesian plane/space to `n` dimensions.
 ///
 /// All dimensions of the space must be at least 1.
+///
+/// # Coordinate Axes
+///
+/// As a `BoxCoordinateSpace` has `n` dimensions, there are `n` coordinate axes.
+/// These are labelled from `0` to `n - 1`. The most minor axis is `0`, and the
+/// most major axis is `n - 1`. These correspond directly with the array or tuple
+/// indices of a [coordinate tuplet][CoordinateTuplet].
+///
+/// # Adjacency
+///
+/// ## Direct Adjacency
+///
+/// Two points are considered directly adjacent if:
+/// * On one single coordinate axis, their respective coordinates differ by exactly 1, and,
+/// * On every other axis, their respective coordinates are the same.
+///
+/// For example, `(1, 1, 1)` and `(1, 2, 1)` are considered directly adjacent.
+/// `(1, 1, 1)` and (`1, 2, 2)` are not directly adjacent. `(1, 1, 1)` and `(1, 1, 1)` are
+/// also not considered directly adjacent.
+///
+/// ## Edge Adjacency
+///
+/// A point is considered to be adjacent to the edge of the coordinate space if there is
+/// some axis where the point's respective coordinate is `0` or the `length of axis - 1`.
 #[derive(Copy, Clone)]
 pub struct BoxCoordinateSpace<const DIMENSION: usize> {
-    /// The dimensions of the coordinate space. These are, for lack
-    /// of a better word, "one-indexed". This means that for a width of
-    /// X, the valid range of X values is 0 <= x < X.
+    /// The dimensions of the coordinate space.
+    ///
+    /// Each dimension represents the number of possible values on the
+    /// respective axis. For example, imagine a dimension with value X.
+    /// The valid range of values on that axis would be 0 <= x < X.
     ///
     /// The most minor coordinate comes first. The ordering is also consistent
     /// with the ordering of co-ordinates for the associated CoordinateTuplets.
     /// (e.g. (x, y, z), (width, height, depth))
     dimensions: [usize; DIMENSION],
+
+    /// The total number of possible points or positions in this coordinate space.
+    ///
+    /// This just serves as a cache of the result of [`self.dimensions.product()`][Product::product].
     size: usize,
 }
 
 impl <const DIMENSION: usize> BoxCoordinateSpace<DIMENSION> {
+    /// Construct a new `BoxCoordinateSpace` from the given dimensions.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use mazelib::implm::point::boxy::BoxCoordinateSpace;
+    ///
+    /// let coord_space = BoxCoordinateSpace::new([5, 7, 3]);
+    /// ```
     pub fn new(dimensions: [usize; DIMENSION]) -> Self {
         if DIMENSION == 0 {
             panic!("DIMENSION must be >= 1")
@@ -35,11 +74,12 @@ impl <const DIMENSION: usize> BoxCoordinateSpace<DIMENSION> {
         Self { dimensions, size: dimensions.product() }
     }
 
+    /// Return the dimensions of this coordinate space.
     pub fn dimensions(&self) -> [usize; DIMENSION] {
         self.dimensions
     }
 
-    /// Whether the point is on the outer edge of the space (e.g. on the "surface")
+    /// Return whether the point is [adjacent to the edge of this coordinate space](#edge-adjacency).
     pub fn is_adjacent_to_edge(&self, pt: <Self as CoordinateSpace>::PtType) -> bool {
         for i in 0..DIMENSION {
             if pt[i] == 0 || pt[i] == self[i] - 1 {

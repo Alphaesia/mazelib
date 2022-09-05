@@ -6,13 +6,16 @@ use rand::Rng;
 /// # See Also
 ///
 /// [`Point`] -- the individual parts of a coordinate space
+#[doc(notable_trait)]
 pub trait CoordinateSpace : Sized + Clone + Copy + Send + Sync + IntoIterator<Item = Self::PtType> + Debug {
+    /// The [`Point`] type that goes with this coordinate space.
     type PtType: Point;
     type IntoIter: Iterator<Item = Self::PtType>;
 
     /// The maximum number of points/nodes in this coordinate space.
     fn logical_size(&self) -> usize;
 
+    /// Every point that is directly adjacent
     fn neighbours_of_pt(&self, pt: Self::PtType) -> Vec<Self::PtType>;
 
     /// Note, a point is NOT considered to be adjacent to itself
@@ -52,4 +55,5 @@ pub trait CoordinateSpace : Sized + Clone + Copy + Send + Sync + IntoIterator<It
 /// * Cloneable
 /// * Equality must be reflexive, symmetric, transitive, *and anti-symmetric*
 /// * Hashable
+#[doc(notable_trait)]
 pub trait Point: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Debug {}

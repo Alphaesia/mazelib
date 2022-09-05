@@ -172,6 +172,7 @@
 #![feature(min_specialization)]
 #![feature(label_break_value)]
 #![feature(doc_cfg)]
+#![feature(doc_notable_trait)]
 
 #![deny(rustdoc::broken_intra_doc_links)]
 
