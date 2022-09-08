@@ -97,14 +97,19 @@ impl <const DIMENSION: usize> CoordinateTuplet<DIMENSION> {
     /// [axis]: self::super::BoxCoordinateSpace#coordinate-axes
     /// [directly adjacent]: self::super::BoxCoordinateSpace#direct-adjacency
     pub fn axis_of_adjacency_with(&self, other_pt: CoordinateTuplet<DIMENSION>) -> Option<usize> {
+        let mut found_dimension: Option<usize> = None;
+
         for i in 0..DIMENSION {
-            return match self[i].abs_diff(other_pt[i]) {
-                0 => continue,
-                1 => Some(i),
-                _ => None,
+            match self[i].abs_diff(other_pt[i]) {
+                0 => {},
+                1 => match found_dimension {
+                    Some(_) => return None,
+                    None    => found_dimension = Some(i),
+                },
+                _ => return None,
             }
         }
 
-        return None
+        return found_dimension
     }
 }
