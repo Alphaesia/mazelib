@@ -3,6 +3,7 @@ name = "mazelib"
 version = "0.1.0"
 authors = ["Alphaesia"]
 edition = "2021"
+rust-version = "1.67.0"
 description = "A comprehensive library for generating and solving mazes"
 readme = "README.md"
 license = "MIT"
