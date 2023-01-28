@@ -6,21 +6,42 @@ use rand::Rng;
 /// # See Also
 ///
 /// [`Point`] -- the individual parts of a coordinate space
-pub trait CoordinateSpace : Sized + Clone + Copy + Send + Sync + IntoIterator<Item = Self::PtType> + Debug {
+pub trait CoordinateSpace : Sized + Clone + Copy + Send + Sync + Debug {
     /// The [`Point`] type that goes with this coordinate space.
     type PtType: Point;
-    type IntoIter: Iterator<Item = Self::PtType>;
+    type Iter: Iterator<Item = Self::PtType>;
 
-    /// The maximum number of points/nodes in this coordinate space.
+    /// Return the number of points in this coordinate space. This never
+    /// changes.
     fn logical_size(&self) -> usize;
 
-    /// Every point that is directly adjacent
+    /// Return a vector containing every point in the coordinate space
+    /// that is adjacent to `pt` (as determined by [`are_adjacent()`](Self::are_adjacent)).
     fn neighbours_of_pt(&self, pt: Self::PtType) -> Vec<Self::PtType>;
 
-    /// Note, a point is NOT considered to be adjacent to itself
+    /// Return whether two points are adjacent in this coordinate space.
+    ///
+    /// A point is **not** considered to be adjacent to itself.
     fn are_adjacent(pt1: Self::PtType, pt2: Self::PtType) -> bool;
 
-    fn iter_from(&self, pt: Self::PtType) -> <Self as CoordinateSpace>::IntoIter;
+    /// Return an iterator that yields every point in this coordinate space.
+    ///
+    /// Every point yielded is adjacent to a point previously yielded.
+    /// The one exception to this is where there is no possible path from the
+    /// current point to any previously yielded point. For example, the first
+    /// point, or if the space contains two or more isolated components, the
+    /// first point of each component.
+    ///
+    /// If the coordinate space has any notion of an origin, it is the first
+    /// point yielded.
+    fn iter(&self) -> Self::Iter;
+
+    /// Return an iterator that behaves exactly like [`iter()`](Self::iter),
+    /// but skips every point up to and including `pt`.
+    ///
+    /// Points that are skipped are still considered to have been yielded for
+    /// the purposes of the path constraint in `into_iter()`.
+    fn iter_from(&self, pt: Self::PtType) -> Self::Iter;
 
     /// Return a random point in this coordinate space.
     fn choose<RNG: Rng + ?Sized>(&self, rng: &mut RNG) -> Self::PtType;
@@ -31,9 +52,9 @@ pub trait CoordinateSpace : Sized + Clone + Copy + Send + Sync + IntoIterator<It
 /// In less abstract terms, points are basically the potential junctions
 /// in a maze.
 ///
-/// Unlike cells, have semantic meaning, and it is the connection of points
-/// (by the [`CoordinateSpace`]) that determine the logical structure of
-/// the maze.
+/// Unlike cells, points have semantic meaning, and it is the connection
+/// of points (by the [`CoordinateSpace`]) that determine the logical
+/// structure of the maze.
 ///
 /// A detailed introduction can be found in the
 /// [section on points in the core maze components explanation][crate::interface#point].

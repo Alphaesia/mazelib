@@ -32,7 +32,7 @@ pub struct HuntAndKillGenerator {
 
 impl <M: Maze> MazeGenerator<M> for HuntAndKillGenerator {
     fn generate_with_rng<R: Rng + ?Sized>(&mut self, maze: &mut M, rng: &mut R) {
-        'hunt: for pt in maze.coord_space().into_iter() {
+        'hunt: for pt in maze.coord_space().iter() {
             // Look for an unvisited point
 
             if maze.get(pt).is_fully_visited() == false {

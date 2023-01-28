@@ -98,7 +98,7 @@ impl <const DIMENSION: usize> BoxCoordinateSpace<DIMENSION> {
 
 impl <const DIMENSION: usize> CoordinateSpace for BoxCoordinateSpace<DIMENSION> {
     type PtType = CoordinateTuplet<DIMENSION>;
-    type IntoIter = BoxCoordinateSpaceIterator<DIMENSION>;
+    type Iter = BoxCoordinateSpaceIterator<DIMENSION>;
 
     fn logical_size(&self) -> usize {
         self.size
@@ -130,7 +130,11 @@ impl <const DIMENSION: usize> CoordinateSpace for BoxCoordinateSpace<DIMENSION> 
         return false
     }
 
-    fn iter_from(&self, pt: Self::PtType) -> <Self as CoordinateSpace>::IntoIter {
+    fn iter(&self) -> Self::Iter {
+        BoxCoordinateSpaceIterator::new(*self, None)
+    }
+
+    fn iter_from(&self, pt: Self::PtType) -> Self::Iter {
         BoxCoordinateSpaceIterator::new(*self, Some(pt))
     }
 
