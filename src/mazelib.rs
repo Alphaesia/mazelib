@@ -1,7 +1,7 @@
 //! Mazes are inherently complex. However, most programs give you very limited options
 //! in dealing with mazes. Whether being restricted to 2D square mazes, or only supporting
 //! one type of output. This library aims to unlock and expose mazes fully and completely,
-//! allowing you to create, manipulate, and solve mazes however you desire.
+//! allowing you to create, manipulate, analyse, and solve mazes however you desire.
 //!
 //! # Quick Start
 //!
@@ -41,7 +41,7 @@
 //! HuntAndKillGenerator::generate(&mut maze);
 //!
 //! // Print the maze as text
-//! let maze_as_text = BoxSpaceTextMazeRenderer::render(&maze, &mut std::io::stdout());
+//! BoxSpaceTextMazeRenderer::render(&maze, &mut std::io::stdout());
 //! ```
 //! produces
 //! ```text
@@ -106,10 +106,10 @@
 //!
 //! The library is split into two halves:
 //!
-//! [crate::interface] holds the key abstractions and defines the model of mazes the library
+//! [`interface`] holds the key abstractions and defines the model of mazes the library
 //! uses. It's very important.
 //!
-//! [crate::implm] has a bunch of built-in implementations of the aforementioned
+//! [`implm`] has a bunch of built-in implementations of the aforementioned
 //! interfaces for your convenience. While you're probably want to use them in most cases,
 //! you're not obligated to use all (or any) of them. Feel free to implement any of the
 //! interfaces yourself!
@@ -118,16 +118,16 @@
 //!
 //! Firstly, read the previous section in this page on the [crate architecture](#architecture).
 //!
-//! Then, you should read the module-level docs of [crate::interface]. It explains all of the
+//! Then, you should read the module-level docs of [`interface`]. It explains all of the
 //! key interfaces and their role in our maze model.
 //!
-//! After that, you'll probably want to check out [crate::interface::cell::CellManager].
+//! After that, you'll probably want to check out [`interface::cell::CellManager`].
 //! This is the central trait which all of the machinery interacts with, and is the main
 //! interface between you and the maze. The documentation for
-//! [crate::interface::generate::MazeGenerator] will likely be of use. The details of the
+//! [`interface::generate::MazeGenerator`] will likely be of use. The details of the
 //! other interfaces are not too important unless you're implementing an interface.
 //!
-//! Lastly, explore [crate::implm]. It contains standard implementations of all of the
+//! Lastly, explore [`implm`]. It contains standard implementations of all of the
 //! interfaces. You'll almost certainly want to use some of them, so have a look around.
 //!
 //! ## Further Reading
@@ -151,20 +151,17 @@
 //! For precise information about how maze generation algorithms actually work and how to
 //! implement them yourself, Jamis Buck has some great blog entries on the subject.
 //! They all come with visualisers you can run in the browser!
-//!
 //! <https://weblog.jamisbuck.org/2011/2/7/maze-generation-algorithm-recap>.
 //!
 //! He has also written a full book on maze algorithms,
 //! [Mazes for Programmers](https://pragprog.com/titles/jbmaze/mazes-for-programmers/).
-//!
 //! It discusses generating mazes, solving mazes, mazes on cubes, spheres, cylinders,
 //! and mobius strips, and more.
-//!
 //! <http://www.mazesforprogrammers.com>.
 //!
 //! # Glossary
 //!
-//! [crate::implm] defines some core concepts such as "cell" and "point". For all other jargon,
+//! [`implm`] defines some core concepts such as "cell" and "point". For all other jargon,
 //! [Think Labyrinth!](http://www.astrolog.org/labyrnth.htm>) has a great glossary on technical
 //! maze terms that you can find at <http://www.astrolog.org/labyrnth/glossary.htm>.
 

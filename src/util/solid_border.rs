@@ -6,6 +6,7 @@ use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::CellManager;
 use crate::interface::point::CoordinateSpace;
 
+/// Convert all *cells* (not points) adjacent to the edge of a box maze into border cells.
 pub fn solid_border<M: CellManager<CoordSpace=BoxCoordinateSpace<DIMENSION>>, const DIMENSION: usize>(maze: &mut M) {
     <FixSpecialisationPls as SolidBorder<M>>::apply(maze);
 }

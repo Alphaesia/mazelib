@@ -1,4 +1,4 @@
-//! A variety of built-in implementations of the interfaces defined in [crate::interface].
+//! A variety of built-in implementations of the interfaces defined in [`crate::interface`].
 //!
 //! If you are not doing anything special, and just generating/solving regular mazes,
 //! you can use the implementations in this crate instead of rolling your own.
