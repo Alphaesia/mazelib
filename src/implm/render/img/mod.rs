@@ -1,5 +1,4 @@
 #![cfg(any(feature = "img", doc))]
-#![doc(cfg(feature = "img"))]
 
 use image::ImageFormat;
 

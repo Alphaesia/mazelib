@@ -170,8 +170,7 @@
 
 #![feature(array_zip)]
 #![feature(min_specialization)]
-#![feature(doc_cfg)]
-#![feature(doc_notable_trait)]
+#![feature(doc_auto_cfg)]
 
 #![deny(rustdoc::broken_intra_doc_links)]
 

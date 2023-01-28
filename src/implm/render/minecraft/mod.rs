@@ -1,5 +1,4 @@
 #![cfg(any(feature = "minecraft", doc))]
-#![doc(cfg(feature = "minecraft"))]
 
 use crate::interface::maze::Maze;
 use crate::interface::render::MazeRenderer;
