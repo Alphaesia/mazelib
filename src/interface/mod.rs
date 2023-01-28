@@ -199,10 +199,10 @@
 //! [Generators]: #generator
 //! [Solvers]: #solver
 //! [Templates]: #template
-#![doc = ::embed_doc_image::embed_image!("example-maze-unannotated", "src/doc/img/example-maze-unannotated.png")]
-#![doc = ::embed_doc_image::embed_image!("example-maze-cell-outlines", "src/doc/img/example-maze-cell-outlines.png")]
-#![doc = ::embed_doc_image::embed_image!("example-maze-points", "src/doc/img/example-maze-points.png")]
-#![doc = ::embed_doc_image::embed_image!("example-maze-points-connected", "src/doc/img/example-maze-points-connected.png")]
+#![doc = ::embed_doc_image::embed_image!("example-maze-unannotated", "src/doc/img/maze-model/example-maze-unannotated.png")]
+#![doc = ::embed_doc_image::embed_image!("example-maze-cell-outlines", "src/doc/img/maze-model/example-maze-cell-outlines.png")]
+#![doc = ::embed_doc_image::embed_image!("example-maze-points", "src/doc/img/maze-model/example-maze-points.png")]
+#![doc = ::embed_doc_image::embed_image!("example-maze-points-connected", "src/doc/img/maze-model/example-maze-points-connected.png")]
 
 pub mod buffer;
 pub mod point;

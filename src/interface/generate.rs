@@ -1,13 +1,13 @@
 //! Generating mazes.
 //!
-//! As an abstraction, generating mazes is simple. You construct a generator (possibly with
-//! a few parameters), then hand off your maze to it. Once the generator returns, you have
-//! your generated maze.
+//! As an abstraction, generating mazes is simple. You instantiate a generator then hand
+//! off your [maze][crate::interface::maze::Maze] to it. Once the generator returns, you
+//! have your generated maze.
 //!
 //! # Recommended Reading
 //!
 //! 1. [`MazeGenerator`] --- the generator interface.
-//! 2. [`crate::implm::generate`] --- a comparison of the builtin generators.
+//! 2. [`crate::implm::generate`] --- a comparison of the built-in generators.
 
 use rand::Rng;
 

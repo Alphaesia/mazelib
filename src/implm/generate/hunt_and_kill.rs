@@ -1,3 +1,4 @@
+use embed_doc_image::embed_doc_image;
 use rand::Rng;
 use rand::seq::SliceRandom;
 
@@ -7,6 +8,24 @@ use crate::interface::generate::MazeGenerator;
 use crate::interface::maze::Maze;
 use crate::interface::point::CoordinateSpace;
 
+/// The **Hunt-and-Kill** algorithm links random walks together to generate a maze.
+///
+/// It produces mazes with a high river factor, without any noticeable visual patterns or artifacts.
+///
+/// It runs relatively quickly, visiting every cell exactly twice, and uses no extra memory.
+///
+/// Hunt-and-Kill is a solid all-round algorithm, and the suggested default algorithm for users.
+///
+/// It was invented by [Walter D. Pullen](https://www.astrolog.org/home.htm).
+///
+/// # Example
+///
+/// ![A typical output of Hunt-and-Kill.][example]
+///
+/// As you can see, Hunt-and-Kill typically produces mazes with passages that run for a long way
+/// before dead-ending. They also tend to be quite twisty. It still features a number of cul-de-sacs
+/// though.
+#[embed_doc_image("example", "src/doc/img/generator/hunt-and-kill/example.png")]
 pub struct HuntAndKillGenerator {
     _private: ()
 }
