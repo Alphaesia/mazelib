@@ -1,4 +1,5 @@
 use crate::implm::point::boxy::{BoxCoordinateSpace, CoordinateTuplet};
+use crate::interface::point::CoordinateSpace;
 
 #[test]
 fn test_one_dimensional() {

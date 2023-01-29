@@ -90,11 +90,6 @@ impl <const DIMENSION: usize> BoxCoordinateSpace<DIMENSION> {
 
         return false
     }
-
-    // TODO specialisation - DIRTY TEMP - how do I do narrowing on iterators?
-    pub fn iter(&self) -> BoxCoordinateSpaceIterator<DIMENSION> {
-        BoxCoordinateSpaceIterator::new(*self, None)
-    }
 }
 
 impl <const DIMENSION: usize> CoordinateSpace for BoxCoordinateSpace<DIMENSION> {
