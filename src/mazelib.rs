@@ -19,9 +19,6 @@
 //! use mazelib::interface::render::DefaultMazeRendererNonSeeking;
 //! use mazelib::util::solid_border;
 //!
-//! // 2 for a 2D maze, 3 for a 3D maze, etc.
-//! const DIMENSION: usize = 2;
-//!
 //! let [width, height] = [5, 5];
 //!
 //! // Determine the size of the maze
@@ -32,7 +29,8 @@
 //! // Create the maze "object". The name of the maze type hints at what it supports:
 //! // "BoxSpace" means it expects a BoxCoordinateSpace.
 //! // "BlockCell" means it will use BlockCells for cells.
-//! let mut maze = BoxSpaceBlockCellMazeBuilder::<Buffer, DIMENSION>::new(coord_space).build();
+//! // 2 means we're creating a 2D maze
+//! let mut maze = BoxSpaceBlockCellMazeBuilder::<Buffer, 2>::new(coord_space).build();
 //!
 //! // Give our maze a nice thick border
 //! solid_border(&mut maze);
@@ -41,6 +39,7 @@
 //! HuntAndKillGenerator::generate(&mut maze);
 //!
 //! // Print the maze as text
+//! # #[allow(unused_must_use)]
 //! BoxSpaceTextMazeRenderer::render(&maze, &mut std::io::stdout());
 //! ```
 //! produces
@@ -66,9 +65,8 @@
 //! can be swapped out for other implementations. Different implementations will affect an aspect
 //! of the generated maze in different ways.
 //!
-//! For example, changing `BlockCellValue` to `InlineCellValue<DIMENSION>` will change how the
-//! cells look. (Note you wll have to replace `BoxSpaceBlockCellMazeBuilder` with
-//! `BoxSpaceInlineCellMazeBuilder`).
+//! For example, changing `BlockCellValue` to `InlineCellValue<2>` will change how the cells look.
+//! (Note you wll have to replace `BoxSpaceBlockCellMazeBuilder` with `BoxSpaceInlineCellMazeBuilder`).
 //!
 //! ```
 //! # use mazelib::implm::buffer::VecBuffer;
@@ -79,9 +77,10 @@
 //! # const DIMENSION: usize = 2;
 //! # let coord_space = BoxCoordinateSpace::new([1, 1]);
 //! #
-//! type Buffer = VecBuffer<InlineCellValue<DIMENSION>>;
+//! // 2 for a 2D maze
+//! type Buffer = VecBuffer<InlineCellValue<2>>;
 //!
-//! let mut maze = BoxSpaceInlineCellMazeBuilder::<Buffer, DIMENSION>::new(coord_space).build();
+//! let mut maze = BoxSpaceInlineCellMazeBuilder::<Buffer, 2>::new(coord_space).build();
 //! ```
 //! produces
 //! ```text

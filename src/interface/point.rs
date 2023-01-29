@@ -3,6 +3,36 @@ use std::hash::Hash;
 
 use rand::Rng;
 
+/// A mathematical graph that represents all possible meaningful positions in a maze.
+///
+/// It defines where potential junctions are and how they connect to other potential
+/// junctions. It does not encode any information about passages or walls, only the
+/// locations where they *could* go.
+///
+/// For a more in-depth explanation, [see the explainer in `interface`](crate::interface#coordinate-space).
+///
+/// # Examples
+///
+/// Constructing a maze with a specific coordinate space:
+///
+/// ```
+/// #![feature(generic_arg_infer)]  // Optional, lets the compiler infer whether it's 2D, 3D, etc.
+///
+/// # use mazelib::implm::buffer::VecBuffer;
+/// # use mazelib::implm::cell::block::BlockCellValue;
+/// # use mazelib::implm::maze::block::BoxSpaceBlockCellMazeBuilder;
+/// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
+/// #
+/// # type Buffer = VecBuffer<BlockCellValue>;
+/// #
+/// let dimensions = [7, 7];
+///
+/// let space = BoxCoordinateSpace::new(dimensions);
+///
+/// // Will need to pick your own buffer
+/// let maze = BoxSpaceBlockCellMazeBuilder::<Buffer, _>::new(space).build();
+/// ```
+///
 /// # See Also
 ///
 /// [`Point`] -- the individual parts of a coordinate space
@@ -14,17 +44,81 @@ pub trait CoordinateSpace : Sized + Clone + Copy + Send + Sync + Debug {
     /// [`iter_from()`][Self::iter_from].
     type Iter: Iterator<Item = Self::PtType>;
 
-    /// Return the number of points in this coordinate space. This never
-    /// changes.
+    /// Return the number of points in this coordinate space.
+    ///
+    /// This value is fixed.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
+    /// # use mazelib::interface::point::CoordinateSpace;
+    /// #
+    /// // A 3x3 space has 9 points
+    /// let space = BoxCoordinateSpace::new([3, 3]);
+    ///
+    /// assert_eq!(9, space.logical_size());
+    /// ```
     fn logical_size(&self) -> usize;
 
     /// Return a vector containing every point in the coordinate space
     /// that is adjacent to `pt` (as determined by [`are_adjacent()`](Self::are_adjacent)).
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use mazelib::implm::point::boxy::{BoxCoordinateSpace, CoordinatePair};
+    /// # use mazelib::interface::point::CoordinateSpace;
+    /// #
+    /// let space = BoxCoordinateSpace::new([3, 3]);
+    ///
+    /// /*
+    ///  * Point = X
+    ///  * Neighbours = *
+    ///  *
+    ///  * ┌───┬───┬───┐
+    ///  * │   │   │   │
+    ///  * ├───┼───┼───┤
+    ///  * │   │ * │   │
+    ///  * ├───┼───┼───┤
+    ///  * │ * │ X │ * │
+    ///  * └───┴───┴───┘
+    ///  */
+    ///
+    /// let pt = (1, 0).into();
+    ///
+    /// let expected_neighbours: Vec<CoordinatePair> = vec![
+    ///     (0, 0).into(),
+    ///     (2, 0).into(),
+    ///     (1, 1).into()
+    /// ];
+    ///
+    /// assert_eq!(expected_neighbours, space.neighbours_of_pt(pt));
+    /// ```
     fn neighbours_of_pt(&self, pt: Self::PtType) -> Vec<Self::PtType>;
 
     /// Return whether two points are adjacent in this coordinate space.
     ///
-    /// A point is **not** considered to be adjacent to itself.
+    /// A point is **not** adjacent to itself.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use mazelib::implm::point::boxy::{BoxCoordinateSpace, CoordinatePair};
+    /// # use mazelib::interface::point::CoordinateSpace;
+    /// #
+    /// let space = BoxCoordinateSpace::new([3, 3]);
+    ///
+    /// // Adjacent
+    /// assert!(space.are_adjacent((1, 0).into(), (0, 0).into()));
+    /// assert!(space.are_adjacent((1, 0).into(), (1, 1).into()));
+    /// assert!(space.are_adjacent((1, 0).into(), (2, 0).into()));
+    ///
+    /// // Not adjacent
+    /// assert!(!space.are_adjacent((1, 0).into(), (0, 1).into()));
+    /// assert!(!space.are_adjacent((1, 0).into(), (2, 2).into()));
+    /// assert!(!space.are_adjacent((1, 0).into(), (1, 2).into()));  // No wrapping
+    /// ```
     fn are_adjacent(&self, pt1: Self::PtType, pt2: Self::PtType) -> bool;
 
     /// Return an iterator that yields every point in this coordinate space.
@@ -37,16 +131,65 @@ pub trait CoordinateSpace : Sized + Clone + Copy + Send + Sync + Debug {
     ///
     /// If the coordinate space has any notion of an origin, it is the first
     /// point yielded.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
+    /// # use mazelib::interface::point::CoordinateSpace;
+    /// #
+    /// let space = BoxCoordinateSpace::new([2, 2]);
+    ///
+    /// let mut iter = space.iter();
+    ///
+    /// assert_eq!(Some((0, 0).into()), iter.next());
+    /// assert_eq!(Some((1, 0).into()), iter.next());
+    /// assert_eq!(Some((0, 1).into()), iter.next());
+    /// assert_eq!(Some((1, 1).into()), iter.next());
+    ///
+    /// assert_eq!(None, iter.next());
+    /// ```
     fn iter(&self) -> Self::Iter;
 
     /// Return an iterator that behaves exactly like [`iter()`](Self::iter),
     /// but skips every point up to and including `pt`.
     ///
     /// Points that are skipped are still considered to have been yielded for
-    /// the purposes of the path constraint in `into_iter()`.
+    /// the purposes of the path constraint in `iter()`.
+    ///
+    /// # Examples
+    ///
+    /// Contrast this example with the example for `iter()`.
+    /// ```
+    /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
+    /// # use mazelib::interface::point::CoordinateSpace;
+    /// #
+    /// let space = BoxCoordinateSpace::new([2, 2]);
+    ///
+    /// let mut iter = space.iter_from((1, 0).into());
+    ///
+    /// assert_eq!(Some((0, 1).into()), iter.next());
+    /// assert_eq!(Some((1, 1).into()), iter.next());
+    ///
+    /// assert_eq!(None, iter.next());
+    /// ```
     fn iter_from(&self, pt: Self::PtType) -> Self::Iter;
 
     /// Return a random point in this coordinate space.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use rand::thread_rng;
+    /// # use mazelib::implm::point::boxy::{BoxCoordinateSpace, CoordinatePair};
+    /// # use mazelib::interface::point::CoordinateSpace;
+    /// #
+    /// let mut rng = thread_rng();
+    ///
+    /// let space = BoxCoordinateSpace::new([3, 3]);
+    ///
+    /// let pt = space.choose(&mut rng);
+    /// ```
     fn choose(&self, rng: &mut (impl Rng + ?Sized)) -> Self::PtType;
 }
 
