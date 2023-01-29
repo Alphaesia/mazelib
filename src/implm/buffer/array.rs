@@ -3,11 +3,11 @@ use std::fmt::{Debug, Formatter};
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::{CellID, CellValue};
 
-/// A [MazeBuffer] that stores its cells in a fixed-size array.
+/// A [buffer][MazeBuffer] that stores its cells in a fixed-size array.
 ///
 /// `MAX_CELLS` is the capacity of the backing array.
 ///
-/// You should probably use [VecBuffer][super::VecBuffer] instead.
+/// You should probably use [`VecBuffer`][crate::implm::buffer::VecBuffer] instead.
 pub struct ArrayBuffer<CellVal: CellValue, const MAX_CELLS: usize> {
     buf: [CellVal; MAX_CELLS],
 }

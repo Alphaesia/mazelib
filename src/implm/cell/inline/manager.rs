@@ -25,7 +25,8 @@ pub struct BoxSpaceInlineCellManager<Buffer: MazeBuffer<InlineCellValue<DIMENSIO
 // Constructor (private - use the builder)
 impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> BoxSpaceInlineCellManager<Buffer, DIMENSION> {
     /// Construct a new maze from a given coordinate space.
-    /// A [crate::interface::buffer::MazeBuffer] will be created from the value of type parameter `Buffer`.
+    /// A [`MazeBuffer`] will be created from the value of type parameter `Buffer`.
+    #[must_use]
     fn new(space: BoxCoordinateSpace<DIMENSION>) -> Self {
         Self { buffer: Buffer::new(space.dimensions().product()), space }
     }
@@ -33,6 +34,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Bo
 
 // Public functions
 impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> BoxSpaceInlineCellManager<Buffer, DIMENSION> {
+    #[must_use]
     pub fn buffer(&self) -> &Buffer {
         &self.buffer
     }
@@ -59,6 +61,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Bo
     /// the point along that axis).
     ///
     /// Returns None if the points are identical or not adjacent.
+    #[must_use]
     fn get_axis_of_adjacency(pt1: pt!(), pt2: pt!()) -> Option<usize> {
         for i in 0..DIMENSION {
             if pt1[i].abs_diff(pt2[i]) == 1 {
@@ -69,6 +72,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Bo
         return None
     }
 
+    #[must_use]
     fn pt_to_cell_id(&self, pt: pt!()) -> CellID {
         let mut offset = pt[0];
 
@@ -79,6 +83,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Bo
         CellID(offset)
     }
 
+    #[must_use]
     fn get_mut(&mut self, pt: pt!()) -> &mut <Self as CellManager>::CellVal {
         self.buffer.get_mut(self.pt_to_cell_id(pt))
     }

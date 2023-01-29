@@ -45,9 +45,11 @@ pub trait CellManager: Debug {
     type CellVal: CellValue;
 
     /// Return the coordinate space for this maze.
+    #[must_use]
     fn coord_space(&self) -> &Self::CoordSpace;
 
     /// Return the value of the point `pt`.
+    #[must_use]
     fn get(&self, pt: pt!()) -> Self::CellVal;
 
     /// Return the type of connection (graph theory: *edge*) between two points.
@@ -59,28 +61,33 @@ pub trait CellManager: Debug {
     ///
     /// This method follows the
     /// [priority order outlined in `ConnectionType`][ConnectionType#priority].
+    #[must_use]
     fn get_connection(&self, from: pt!(), to: pt!()) -> ConnectionType;
 
     /// Return true when [`get_connection(from, to)`][Self::get_connection] returns
     /// [`ConnectionType::PASSAGE`].
+    #[must_use]
     fn is_passage_between(&self, from: pt!(), to: pt!()) -> bool {
         self.get_connection(from, to) == ConnectionType::PASSAGE
     }
 
     /// Return true when [`get_connection(from, to)`][Self::get_connection] returns
     /// [`ConnectionType::WALL`].
+    #[must_use]
     fn is_wall_between(&self, from: pt!(), to: pt!()) -> bool {
         self.get_connection(from, to) == ConnectionType::WALL
     }
 
     /// Return true when [`get_connection(from, to)`][Self::get_connection] returns
     /// [`ConnectionType::BOUNDARY`].
+    #[must_use]
     fn is_boundary_between(&self, from: pt!(), to: pt!()) -> bool {
         self.get_connection(from, to) == ConnectionType::BOUNDARY
     }
 
     /// Return true when [`get_connection(from, to)`][Self::get_connection] returns
     /// [`ConnectionType::UNVISITED`].
+    #[must_use]
     fn is_unvisited_between(&self, from: pt!(), to: pt!()) -> bool {
         self.get_connection(from, to) == ConnectionType::UNVISITED
     }
@@ -137,9 +144,11 @@ pub trait CellValue: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync 
     /// cells are not considered fully visited. This is because when applying
     /// templates, such as a solid boundary around the edge of the maze, the cells
     /// that get touched should still be considered by generators.
+    #[must_use]
     fn is_fully_visited(&self) -> bool;
 
     /// If the cell is currently marked.
+    #[must_use]
     fn is_marked(&self) -> bool;
 
     /// Set the cell's mark flag.

@@ -3,9 +3,9 @@ use std::fmt::{Debug, Formatter};
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::{CellID, CellValue};
 
-/// A [MazeBuffer] that stores its cells in a [Vec] allocated on the heap.
+/// A [buffer][MazeBuffer] that stores its cells in a [`Vec`] allocated on the heap.
 ///
-/// This is the [MazeBuffer] that you will almost always want to use.
+/// This is the buffer that you will almost always want to use.
 pub struct VecBuffer<CellVal: CellValue> {
     buf: Vec<CellVal>,
 }

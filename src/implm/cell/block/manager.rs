@@ -46,7 +46,8 @@ pub struct BoxSpaceBlockCellManager<Buffer: MazeBuffer<BlockCellValue>, const DI
 // Constructor (private - use the builder)
 impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockCellManager<Buffer, DIMENSION> {
     /// Construct a new maze from a given coordinate space, scale factor, and padding.
-    /// A [crate::interface::buffer::MazeBuffer] will be created from the value of type parameter `Buffer`.
+    /// A [`MazeBuffer`] will be created from the value of type parameter `Buffer`.
+    #[must_use]
     fn new(space: BoxCoordinateSpace<DIMENSION>, scale_factor: [usize; DIMENSION], padding: [[usize; 2]; DIMENSION]) -> Self {
         let full_dimensions = Self::scale_dimensions(space.dimensions(), scale_factor).zip(padding).map(|(scaled_dim, padding)| scaled_dim + padding.sum());
 
@@ -58,11 +59,13 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
 
 // Public functions
 impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockCellManager<Buffer, DIMENSION> {
+    #[must_use]
     pub fn buffer(&self) -> &Buffer {
         &self.buffer
     }
 
     /// The dimensions of the coordinate space, scaled by the resolution, plus padding.
+    #[must_use]
     pub fn get_full_dimensions(&self) -> [usize; DIMENSION] {
         self.full_dimensions
     }
@@ -74,17 +77,20 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     ///
     /// Does not affect the distance of points from the outer edge of the maze (see
     /// [`padding()`][Self::padding]).
+    #[must_use]
     pub fn scale_factor(&self) -> [usize; DIMENSION] {
         self.scale_factor
     }
 
     /// The number of cells between the edge of the maze and the outermost cell that is mapped to
     /// a point. Useful for borders when the scale factor is greater than one.
+    #[must_use]
     pub fn padding(&self) -> [[usize; 2]; DIMENSION] {
         self.padding
     }
 
     /// The dimensions of the coordinate space, scaled by the resolution
+    #[must_use]
     pub fn scale_dimensions(dimensions: [usize; DIMENSION], resolution: [usize; DIMENSION]) -> [usize; DIMENSION] {
         dimensions.zip(resolution)
             .map(|(dim, res)| {
@@ -97,6 +103,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     }
 
     /// Map a point to a cell location.
+    #[must_use]
     pub fn map_pt_to_cell_loc(&self, pt: pt!()) -> <Self as CellManager>::CellLoc {
         let mut pt: [usize; DIMENSION] = pt.into();
 
@@ -110,7 +117,8 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
 
     /// Get the value of the point `pt` for mutation.
     ///
-    /// See also: [`Self::get()`].
+    /// *See also: [`get()`][Self::get].*
+    #[must_use]
     pub fn get_mut(&mut self, pt: pt!()) -> &mut <Self as CellManager>::CellVal {
         self.get_cell_value_mut(self.map_pt_to_cell_loc(pt))
     }
@@ -130,7 +138,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     ///
     /// Modifies the cell's type but keeps its mark status intact.
     ///
-    /// Please see [`Self::get_mut()`] for details.
+    /// Please see [`get_mut()`][Self::get_mut] for details.
     pub fn set_type(&mut self, pt: pt!(), cell_type: BlockCellValueType) {
         self.get_mut(pt).cell_type = cell_type;
     }
@@ -140,6 +148,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// In most cases you should use the methods on [`CellManager::get()`]. The only
     /// reason you should use this method is to access a cell that is not mapped by
     /// the coordinated space.
+    #[must_use]
     pub fn get_cell_value(&self, loc: <Self as CellManager>::CellLoc) -> BlockCellValue {
         self.buffer.get(self.cell_loc_to_id(loc))
     }
@@ -151,6 +160,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// the coordinated space.
     ///
     /// See also: [`Self::get_cell_value()`].
+    #[must_use]
     pub fn get_cell_value_mut(&mut self, loc: <Self as CellManager>::CellLoc) -> &mut BlockCellValue {
         self.buffer.get_mut(self.cell_loc_to_id(loc))
     }
@@ -163,6 +173,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// In most cases you should use the methods on [CellManager]. The only reason
     /// you should use this method is to access a cell that is not mapped by the
     /// coordinated space.
+    #[must_use]
     pub fn set_cell_value(&mut self, loc: <Self as CellManager>::CellLoc, value: BlockCellValue) {
         self.buffer.set(self.cell_loc_to_id(loc), value)
     }
@@ -197,6 +208,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// the point along that axis).
     ///
     /// Returns None if the points are identical or not adjacent.
+    #[must_use]
     fn get_axis_of_adjacency(pt1: pt!(), pt2: pt!()) -> Option<usize> {
         for i in 0..DIMENSION {
             if pt1[i].abs_diff(pt2[i]) == 1 {
@@ -208,6 +220,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     }
 
     /// Convert a [`crate::interface::cell::CellLocation`] to a [`crate::interface::cell::CellID`]
+    #[must_use]
     fn cell_loc_to_id(&self, cell_loc: <Self as CellManager>::CellLoc) -> CellID {
         let mut offset = cell_loc[0];
 

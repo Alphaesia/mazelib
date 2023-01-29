@@ -35,6 +35,7 @@ pub trait MazeBuffer<CellVal: CellValue> : Debug + Send {
     /// `cell_count` is the size of the maze's cell space, and is the number of cells that the
     /// buffer is required to track. This is the buffer's size and capacity. It cannot be changed
     /// once a buffer is constructed.
+    #[must_use]
     fn new(cell_count: usize) -> Self;
 
     /// Get the value of a given cell.
@@ -42,6 +43,7 @@ pub trait MazeBuffer<CellVal: CellValue> : Debug + Send {
     /// # Panics
     ///
     /// Panics if `cell` out of bounds (is greater than or equal to this buffer's size).
+    #[must_use]
     fn get(&self, cell: CellID) -> CellVal;
 
     /// Get the value of a given cell for mutation.
@@ -49,6 +51,7 @@ pub trait MazeBuffer<CellVal: CellValue> : Debug + Send {
     /// # Panics
     ///
     /// Panics if `cell` out of bounds (is greater than or equal to this buffer's size).
+    #[must_use]
     fn get_mut(&mut self, cell: CellID) -> &mut CellVal;
 
     /// Set the value of a given cell.

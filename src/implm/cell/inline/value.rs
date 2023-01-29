@@ -54,6 +54,7 @@ pub enum InlineCellValueEdgeSide {
 }
 
 impl <const DIMENSION: usize> InlineCellValue<DIMENSION> {
+    #[must_use]
     pub fn get_wall(&self, axis: usize, side: InlineCellValueEdgeSide) -> InlineCellValueEdgeType {
         let side_index = match side {
             InlineCellValueEdgeSide::POSITIVE => 1,
@@ -79,6 +80,7 @@ impl <const DIMENSION: usize> CellValue for InlineCellValue<DIMENSION> {
 }
 
 impl <const DIMENSION: usize> Default for InlineCellValue<DIMENSION> {
+    #[must_use]
     fn default() -> Self {
         Self { edges: [[UNVISITED; 2]; DIMENSION], marked: false }
     }

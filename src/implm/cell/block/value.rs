@@ -37,5 +37,6 @@ impl CellValue for BlockCellValue {
 }
 
 impl Default for BlockCellValue {
+    #[must_use]
     fn default() -> Self { Self { cell_type: BlockCellValueType::UNVISITED, marked: false } }
 }

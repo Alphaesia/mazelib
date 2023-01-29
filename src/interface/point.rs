@@ -59,6 +59,7 @@ pub trait CoordinateSpace : Sized + Clone + Copy + Send + Sync + Debug {
     ///
     /// assert_eq!(9, space.logical_size());
     /// ```
+    #[must_use]
     fn logical_size(&self) -> usize;
 
     /// Return a vector containing every point in the coordinate space
@@ -95,6 +96,7 @@ pub trait CoordinateSpace : Sized + Clone + Copy + Send + Sync + Debug {
     ///
     /// assert_eq!(expected_neighbours, space.neighbours_of_pt(pt));
     /// ```
+    #[must_use]
     fn neighbours_of_pt(&self, pt: Self::PtType) -> Vec<Self::PtType>;
 
     /// Return whether two points are adjacent in this coordinate space.
@@ -119,6 +121,7 @@ pub trait CoordinateSpace : Sized + Clone + Copy + Send + Sync + Debug {
     /// assert!(!space.are_adjacent((1, 0).into(), (2, 2).into()));
     /// assert!(!space.are_adjacent((1, 0).into(), (1, 2).into()));  // No wrapping
     /// ```
+    #[must_use]
     fn are_adjacent(&self, pt1: Self::PtType, pt2: Self::PtType) -> bool;
 
     /// Return an iterator that yields every point in this coordinate space.
@@ -149,6 +152,7 @@ pub trait CoordinateSpace : Sized + Clone + Copy + Send + Sync + Debug {
     ///
     /// assert_eq!(None, iter.next());
     /// ```
+    #[must_use]
     fn iter(&self) -> Self::Iter;
 
     /// Return an iterator that behaves exactly like [`iter()`](Self::iter),
@@ -173,6 +177,7 @@ pub trait CoordinateSpace : Sized + Clone + Copy + Send + Sync + Debug {
     ///
     /// assert_eq!(None, iter.next());
     /// ```
+    #[must_use]
     fn iter_from(&self, pt: Self::PtType) -> Self::Iter;
 
     /// Return a random point in this coordinate space.
@@ -190,6 +195,7 @@ pub trait CoordinateSpace : Sized + Clone + Copy + Send + Sync + Debug {
     ///
     /// let pt = space.choose(&mut rng);
     /// ```
+    #[must_use]
     fn choose(&self, rng: &mut (impl Rng + ?Sized)) -> Self::PtType;
 }
 

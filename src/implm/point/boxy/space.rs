@@ -67,6 +67,7 @@ impl <const DIMENSION: usize> BoxCoordinateSpace<DIMENSION> {
     ///
     /// let coord_space = BoxCoordinateSpace::new([5, 7, 3]);
     /// ```
+    #[must_use]
     pub fn new(dimensions: [usize; DIMENSION]) -> Self {
         if DIMENSION == 0 {
             panic!("DIMENSION must be >= 1")
@@ -76,11 +77,13 @@ impl <const DIMENSION: usize> BoxCoordinateSpace<DIMENSION> {
     }
 
     /// Return the dimensions of this coordinate space.
+    #[must_use]
     pub fn dimensions(&self) -> [usize; DIMENSION] {
         self.dimensions
     }
 
     /// Return whether the point is [adjacent to the edge of this coordinate space](#edge-adjacency).
+    #[must_use]
     pub fn is_adjacent_to_edge(&self, pt: <Self as CoordinateSpace>::PtType) -> bool {
         for i in 0..DIMENSION {
             if pt[i] == 0 || pt[i] == self[i] - 1 {
