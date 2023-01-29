@@ -36,3 +36,25 @@ fn test_size() {
     assert_eq!(BoxCoordinateSpace::<3>::new([9, 9, 9]).logical_size(), 729);
     assert_eq!(BoxCoordinateSpace::<3>::new([61, 73, 12]).logical_size(), 53436);
 }
+
+#[test]
+fn test_adjacency() {
+    let space = BoxCoordinateSpace::new([9, 9, 9]);
+
+    // Check point is not adjacent to itself
+    assert!(!space.are_adjacent([1, 1, 1].into(), [1, 1, 1].into()));
+
+    assert!(space.are_adjacent([1, 1, 1].into(), [2, 1, 1].into()));
+    assert!(space.are_adjacent([1, 1, 1].into(), [1, 2, 1].into()));
+    assert!(space.are_adjacent([1, 1, 1].into(), [1, 1, 2].into()));
+
+    assert!(!space.are_adjacent([1, 1, 1].into(), [2, 2, 1].into()));
+    assert!(!space.are_adjacent([1, 1, 1].into(), [2, 1, 2].into()));
+    assert!(!space.are_adjacent([1, 1, 1].into(), [1, 2, 2].into()));
+    assert!(!space.are_adjacent([1, 1, 1].into(), [2, 2, 2].into()));
+
+    // Check no wrapping
+    assert!(!space.are_adjacent([0, 0, 0].into(), [8, 0, 0].into()));
+    assert!(!space.are_adjacent([0, 0, 0].into(), [0, 8, 0].into()));
+    assert!(!space.are_adjacent([0, 0, 0].into(), [0, 0, 8].into()));
+}

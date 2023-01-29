@@ -121,14 +121,24 @@ impl <const DIMENSION: usize> CoordinateSpace for BoxCoordinateSpace<DIMENSION> 
         return neighbours
     }
 
-    fn are_adjacent(pt1: Self::PtType, pt2: Self::PtType) -> bool {
+    fn are_adjacent(&self, pt1: Self::PtType, pt2: Self::PtType) -> bool {
+        let mut found_axis_of_adjacency = false;
+
         for dim in 0..DIMENSION {
-            if pt1[dim].abs_diff(pt2[dim]) == 1 {
-                return true
+            match pt1[dim].abs_diff(pt2[dim]) {
+                0 => {},
+                1 => {
+                    if found_axis_of_adjacency {
+                        return false;
+                    } else {
+                        found_axis_of_adjacency = true;
+                    }
+                },
+                _ => return false,
             }
         }
 
-        return false
+        return found_axis_of_adjacency;
     }
 
     fn iter(&self) -> Self::Iter {

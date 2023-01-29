@@ -25,7 +25,7 @@ pub trait CoordinateSpace : Sized + Clone + Copy + Send + Sync + Debug {
     /// Return whether two points are adjacent in this coordinate space.
     ///
     /// A point is **not** considered to be adjacent to itself.
-    fn are_adjacent(pt1: Self::PtType, pt2: Self::PtType) -> bool;
+    fn are_adjacent(&self, pt1: Self::PtType, pt2: Self::PtType) -> bool;
 
     /// Return an iterator that yields every point in this coordinate space.
     ///
