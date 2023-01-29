@@ -30,17 +30,11 @@
 
 mod space;
 mod point;
-mod implm {
-    mod iterator;
-    mod from;
-    mod index;
-    mod display;
-
-    pub(super) use self::iterator::BoxCoordinateSpaceIterator;
-}
+mod iterator;
 
 pub use self::space::BoxCoordinateSpace;
 pub use self::point::CoordinateTuplet;
+pub use self::iterator::BoxCoordinateSpaceIterator;
 
 /// A flat rectangular coordinate space. The most common type of coordinate space for mazes.
 ///

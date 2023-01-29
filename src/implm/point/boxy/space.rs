@@ -1,9 +1,10 @@
+use std::fmt::{Debug, Formatter};
 use std::ops::Index;
 
 use rand::Rng;
 
 use crate::implm::point::boxy::CoordinateTuplet;
-use crate::implm::point::boxy::implm::BoxCoordinateSpaceIterator;
+use crate::implm::point::boxy::BoxCoordinateSpaceIterator;
 use crate::interface::point::CoordinateSpace;
 use crate::internal::array_util::Product;
 
@@ -148,5 +149,19 @@ impl <const DIMENSION: usize> Index<usize> for BoxCoordinateSpace<DIMENSION> {
 
     fn index(&self, index: usize) -> &Self::Output {
         &self.dimensions[index]
+    }
+}
+
+impl <const DIMENSION: usize> Debug for BoxCoordinateSpace<DIMENSION> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "BoxCoordinateSpace(dimensions = ")?;
+
+        for i in 0..(DIMENSION - 1) {
+            write!(f, "{}x", self[i])?;
+        }
+
+        write!(f, "{}", self[DIMENSION - 1])?;
+
+        write!(f, ")")
     }
 }
