@@ -15,7 +15,7 @@ use crate::interface::point::CoordinateSpace;
 ///     if point is unvisited:
 ///         maze.make_wall(point)
 /// ```
-pub fn convert_unvisited_points_to_walls<M: Maze>(maze: &mut M) {
+pub fn convert_unvisited_points_to_walls(maze: &mut impl Maze) {
     for pt in maze.coord_space().iter() {
         if maze.get(pt).is_fully_visited() == false {
             maze.make_wall(pt)

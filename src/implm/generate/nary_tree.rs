@@ -40,7 +40,7 @@ pub struct NAryTreeGenerator {
 }
 
 impl <M: Maze<CoordSpace=BoxCoordinateSpace<DIMENSION>>, const DIMENSION: usize> MazeGenerator<M> for NAryTreeGenerator {
-    fn generate_with_rng<R: Rng + ?Sized>(&mut self, maze: &mut M, rng: &mut R) {
+    fn generate_with_rng(&mut self, maze: &mut M, rng: &mut (impl Rng + ?Sized)) {
         // For every point in the maze,
         maze.coord_space().into_iter().for_each(|pt| {
             let pt_as_arr: [usize; DIMENSION] = pt.into();

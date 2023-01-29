@@ -23,18 +23,13 @@ use crate::interface::maze::Maze;
 /// Generators do not consider mazes at the cellular level. They only jump from point to
 /// point.
 ///
-/// Most implementations will define a static
-/// [`Implementation::generate(maze: &mut Maze)`][DefaultMazeGenerator::generate] that
-/// will generate a maze using some default generator parameters. It also saves you having
-/// to construct the generator struct yourself.
+/// # See Also
+///
+/// [`DefaultMazeGenerator`] --- generate mazes without instantiating them (sugar).
 pub trait MazeGenerator<M: Maze> {
     /// Generate a random maze.
     ///
-    /// Mazes are operated upon in-place. Should for whatever reason a generator panic
-    /// during execution, the maze may be left in a partially-generated state (different
-    /// from what it started as). It will however not be left in an inconsistent state
-    /// (provided that the panic originates from within the [`Maze`] itself).
-    ///
+    /// Mazes are operated upon in-place.
     /// # Parameters
     /// * `maze` --- the maze to be filled in. The maze may be partially or completely
     ///              filled in beforehand. The generator will consider any existing
@@ -47,10 +42,7 @@ pub trait MazeGenerator<M: Maze> {
 
     /// Generate a maze using a given random number generator.
     ///
-    /// Mazes are operated upon in-place. Should for whatever reason a generator panic
-    /// during execution, the maze may be left in a partially-generated state (different
-    /// from what it started as).  It will however not be left in an inconsistent state
-    /// (provided that the panic originates from within the [`Maze`] itself).
+    /// Mazes are operated upon in-place.
     ///
     /// You should prefer [`generate()`][Self::generate`] to this method.
     ///
@@ -63,13 +55,13 @@ pub trait MazeGenerator<M: Maze> {
     /// * `rng`  --- The sole source of randomness for the generator. Given a
     ///              [`rand::SeedableRng`] with a fixed seed, the generator's behaviour
     ///              is deterministic.
-    fn generate_with_rng<R: Rng + ?Sized>(&mut self, maze: &mut M, rng: &mut R);
+    fn generate_with_rng(&mut self, maze: &mut M, rng: &mut (impl Rng + ?Sized));
 }
 
 /// Simple sugar for [`MazeGenerator`]s.
 ///
 /// Lets you elide constructing generators with parameterless constructors (specifically,
-/// generators that implement [`Default`]).
+/// for generators that implement [`Default`]).
 ///
 /// ```
 /// # use mazelib::interface::generate::MazeGenerator;
@@ -99,7 +91,7 @@ pub trait DefaultMazeGenerator<M: Maze>: MazeGenerator<M> {
     fn generate(maze: &mut M);
 
     /// *See [`MazeGenerator::generate_with_rng()`].*
-    fn generate_with_rng<R: Rng + ?Sized>(maze: &mut M, rng: &mut R);
+    fn generate_with_rng(maze: &mut M, rng: &mut (impl Rng + ?Sized));
 }
 
 impl <M: Maze, T: MazeGenerator<M> + Default> DefaultMazeGenerator<M> for T {
@@ -107,7 +99,7 @@ impl <M: Maze, T: MazeGenerator<M> + Default> DefaultMazeGenerator<M> for T {
         Self::default().generate(maze)
     }
 
-    fn generate_with_rng<R: Rng + ?Sized>(maze: &mut M, rng: &mut R) {
+    fn generate_with_rng(maze: &mut M, rng: &mut (impl Rng + ?Sized)) {
         Self::default().generate_with_rng(maze, rng)
     }
 }

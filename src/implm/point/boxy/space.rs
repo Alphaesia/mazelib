@@ -138,7 +138,7 @@ impl <const DIMENSION: usize> CoordinateSpace for BoxCoordinateSpace<DIMENSION> 
         BoxCoordinateSpaceIterator::new(*self, Some(pt))
     }
 
-    fn choose<RNG: Rng + ?Sized>(&self, rng: &mut RNG) -> Self::PtType {
+    fn choose(&self, rng: &mut (impl Rng + ?Sized)) -> Self::PtType {
         self.dimensions.map(|dim| rng.gen_range(0..dim)).into()
     }
 }

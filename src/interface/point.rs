@@ -9,6 +9,9 @@ use rand::Rng;
 pub trait CoordinateSpace : Sized + Clone + Copy + Send + Sync + Debug {
     /// The [`Point`] type that goes with this coordinate space.
     type PtType: Point;
+
+    /// The type of iterator returned by [`iter()`][Self::iter] and
+    /// [`iter_from()`][Self::iter_from].
     type Iter: Iterator<Item = Self::PtType>;
 
     /// Return the number of points in this coordinate space. This never
@@ -44,7 +47,7 @@ pub trait CoordinateSpace : Sized + Clone + Copy + Send + Sync + Debug {
     fn iter_from(&self, pt: Self::PtType) -> Self::Iter;
 
     /// Return a random point in this coordinate space.
-    fn choose<RNG: Rng + ?Sized>(&self, rng: &mut RNG) -> Self::PtType;
+    fn choose(&self, rng: &mut (impl Rng + ?Sized)) -> Self::PtType;
 }
 
 /// A logical location in a maze.

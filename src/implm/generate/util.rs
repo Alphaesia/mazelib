@@ -5,7 +5,7 @@ use crate::interface::cell::{CellManager, CellValue};
 use crate::interface::maze::Maze;
 use crate::interface::point::CoordinateSpace;
 
-pub fn carve_to_unvisited_neighbour<M: Maze, R: Rng + ?Sized>(maze: &mut M, rng: &mut R, from_pt: <<M as CellManager>::CoordSpace as CoordinateSpace>::PtType) -> Option<<<M as CellManager>::CoordSpace as CoordinateSpace>::PtType>
+pub fn carve_to_unvisited_neighbour<M: Maze>(maze: &mut M, rng: &mut (impl Rng + ?Sized), from_pt: <<M as CellManager>::CoordSpace as CoordinateSpace>::PtType) -> Option<<<M as CellManager>::CoordSpace as CoordinateSpace>::PtType>
 {
     // Get unvisited neighbours
     let mut neighbours = maze.coord_space().neighbours_of_pt(from_pt).to_vec();

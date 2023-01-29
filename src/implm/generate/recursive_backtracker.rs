@@ -40,7 +40,7 @@ pub struct RecursiveBacktrackerGenerator {
 }
 
 impl <M: Maze> MazeGenerator<M> for RecursiveBacktrackerGenerator {
-    fn generate_with_rng<R: Rng + ?Sized>(&mut self, maze: &mut M, rng: &mut R) {
+    fn generate_with_rng(&mut self, maze: &mut M, rng: &mut (impl Rng + ?Sized)) {
         // Start at the origin
         let mut current_pt = maze.coord_space().choose(rng);
 

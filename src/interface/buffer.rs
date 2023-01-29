@@ -12,10 +12,10 @@ use std::fmt::Debug;
 
 use crate::interface::cell::{CellID, CellValue};
 
-/// Maze cell container.
+/// A maze cell container.
 ///
 /// Maze buffers store the values of all cells in a maze. This is the meat of the maze. They are
-/// not responsible for other [core maze components], which are held by the
+/// not responsible for other [core maze components](crate::interface#core-components), which are held by the
 /// [cell manager][crate::interface::cell::CellManager] instead.
 ///
 /// A buffer's size is determined at construction, and cannot be changed.
@@ -29,8 +29,6 @@ use crate::interface::cell::{CellID, CellValue};
 /// While most buffers would store their contents in memory, it is conceivable that a buffer
 /// could stream the maze from disk (or elsewhere). This would allow mazes too big to fit in
 /// memory to be generated.
-///
-/// [core maze components]: crate::interface#core-components
 pub trait MazeBuffer<CellVal: CellValue> : Debug + Send {
     /// Construct a new buffer.
     ///
