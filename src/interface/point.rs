@@ -1,5 +1,6 @@
 use std::fmt::Debug;
 use std::hash::Hash;
+use std::num::NonZeroUsize;
 
 use rand::Rng;
 
@@ -10,6 +11,8 @@ use rand::Rng;
 /// locations where they *could* go.
 ///
 /// For a more in-depth explanation, [see the explainer in `interface`](crate::interface#coordinate-space).
+///
+/// A coordinate space must always have at least one point. It can never be empty.
 ///
 /// # Examples
 ///
@@ -48,6 +51,9 @@ pub trait CoordinateSpace : Sized + Clone + Copy + Send + Sync + Debug {
     ///
     /// This value is fixed.
     ///
+    /// As the coordinate space must always have at least one point, this method
+    /// returns `NonZeroUsize`.
+    ///
     /// # Examples
     ///
     /// ```
@@ -57,10 +63,10 @@ pub trait CoordinateSpace : Sized + Clone + Copy + Send + Sync + Debug {
     /// // A 3x3 space has 9 points
     /// let space = BoxCoordinateSpace::new_checked([3, 3]);
     ///
-    /// assert_eq!(9, space.logical_size());
+    /// assert_eq!(9, usize::from(space.logical_size()));
     /// ```
     #[must_use]
-    fn logical_size(&self) -> usize;
+    fn logical_size(&self) -> NonZeroUsize;
 
     /// Return a vector containing every point in the coordinate space
     /// that is adjacent to `pt` (as determined by [`are_adjacent()`](Self::are_adjacent)).

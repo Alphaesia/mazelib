@@ -57,7 +57,7 @@ pub struct BoxCoordinateSpace<const DIMENSION: usize> {
     /// The total number of possible points or positions in this coordinate space.
     ///
     /// This just serves as a cache of the result of [`self.dimensions.product()`][Product::product].
-    size: usize,
+    size: NonZeroUsize,
 }
 
 impl <const DIMENSION: usize> BoxCoordinateSpace<DIMENSION> {
@@ -87,7 +87,7 @@ impl <const DIMENSION: usize> BoxCoordinateSpace<DIMENSION> {
             panic!("DIMENSION must be >= 1")
         }
 
-        Self { dimensions: nonzero_usize_array_to_usize_array(dimensions), size: dimensions.product().into() }
+        Self { dimensions: nonzero_usize_array_to_usize_array(dimensions), size: dimensions.product() }
     }
 
     /// Construct a new `BoxCoordinateSpace` from the given (size) dimensions.
@@ -130,7 +130,7 @@ impl <const DIMENSION: usize> CoordinateSpace for BoxCoordinateSpace<DIMENSION> 
     type PtType = CoordinateTuplet<DIMENSION>;
     type Iter = BoxCoordinateSpaceIterator<DIMENSION>;
 
-    fn logical_size(&self) -> usize {
+    fn logical_size(&self) -> NonZeroUsize {
         self.size
     }
 
