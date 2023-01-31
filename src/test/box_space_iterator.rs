@@ -4,7 +4,7 @@ use crate::interface::point::CoordinateSpace;
 #[test]
 fn test_one_dimensional() {
     {
-        let space = BoxCoordinateSpace::new([0]);
+        let space = BoxCoordinateSpace::new_checked([0]);
 
         let mut iter = space.iter();
 
@@ -13,7 +13,7 @@ fn test_one_dimensional() {
     }
 
     {
-        let space = BoxCoordinateSpace::new([1]);
+        let space = BoxCoordinateSpace::new_checked([1]);
 
         let mut iter = space.iter();
 
@@ -24,7 +24,7 @@ fn test_one_dimensional() {
     }
 
     {
-        let space = BoxCoordinateSpace::new([2]);
+        let space = BoxCoordinateSpace::new_checked([2]);
 
         let mut iter = space.iter();
 
@@ -36,7 +36,7 @@ fn test_one_dimensional() {
     }
 
     {
-        let space = BoxCoordinateSpace::new([3]);
+        let space = BoxCoordinateSpace::new_checked([3]);
 
         let mut iter = space.iter();
 
@@ -48,7 +48,7 @@ fn test_one_dimensional() {
     }
 
     {
-        let space = BoxCoordinateSpace::new([9]);
+        let space = BoxCoordinateSpace::new_checked([9]);
 
         let mut iter = space.iter();
 
@@ -70,7 +70,7 @@ fn test_one_dimensional() {
 #[test]
 fn test_two_dimensional() {
     {
-        let space = BoxCoordinateSpace::new([0, 0]);
+        let space = BoxCoordinateSpace::new_checked([0, 0]);
 
         let mut iter = space.iter();
 
@@ -79,7 +79,7 @@ fn test_two_dimensional() {
     }
 
     {
-        let space = BoxCoordinateSpace::new([1, 0]);
+        let space = BoxCoordinateSpace::new_checked([1, 0]);
 
         let mut iter = space.iter();
 
@@ -88,7 +88,7 @@ fn test_two_dimensional() {
     }
 
     {
-        let space = BoxCoordinateSpace::new([2, 0]);
+        let space = BoxCoordinateSpace::new_checked([2, 0]);
 
         let mut iter = space.iter();
 
@@ -97,7 +97,7 @@ fn test_two_dimensional() {
     }
 
     {
-        let space = BoxCoordinateSpace::new([3, 0]);
+        let space = BoxCoordinateSpace::new_checked([3, 0]);
 
         let mut iter = space.iter();
 
@@ -106,7 +106,7 @@ fn test_two_dimensional() {
     }
 
     {
-        let space = BoxCoordinateSpace::new([4, 0]);
+        let space = BoxCoordinateSpace::new_checked([4, 0]);
 
         let mut iter = space.iter();
 
@@ -115,7 +115,7 @@ fn test_two_dimensional() {
     }
 
     {
-        let space = BoxCoordinateSpace::new([5, 0]);
+        let space = BoxCoordinateSpace::new_checked([5, 0]);
 
         let mut iter = space.iter();
 
@@ -124,7 +124,7 @@ fn test_two_dimensional() {
     }
 
     {
-        let space = BoxCoordinateSpace::new([6, 0]);
+        let space = BoxCoordinateSpace::new_checked([6, 0]);
 
         let mut iter = space.iter();
 
@@ -133,7 +133,7 @@ fn test_two_dimensional() {
     }
 
     {
-        let space = BoxCoordinateSpace::new([0, 1]);
+        let space = BoxCoordinateSpace::new_checked([0, 1]);
 
         let mut iter = space.iter();
 
@@ -142,7 +142,7 @@ fn test_two_dimensional() {
     }
 
     {
-        let space = BoxCoordinateSpace::new([0, 2]);
+        let space = BoxCoordinateSpace::new_checked([0, 2]);
 
         let mut iter = space.iter();
 
@@ -151,7 +151,7 @@ fn test_two_dimensional() {
     }
 
     {
-        let space = BoxCoordinateSpace::new([0, 3]);
+        let space = BoxCoordinateSpace::new_checked([0, 3]);
 
         let mut iter = space.iter();
 
@@ -160,7 +160,7 @@ fn test_two_dimensional() {
     }
 
     {
-        let space = BoxCoordinateSpace::new([0, 4]);
+        let space = BoxCoordinateSpace::new_checked([0, 4]);
 
         let mut iter = space.iter();
 
@@ -169,7 +169,7 @@ fn test_two_dimensional() {
     }
 
     {
-        let space = BoxCoordinateSpace::new([0, 5]);
+        let space = BoxCoordinateSpace::new_checked([0, 5]);
 
         let mut iter = space.iter();
 
@@ -178,7 +178,7 @@ fn test_two_dimensional() {
     }
 
     {
-        let space = BoxCoordinateSpace::new([0, 6]);
+        let space = BoxCoordinateSpace::new_checked([0, 6]);
 
         let mut iter = space.iter();
 
@@ -187,7 +187,7 @@ fn test_two_dimensional() {
     }
 
     {
-        let space = BoxCoordinateSpace::new([6, 6]);
+        let space = BoxCoordinateSpace::new_checked([6, 6]);
 
         let mut iter = space.iter();
 
@@ -240,7 +240,7 @@ fn test_two_dimensional() {
 
 #[test]
 fn test_three_dimensional() {
-    let space = BoxCoordinateSpace::new([3, 3, 3]);
+    let space = BoxCoordinateSpace::new_checked([3, 3, 3]);
 
     let mut iter = space.iter();
 

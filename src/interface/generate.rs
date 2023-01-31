@@ -70,7 +70,7 @@ pub trait MazeGenerator<M: Maze> {
 /// # use mazelib::implm::generate::HuntAndKillGenerator;
 /// # use mazelib::implm::maze::block::BoxSpaceBlockCellMazeBuilder;
 /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
-/// # let mut maze = BoxSpaceBlockCellMazeBuilder::<VecBuffer<BlockCellValue>, 1>::new(BoxCoordinateSpace::new([1])).build();
+/// # let mut maze = BoxSpaceBlockCellMazeBuilder::<VecBuffer<BlockCellValue>, 1>::new(BoxCoordinateSpace::new_checked([1])).build();
 /// #
 /// HuntAndKillGenerator::new().generate(&mut maze);
 /// ```
@@ -82,7 +82,7 @@ pub trait MazeGenerator<M: Maze> {
 /// # use mazelib::implm::generate::HuntAndKillGenerator;
 /// # use mazelib::implm::maze::block::BoxSpaceBlockCellMazeBuilder;
 /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
-/// # let mut maze = BoxSpaceBlockCellMazeBuilder::<VecBuffer<BlockCellValue>, 1>::new(BoxCoordinateSpace::new([1])).build();
+/// # let mut maze = BoxSpaceBlockCellMazeBuilder::<VecBuffer<BlockCellValue>, 1>::new(BoxCoordinateSpace::new_checked([1])).build();
 /// #
 /// HuntAndKillGenerator::generate(&mut maze);
 /// ```

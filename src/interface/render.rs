@@ -47,7 +47,7 @@ use crate::interface::maze::Maze;
 /// #
 /// # fn test() -> Result<()> {
 /// #
-/// # let maze = BoxSpaceInlineCellMazeBuilder::<VecBuffer<InlineCellValue<2>>, 2>::new(BoxCoordinateSpace::new([5, 5])).build();
+/// # let maze = BoxSpaceInlineCellMazeBuilder::<VecBuffer<InlineCellValue<2>>, 2>::new(BoxCoordinateSpace::new_checked([5, 5])).build();
 ///
 /// // Buffer writes for performance
 /// let mut output = BufWriter::new(std::io::stdout());
@@ -69,7 +69,7 @@ use crate::interface::maze::Maze;
 /// #
 /// # fn example() -> std::io::Result<()> {
 /// #
-/// # let maze = BoxSpaceInlineCellMazeBuilder::<VecBuffer<InlineCellValue<2>>, 2>::new(BoxCoordinateSpace::new([5, 5])).build();
+/// # let maze = BoxSpaceInlineCellMazeBuilder::<VecBuffer<InlineCellValue<2>>, 2>::new(BoxCoordinateSpace::new_checked([5, 5])).build();
 ///
 /// // Buffer writes for performance
 /// let mut output = BufWriter::new(File::create("maze.txt")?);
@@ -137,7 +137,7 @@ impl <M: Maze, T: MazeRendererNonSeeking<M>> MazeRenderer<M> for T {
 /// #
 /// # fn test() -> std::io::Result<()> {
 /// #
-/// # let mut maze = BoxSpaceBlockCellMazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(BoxCoordinateSpace::new([1, 1])).build();
+/// # let mut maze = BoxSpaceBlockCellMazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(BoxCoordinateSpace::new_checked([1, 1])).build();
 /// # let mut output = File::create(Path::new("")).unwrap();
 /// #
 /// BoxSpaceTextMazeRenderer::new().render(&mut maze, &mut output)
@@ -158,7 +158,7 @@ impl <M: Maze, T: MazeRendererNonSeeking<M>> MazeRenderer<M> for T {
 /// #
 /// # fn test() -> std::io::Result<()> {
 /// #
-/// # let mut maze = BoxSpaceBlockCellMazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(BoxCoordinateSpace::new([1, 1])).build();
+/// # let mut maze = BoxSpaceBlockCellMazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(BoxCoordinateSpace::new_checked([1, 1])).build();
 /// # let mut output = File::create(Path::new("")).unwrap();
 /// #
 /// BoxSpaceTextMazeRenderer::render(&mut maze, &mut output)
@@ -194,7 +194,7 @@ impl <M: Maze, T: MazeRenderer<M> + Default> DefaultMazeRenderer<M> for T {
 /// #
 /// # fn test() -> std::io::Result<()> {
 /// #
-/// # let mut maze = BoxSpaceBlockCellMazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(BoxCoordinateSpace::new([1, 1])).build();
+/// # let mut maze = BoxSpaceBlockCellMazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(BoxCoordinateSpace::new_checked([1, 1])).build();
 /// # let mut output = File::create(Path::new("")).unwrap();
 /// #
 /// BoxSpaceTextMazeRenderer::new().render(&mut maze, &mut output)
@@ -215,7 +215,7 @@ impl <M: Maze, T: MazeRenderer<M> + Default> DefaultMazeRenderer<M> for T {
 /// #
 /// # fn test() -> std::io::Result<()> {
 /// #
-/// # let mut maze = BoxSpaceBlockCellMazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(BoxCoordinateSpace::new([1, 1])).build();
+/// # let mut maze = BoxSpaceBlockCellMazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(BoxCoordinateSpace::new_checked([1, 1])).build();
 /// # let mut output = File::create(Path::new("")).unwrap();
 /// #
 /// BoxSpaceTextMazeRenderer::render(&mut maze, &mut output)

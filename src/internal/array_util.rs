@@ -1,3 +1,6 @@
+use std::num::NonZeroUsize;
+use crate::internal::util::NONZERO_USIZE_ONE;
+
 pub trait Sum<T> {
     fn sum(&self) -> T;
 }
@@ -9,6 +12,19 @@ impl <const LENGTH: usize> Sum<usize> for [usize; LENGTH] {
 
         for x in self {
             sum += x;
+        }
+
+        return sum;
+    }
+}
+
+impl <const LENGTH: usize> Sum<usize> for [NonZeroUsize; LENGTH] {
+    /// Return the sum of all elements in an array.
+    fn sum(&self) -> usize {
+        let mut sum = 0;
+
+        for x in self {
+            sum += usize::from(*x);
         }
 
         return sum;
@@ -27,6 +43,20 @@ impl <const LENGTH: usize> Product<usize> for [usize; LENGTH] {
 
         for x in self {
             product *= x;
+        }
+
+        return product;
+    }
+}
+
+impl <const LENGTH: usize> Product<NonZeroUsize> for [NonZeroUsize; LENGTH] {
+    /// Return the product of all elements in an array.
+    /// Returns 1 when LENGTH == 0.
+    fn product(&self) -> NonZeroUsize {
+        let mut product = NONZERO_USIZE_ONE;
+
+        for x in self {
+            product = product.checked_mul(*x).expect("overflow");
         }
 
         return product;

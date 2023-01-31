@@ -23,7 +23,7 @@ use crate::internal::noise_util::pt;
 /// use mazelib::implm::cell::block::{BlockCellValue, BoxSpaceBlockCellManagerBuilder};
 /// use mazelib::implm::buffer::VecBuffer;
 ///
-/// let coord_space = TwoDimensionalBoxCoordinateSpace::new([11, 11]); // Standard 2D coordinate space
+/// let coord_space = TwoDimensionalBoxCoordinateSpace::new_checked([11, 11]); // Standard 2D coordinate space
 /// let scale_factor = [2, 2]; // A simple scale factor of 2 for a clean look
 /// let padding = [[1, 1], [1, 1]]; // 1 cell on each side for a border
 /// type CellType = BlockCellValue; // Pixelated maze style
@@ -129,7 +129,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// # use mazelib::implm::cell::block::{BlockCellValue, BlockCellValueType, BoxSpaceBlockCellManagerBuilder};
     /// # use mazelib::implm::cell::inline::InlineCellValue;
     /// # use mazelib::implm::point::boxy::{BoxCoordinateSpace, CoordinateTuplet};
-    /// # let mut maze = BoxSpaceBlockCellManagerBuilder::<VecBuffer<BlockCellValue>, 1>::new(BoxCoordinateSpace::new([1])).build();
+    /// # let mut maze = BoxSpaceBlockCellManagerBuilder::<VecBuffer<BlockCellValue>, 1>::new(BoxCoordinateSpace::new_checked([1])).build();
     /// # let pt: CoordinateTuplet<1> = [0].into();
     /// # let cell_type = BlockCellValueType::PASSAGE;
     /// #
@@ -184,7 +184,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// # use mazelib::implm::cell::block::{BlockCellLocation, BlockCellValue, BlockCellValueType, BoxSpaceBlockCellManagerBuilder};
     /// # use mazelib::implm::cell::inline::InlineCellValue;
     /// # use mazelib::implm::point::boxy::{BoxCoordinateSpace, CoordinateTuplet};
-    /// # let mut maze = BoxSpaceBlockCellManagerBuilder::<VecBuffer<BlockCellValue>, 1>::new(BoxCoordinateSpace::new([1])).build();
+    /// # let mut maze = BoxSpaceBlockCellManagerBuilder::<VecBuffer<BlockCellValue>, 1>::new(BoxCoordinateSpace::new_checked([1])).build();
     /// # let loc: BlockCellLocation<1> = [0].into();
     /// # let cell_type = BlockCellValueType::PASSAGE;
     /// #

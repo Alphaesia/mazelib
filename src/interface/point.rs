@@ -27,7 +27,7 @@ use rand::Rng;
 /// #
 /// let dimensions = [7, 7];
 ///
-/// let space = BoxCoordinateSpace::new(dimensions);
+/// let space = BoxCoordinateSpace::new_checked(dimensions);
 ///
 /// // Will need to pick your own buffer
 /// let maze = BoxSpaceBlockCellMazeBuilder::<Buffer, _>::new(space).build();
@@ -55,7 +55,7 @@ pub trait CoordinateSpace : Sized + Clone + Copy + Send + Sync + Debug {
     /// # use mazelib::interface::point::CoordinateSpace;
     /// #
     /// // A 3x3 space has 9 points
-    /// let space = BoxCoordinateSpace::new([3, 3]);
+    /// let space = BoxCoordinateSpace::new_checked([3, 3]);
     ///
     /// assert_eq!(9, space.logical_size());
     /// ```
@@ -71,7 +71,7 @@ pub trait CoordinateSpace : Sized + Clone + Copy + Send + Sync + Debug {
     /// # use mazelib::implm::point::boxy::{BoxCoordinateSpace, CoordinatePair};
     /// # use mazelib::interface::point::CoordinateSpace;
     /// #
-    /// let space = BoxCoordinateSpace::new([3, 3]);
+    /// let space = BoxCoordinateSpace::new_checked([3, 3]);
     ///
     /// /*
     ///  * Point = X
@@ -109,7 +109,7 @@ pub trait CoordinateSpace : Sized + Clone + Copy + Send + Sync + Debug {
     /// # use mazelib::implm::point::boxy::{BoxCoordinateSpace, CoordinatePair};
     /// # use mazelib::interface::point::CoordinateSpace;
     /// #
-    /// let space = BoxCoordinateSpace::new([3, 3]);
+    /// let space = BoxCoordinateSpace::new_checked([3, 3]);
     ///
     /// // Adjacent
     /// assert!(space.are_adjacent((1, 0).into(), (0, 0).into()));
@@ -141,7 +141,7 @@ pub trait CoordinateSpace : Sized + Clone + Copy + Send + Sync + Debug {
     /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
     /// # use mazelib::interface::point::CoordinateSpace;
     /// #
-    /// let space = BoxCoordinateSpace::new([2, 2]);
+    /// let space = BoxCoordinateSpace::new_checked([2, 2]);
     ///
     /// let mut iter = space.iter();
     ///
@@ -168,7 +168,7 @@ pub trait CoordinateSpace : Sized + Clone + Copy + Send + Sync + Debug {
     /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
     /// # use mazelib::interface::point::CoordinateSpace;
     /// #
-    /// let space = BoxCoordinateSpace::new([2, 2]);
+    /// let space = BoxCoordinateSpace::new_checked([2, 2]);
     ///
     /// let mut iter = space.iter_from((1, 0).into());
     ///
@@ -191,7 +191,7 @@ pub trait CoordinateSpace : Sized + Clone + Copy + Send + Sync + Debug {
     /// #
     /// let mut rng = thread_rng();
     ///
-    /// let space = BoxCoordinateSpace::new([3, 3]);
+    /// let space = BoxCoordinateSpace::new_checked([3, 3]);
     ///
     /// let pt = space.choose(&mut rng);
     /// ```

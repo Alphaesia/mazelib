@@ -22,7 +22,7 @@
 //! let [width, height] = [5, 5];
 //!
 //! // Determine the size of the maze
-//! let coord_space = BoxCoordinateSpace::new([width, height]);
+//! let coord_space = BoxCoordinateSpace::new_checked([width, height]);
 //!
 //! type Buffer = VecBuffer<BlockCellValue>;
 //!
@@ -75,7 +75,7 @@
 //! # use mazelib::implm::point::boxy::BoxCoordinateSpace;
 //! #
 //! # const DIMENSION: usize = 2;
-//! # let coord_space = BoxCoordinateSpace::new([1, 1]);
+//! # let coord_space = BoxCoordinateSpace::new_checked([1, 1]);
 //! #
 //! // 2 for a 2D maze
 //! type Buffer = VecBuffer<InlineCellValue<2>>;
@@ -165,6 +165,7 @@
 //! maze terms that you can find at <http://www.astrolog.org/labyrnth/glossary.htm>.
 
 #![feature(array_zip)]
+#![feature(array_try_map)]
 #![feature(min_specialization)]
 #![feature(doc_auto_cfg)]
 

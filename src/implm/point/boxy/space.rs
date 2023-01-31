@@ -1,4 +1,5 @@
 use std::fmt::{Debug, Formatter};
+use std::num::NonZeroUsize;
 use std::ops::Index;
 
 use rand::Rng;
@@ -7,6 +8,7 @@ use crate::implm::point::boxy::CoordinateTuplet;
 use crate::implm::point::boxy::BoxCoordinateSpaceIterator;
 use crate::interface::point::CoordinateSpace;
 use crate::internal::array_util::Product;
+use crate::internal::util::nonzero_usize_array_to_usize_array;
 
 /// An `n`-dimensional coordinate space shaped like a box with box-like points.
 ///
@@ -63,12 +65,39 @@ impl <const DIMENSION: usize> BoxCoordinateSpace<DIMENSION> {
     /// # Examples
     ///
     /// ```
-    /// use mazelib::implm::point::boxy::BoxCoordinateSpace;
+    /// # unsafe {
+    /// # use std::num::NonZeroUsize;
+    /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
+    /// #
+    /// // If you're using hard-coded constants like in this example,
+    /// // you may prefer new_checked() for the ergonomics
+    /// let coord_space = BoxCoordinateSpace::new([NonZeroUsize::new_unchecked(5), NonZeroUsize::new_unchecked(7)]);
+    /// # }
+    /// ```
     ///
-    /// let coord_space = BoxCoordinateSpace::new([5, 7, 3]);
+    /// # See Also
+    ///
+    /// [`new_checked()`][Self::new_checked]
+    #[must_use]
+    pub fn new(dimensions: [NonZeroUsize; DIMENSION]) -> Self {
+        if DIMENSION == 0 {
+            panic!("DIMENSION must be >= 1")
+        }
+
+        Self { dimensions: nonzero_usize_array_to_usize_array(dimensions), size: dimensions.product().into() }
+    }
+
+    /// Construct a new `BoxCoordinateSpace` from the given dimensions.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
+    /// #
+    /// let coord_space = BoxCoordinateSpace::new_checked([5, 7, 3]);
     /// ```
     #[must_use]
-    pub fn new(dimensions: [usize; DIMENSION]) -> Self {
+    pub fn new_checked(dimensions: [usize; DIMENSION]) -> Self {
         if DIMENSION == 0 {
             panic!("DIMENSION must be >= 1")
         }

@@ -234,11 +234,11 @@ fn get_test_rng() -> ChaCha8Rng {
 }
 
 fn get_new_block_cell_maze() -> BoxSpaceBlockCellMaze<VecBuffer<BlockCellValue>, 2> {
-    BoxSpaceBlockCellMazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(BoxCoordinateSpace::<2>::new([9, 9])).build()
+    BoxSpaceBlockCellMazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(BoxCoordinateSpace::<2>::new_checked([9, 9])).build()
 }
 
 fn get_new_inline_cell_maze() -> BoxSpaceInlineCellMaze::<VecBuffer<InlineCellValue<2>>, 2> {
-    BoxSpaceInlineCellMazeBuilder::<VecBuffer<InlineCellValue<2>>, 2>::new(BoxCoordinateSpace::<2>::new([9, 9])).build()
+    BoxSpaceInlineCellMazeBuilder::<VecBuffer<InlineCellValue<2>>, 2>::new(BoxCoordinateSpace::<2>::new_checked([9, 9])).build()
 }
 
 fn render_block_cell_maze(maze: &BoxSpaceBlockCellMaze<VecBuffer<BlockCellValue>, 2>) -> String {

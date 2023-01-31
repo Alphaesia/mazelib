@@ -22,8 +22,8 @@
 //! could be constructed as:
 //! ```
 //! # use mazelib::implm::point::boxy::{BoxCoordinateSpace, ThreeDimensionalBoxCoordinateSpace};
-//! BoxCoordinateSpace::new([5, 4, 3]);
-//! # ThreeDimensionalBoxCoordinateSpace::new([5, 4, 3]);  // Verify the comment below
+//! BoxCoordinateSpace::new_checked([5, 4, 3]);
+//! # ThreeDimensionalBoxCoordinateSpace::new_checked([5, 4, 3]);  // Verify the comment below
 //! ```
 //! You could also use [ThreeDimensionalBoxCoordinateSpace] in this example instead of
 //! [BoxCoordinateSpace] — they would be equivalent.

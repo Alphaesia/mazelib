@@ -31,7 +31,7 @@ fn main() {
 
     let mut rng = thread_rng();
 
-    let space = Space::new([9, 9]);
+    let space = Space::new_checked([9, 9]);
 
     let mut maze = Maze::new(space).build();
 
