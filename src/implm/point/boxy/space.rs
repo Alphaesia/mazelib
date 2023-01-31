@@ -8,14 +8,15 @@ use crate::implm::point::boxy::CoordinateTuplet;
 use crate::implm::point::boxy::BoxCoordinateSpaceIterator;
 use crate::interface::point::CoordinateSpace;
 use crate::internal::array_util::Product;
-use crate::internal::util::nonzero_usize_array_to_usize_array;
+use crate::internal::util::{nonzero_usize_array_to_usize_array, try_usize_array_to_nonzero_usize_array};
 
 /// An `n`-dimensional coordinate space shaped like a box with box-like points.
 ///
 /// It is a generalisation of the common two-dimensional and three-dimensional
 /// Cartesian plane/space to `n` dimensions.
 ///
-/// All dimensions of the space must be at least 1.
+/// All (size) dimensions of the space must be at least 1. The (mathematical)
+/// dimension (`DIMENSION`) must be also be at least 1.
 ///
 /// # Coordinate Axes
 ///
@@ -42,7 +43,7 @@ use crate::internal::util::nonzero_usize_array_to_usize_array;
 /// some axis where the point's respective coordinate is `0` or the `length of axis - 1`.
 #[derive(Copy, Clone)]
 pub struct BoxCoordinateSpace<const DIMENSION: usize> {
-    /// The dimensions of the coordinate space.
+    /// The (size) dimensions of the coordinate space.
     ///
     /// Each dimension represents the number of possible values on the
     /// respective axis. For example, imagine a dimension with value X.
@@ -60,7 +61,9 @@ pub struct BoxCoordinateSpace<const DIMENSION: usize> {
 }
 
 impl <const DIMENSION: usize> BoxCoordinateSpace<DIMENSION> {
-    /// Construct a new `BoxCoordinateSpace` from the given dimensions.
+    /// Construct a new `BoxCoordinateSpace` from the given (size) dimensions.
+    ///
+    /// Remember that `DIMENSION` must be non-zero.
     ///
     /// # Examples
     ///
@@ -87,7 +90,10 @@ impl <const DIMENSION: usize> BoxCoordinateSpace<DIMENSION> {
         Self { dimensions: nonzero_usize_array_to_usize_array(dimensions), size: dimensions.product().into() }
     }
 
-    /// Construct a new `BoxCoordinateSpace` from the given dimensions.
+    /// Construct a new `BoxCoordinateSpace` from the given (size) dimensions.
+    ///
+    /// Remember that all dimensions of the space must be at least 1,
+    /// and `DIMENSION` must also be non-zero.
     ///
     /// # Examples
     ///
@@ -98,14 +104,10 @@ impl <const DIMENSION: usize> BoxCoordinateSpace<DIMENSION> {
     /// ```
     #[must_use]
     pub fn new_checked(dimensions: [usize; DIMENSION]) -> Self {
-        if DIMENSION == 0 {
-            panic!("DIMENSION must be >= 1")
-        }
-
-        Self { dimensions, size: dimensions.product() }
+        Self::new(try_usize_array_to_nonzero_usize_array(dimensions).expect("dimension was zero"))
     }
 
-    /// Return the dimensions of this coordinate space.
+    /// Return the (size) dimensions of this coordinate space.
     #[must_use]
     pub fn dimensions(&self) -> [usize; DIMENSION] {
         self.dimensions

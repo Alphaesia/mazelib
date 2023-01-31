@@ -46,21 +46,6 @@ fn test_construction() {
     }
 
     {
-        let coord_space = BoxCoordinateSpace::new_checked([0, 3]);
-        let maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).build();
-    }
-
-    {
-        let coord_space = BoxCoordinateSpace::new_checked([3, 0]);
-        let maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).build();
-    }
-
-    {
-        let coord_space = BoxCoordinateSpace::new_checked([0, 0]);
-        let maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).build();
-    }
-
-    {
         let coord_space = BoxCoordinateSpace::new_checked([4, 4]);
         let maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor([2, 2]).build();
     }
@@ -107,16 +92,6 @@ fn test_construction() {
 
     {
         let coord_space = BoxCoordinateSpace::new_checked([1, 1]);
-        let maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor([0, 0]).build();
-    }
-
-    {
-        let coord_space = BoxCoordinateSpace::new_checked([12, 0]);
-        let maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor([0, 0]).build();
-    }
-
-    {
-        let coord_space = BoxCoordinateSpace::new_checked([0, 0]);
         let maze = MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor([0, 0]).build();
     }
 

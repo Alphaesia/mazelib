@@ -4,16 +4,12 @@ use crate::interface::point::CoordinateSpace;
 #[test]
 fn test_size() {
     // One-dimensional
-    assert_eq!(BoxCoordinateSpace::<1>::new_checked([0]).logical_size(), 0);
     assert_eq!(BoxCoordinateSpace::<1>::new_checked([1]).logical_size(), 1);
     assert_eq!(BoxCoordinateSpace::<1>::new_checked([2]).logical_size(), 2);
     assert_eq!(BoxCoordinateSpace::<1>::new_checked([3]).logical_size(), 3);
     assert_eq!(BoxCoordinateSpace::<1>::new_checked([9]).logical_size(), 9);
     assert_eq!(BoxCoordinateSpace::<1>::new_checked([10]).logical_size(), 10);
 
-    assert_eq!(BoxCoordinateSpace::<2>::new_checked([0, 0]).logical_size(), 0);
-    assert_eq!(BoxCoordinateSpace::<2>::new_checked([1, 0]).logical_size(), 0);
-    assert_eq!(BoxCoordinateSpace::<2>::new_checked([0, 1]).logical_size(), 0);
     assert_eq!(BoxCoordinateSpace::<2>::new_checked([1, 1]).logical_size(), 1);
     assert_eq!(BoxCoordinateSpace::<2>::new_checked([2, 1]).logical_size(), 2);
     assert_eq!(BoxCoordinateSpace::<2>::new_checked([1, 2]).logical_size(), 2);
@@ -21,13 +17,6 @@ fn test_size() {
     assert_eq!(BoxCoordinateSpace::<2>::new_checked([9, 9]).logical_size(), 81);
     assert_eq!(BoxCoordinateSpace::<2>::new_checked([61, 73]).logical_size(), 4453);
 
-    assert_eq!(BoxCoordinateSpace::<3>::new_checked([0, 0, 0]).logical_size(), 0);
-    assert_eq!(BoxCoordinateSpace::<3>::new_checked([1, 0, 0]).logical_size(), 0);
-    assert_eq!(BoxCoordinateSpace::<3>::new_checked([0, 1, 0]).logical_size(), 0);
-    assert_eq!(BoxCoordinateSpace::<3>::new_checked([0, 0, 1]).logical_size(), 0);
-    assert_eq!(BoxCoordinateSpace::<3>::new_checked([1, 1, 0]).logical_size(), 0);
-    assert_eq!(BoxCoordinateSpace::<3>::new_checked([0, 1, 1]).logical_size(), 0);
-    assert_eq!(BoxCoordinateSpace::<3>::new_checked([1, 0, 1]).logical_size(), 0);
     assert_eq!(BoxCoordinateSpace::<3>::new_checked([1, 1, 1]).logical_size(), 1);
     assert_eq!(BoxCoordinateSpace::<3>::new_checked([2, 1, 1]).logical_size(), 2);
     assert_eq!(BoxCoordinateSpace::<3>::new_checked([1, 2, 1]).logical_size(), 2);
