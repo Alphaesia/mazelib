@@ -37,6 +37,42 @@ impl <const LENGTH: usize> Sum for [NonZeroUsize; LENGTH] {
     }
 }
 
+pub trait CheckedSum {
+    type Output;
+
+    fn checked_sum(&self) -> Option<Self::Output>;
+}
+
+impl <const LENGTH: usize> CheckedSum for [usize; LENGTH] {
+    type Output = usize;
+
+    /// Return the sum of all elements in an array.
+    fn checked_sum(&self) -> Option<Self::Output> {
+        let mut sum = 0usize;
+
+        for x in self {
+            sum = sum.checked_add(*x)?;
+        }
+
+        return Some(sum);
+    }
+}
+
+impl <const LENGTH: usize> CheckedSum for [NonZeroUsize; LENGTH] {
+    type Output = usize;
+
+    /// Return the sum of all elements in an array.
+    fn checked_sum(&self) -> Option<Self::Output> {
+        let mut sum = 0usize;
+
+        for x in self {
+            sum = sum.checked_add(usize::from(*x))?;
+        }
+
+        return Some(sum);
+    }
+}
+
 pub trait Product {
     type Output;
 

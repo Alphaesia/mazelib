@@ -1,3 +1,4 @@
+use fluent_asserter::prelude::*;
 use crate::implm::buffer::VecBuffer;
 use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
 use crate::implm::maze::block::BoxSpaceBlockCellMazeBuilder as MazeBuilder;
@@ -93,6 +94,46 @@ fn test_construction() {
     {
         let coord_space = BoxCoordinateSpace::new_checked([2, 2, 2, 2, 2, 2]);
         let maze = MazeBuilder::<VecBuffer<BlockCellValue>, 6>::new(coord_space).scale_factor_checked([3, 1, 4, 1, 5, 9]).build();
+    }
+
+    {
+        let coord_space = BoxCoordinateSpace::new_checked([5, 5]);
+        assert_that_code!(|| MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor_checked([0, 0]).build()).panics().with_having_message("All scalars must be non-zero")
+    }
+
+    {
+        let coord_space = BoxCoordinateSpace::new_checked([5, 5]);
+        assert_that_code!(|| MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor_checked([1, 0]).build()).panics().with_having_message("All scalars must be non-zero")
+    }
+
+    {
+        let coord_space = BoxCoordinateSpace::new_checked([5, 5]);
+        assert_that_code!(|| MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor_checked([0, 1]).build()).panics().with_having_message("All scalars must be non-zero")
+    }
+
+    {
+        let coord_space = BoxCoordinateSpace::new_checked([5, 5]);
+        assert_that_code!(|| MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor_checked([1, usize::MAX]).build()).panics().with_having_message("The scaled dimensions do not all fit within a usize")
+    }
+
+    {
+        let coord_space = BoxCoordinateSpace::new_checked([5, 5]);
+        assert_that_code!(|| MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor_checked([usize::MAX, 1]).build()).panics().with_having_message("The scaled dimensions do not all fit within a usize")
+    }
+
+    {
+        let coord_space = BoxCoordinateSpace::new_checked([5, 5]);
+        assert_that_code!(|| MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor_checked([usize::MAX, usize::MAX]).build()).panics().with_having_message("The scaled dimensions do not all fit within a usize")
+    }
+
+    {
+        let coord_space = BoxCoordinateSpace::new_checked([5, 5]);
+        assert_that_code!(|| MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor_checked([1, 1]).padding([[usize::MAX, usize::MAX], [usize::MAX, usize::MAX]]).build()).panics().with_having_message("The full dimensions do not all fit within a usize")
+    }
+
+    {
+        let coord_space = BoxCoordinateSpace::new_checked([5, 5]);
+        assert_that_code!(|| MazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(coord_space).scale_factor_checked([usize::MAX / 16, usize::MAX / 16]).build()).panics().with_having_message("The full dimensions specified are too large. The number of cells in the maze does not fit within a usize.")
     }
 }
 

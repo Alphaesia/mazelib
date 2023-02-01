@@ -11,9 +11,9 @@ use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::{CellID, CellManager, ConnectionType};
 use crate::interface::point::CoordinateSpace;
 use crate::interface::render::MazeRendererNonSeeking;
-use crate::internal::array_util::{Product, Sum};
+use crate::internal::array_util::{CheckedProduct, CheckedSum};
 use crate::internal::noise_util::pt;
-use crate::internal::util::{nonzero_usize_array_to_usize_array, try_usize_array_to_nonzero_usize_array};
+use crate::internal::util::{nonzero_usize_array_to_usize_array, NONZERO_USIZE_TWO, try_usize_array_to_nonzero_usize_array};
 
 /// TODO write a description
 ///
@@ -48,14 +48,46 @@ pub struct BoxSpaceBlockCellManager<Buffer: MazeBuffer<BlockCellValue>, const DI
 // Constructor (private - use the builder)
 impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockCellManager<Buffer, DIMENSION> {
     /// Construct a new maze from a given coordinate space, scale factor, and padding.
-    /// A [`MazeBuffer`] will be created from the value of type parameter `Buffer`.
+    ///
+    /// # Parameters
+    ///
+    /// `space`        --- the coordinate space for this maze.
+    /// `scale_factor` --- the scale factor for points to cells. You can think about it
+    ///                    like `cells:points`. A scale factor of 3 will yield 3 cells
+    ///                    for every point (a 3:1 ratio). Each axis is scaled independently.
+    ///                    The ordering of the scalars is the same as the standard ordering
+    ///                    of the coordinate axes.
+    /// `padding`      --- How many extra cells to place between edge-adjacent points
+    ///                    and the edge of the maze. For example, a value of 1 will yield
+    ///                    a 1-cell thick "border" along that edge of the maze. The ordering
+    ///                    of the outer elements is the same as the standard ordering of
+    ///                    the coordinate axes. For the inner elements, the side closest
+    ///                    to zero comes before the side furthest from zero.
+    ///
+    /// # Type Parameter
+    ///
+    /// `Buffer` --- the type of buffer to use. A buffer instance will be automatically
+    ///              constructed from this type.
     #[must_use]
-    fn new(space: BoxCoordinateSpace<DIMENSION>, scale_factor: [usize; DIMENSION], padding: [[usize; 2]; DIMENSION]) -> Self {
-        let full_dimensions = Self::scale_dimensions(nonzero_usize_array_to_usize_array(space.dimensions()), scale_factor).zip(padding).map(|(scaled_dim, padding)| scaled_dim + padding.sum());
+    fn new(space: BoxCoordinateSpace<DIMENSION>, scale_factor: [NonZeroUsize; DIMENSION], padding: [[usize; 2]; DIMENSION]) -> Self {
+        // Arithmetic is so easy and beautiful and succinct
+        let full_dimensions = space.dimensions().zip(scale_factor)
+            .map(|(dim, scalar)| {
+                // NonZeroUsize::new only returns None if the scaled dimension == usize::MAX (which I don't
+                // think is mathematically even possible, but in such a hypothetical case) the +1 would cause
+                // the sum to overflow to zero
+                (usize::from(dim) - 1).checked_mul(usize::from(scalar))
+                    .and_then(|scaled_dim| NonZeroUsize::new(scaled_dim + 1))
+                    .expect("The scaled dimensions do not all fit within a usize")
+            })
+            .zip(padding)
+            .map(|(scaled_dim, padding)| {
+                padding.checked_sum().and_then(|summed_padding| scaled_dim.checked_add(summed_padding)).expect("The full dimensions do not all fit within a usize")
+            });
 
-        let cells_required = NonZeroUsize::new(full_dimensions.product()).expect("All dimensions must be non-zero");
+        let cells_required = full_dimensions.checked_product().expect("The full dimensions specified are too large. The number of cells in the maze does not fit within a usize.");
 
-        Self { buffer: Buffer::new(cells_required), space, scale_factor, full_dimensions, padding }
+        Self { buffer: Buffer::new(cells_required), space, scale_factor: nonzero_usize_array_to_usize_array(scale_factor), full_dimensions: nonzero_usize_array_to_usize_array(full_dimensions), padding }
     }
 }
 
@@ -89,19 +121,6 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     #[must_use]
     pub fn padding(&self) -> [[usize; 2]; DIMENSION] {
         self.padding
-    }
-
-    /// The dimensions of the coordinate space, scaled by the resolution
-    #[must_use]
-    pub fn scale_dimensions(dimensions: [usize; DIMENSION], resolution: [usize; DIMENSION]) -> [usize; DIMENSION] {
-        dimensions.zip(resolution)
-            .map(|(dim, res)| {
-                if dim != 0 {
-                    (dim - 1) * res + 1
-                } else {
-                    0
-                }
-            })
     }
 
     /// Map a point to a cell location.
@@ -379,7 +398,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> CellManager fo
 pub struct BoxSpaceBlockCellManagerBuilder<Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> {
     _buffer: PhantomData<Buffer>,  // We're not actually interested in constructing a buffer yet
     space: BoxCoordinateSpace<DIMENSION>,
-    scale_factor: [usize; DIMENSION],
+    scale_factor: [NonZeroUsize; DIMENSION],
     padding: [[usize; 2]; DIMENSION],
 }
 
@@ -388,13 +407,13 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
         Self {
             _buffer: PhantomData,
             space,
-            scale_factor: [2; DIMENSION],
+            scale_factor: [NONZERO_USIZE_TWO; DIMENSION],
             padding: [[1, 1]; DIMENSION],
         }
     }
 
     pub fn scale_factor(mut self, scale_factor: [NonZeroUsize; DIMENSION]) -> Self {
-        self.scale_factor = nonzero_usize_array_to_usize_array(scale_factor);
+        self.scale_factor = scale_factor;
 
         return self
     }
