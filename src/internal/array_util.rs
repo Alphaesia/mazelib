@@ -1,13 +1,17 @@
 use std::num::NonZeroUsize;
 use crate::internal::util::NONZERO_USIZE_ONE;
 
-pub trait Sum<T> {
-    fn sum(&self) -> T;
+pub trait Sum {
+    type Output;
+
+    fn sum(&self) -> Self::Output;
 }
 
-impl <const LENGTH: usize> Sum<usize> for [usize; LENGTH] {
+impl <const LENGTH: usize> Sum for [usize; LENGTH] {
+    type Output = usize;
+
     /// Return the sum of all elements in an array.
-    fn sum(&self) -> usize {
+    fn sum(&self) -> Self::Output {
         let mut sum = 0;
 
         for x in self {
@@ -18,9 +22,11 @@ impl <const LENGTH: usize> Sum<usize> for [usize; LENGTH] {
     }
 }
 
-impl <const LENGTH: usize> Sum<usize> for [NonZeroUsize; LENGTH] {
+impl <const LENGTH: usize> Sum for [NonZeroUsize; LENGTH] {
+    type Output = usize;
+
     /// Return the sum of all elements in an array.
-    fn sum(&self) -> usize {
+    fn sum(&self) -> Self::Output {
         let mut sum = 0;
 
         for x in self {
@@ -31,14 +37,18 @@ impl <const LENGTH: usize> Sum<usize> for [NonZeroUsize; LENGTH] {
     }
 }
 
-pub trait Product<T> {
-    fn product(&self) -> T;
+pub trait Product {
+    type Output;
+
+    fn product(&self) -> Self::Output;
 }
 
-impl <const LENGTH: usize> Product<usize> for [usize; LENGTH] {
+impl <const LENGTH: usize> Product for [usize; LENGTH] {
+    type Output = usize;
+
     /// Return the product of all elements in an array.
     /// Returns 1 when LENGTH == 0.
-    fn product(&self) -> usize {
+    fn product(&self) -> Self::Output {
         let mut product = 1;
 
         for x in self {
@@ -49,10 +59,12 @@ impl <const LENGTH: usize> Product<usize> for [usize; LENGTH] {
     }
 }
 
-impl <const LENGTH: usize> Product<NonZeroUsize> for [NonZeroUsize; LENGTH] {
+impl <const LENGTH: usize> Product for [NonZeroUsize; LENGTH] {
+    type Output = NonZeroUsize;
+
     /// Return the product of all elements in an array.
     /// Returns 1 when LENGTH == 0.
-    fn product(&self) -> NonZeroUsize {
+    fn product(&self) -> Self::Output {
         let mut product = NONZERO_USIZE_ONE;
 
         for x in self {
@@ -60,6 +72,45 @@ impl <const LENGTH: usize> Product<NonZeroUsize> for [NonZeroUsize; LENGTH] {
         }
 
         return product;
+    }
+}
+
+pub trait CheckedProduct {
+    type Output;
+
+    /// Return None if overflow occurs.
+    fn checked_product(&self) -> Option<Self::Output>;
+}
+
+impl <const LENGTH: usize> CheckedProduct for [usize; LENGTH] {
+    type Output = usize;
+
+    /// Return the product of all elements in an array.
+    /// Returns 1 when LENGTH == 0.
+    fn checked_product(&self) -> Option<Self::Output> {
+        let mut product = 1usize;
+
+        for x in self {
+            product = product.checked_mul(*x)?;
+        }
+
+        return Some(product);
+    }
+}
+
+impl <const LENGTH: usize> CheckedProduct for [NonZeroUsize; LENGTH] {
+    type Output = NonZeroUsize;
+
+    /// Return the product of all elements in an array.
+    /// Returns 1 when LENGTH == 0.
+    fn checked_product(&self) -> Option<Self::Output> {
+        let mut product = NONZERO_USIZE_ONE;
+
+        for x in self {
+            product = product.checked_mul(*x)?;
+        }
+
+        return Some(product);
     }
 }
 

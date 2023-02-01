@@ -7,7 +7,7 @@ use rand::Rng;
 use crate::implm::point::boxy::CoordinateTuplet;
 use crate::implm::point::boxy::BoxCoordinateSpaceIterator;
 use crate::interface::point::CoordinateSpace;
-use crate::internal::array_util::Product;
+use crate::internal::array_util::CheckedProduct;
 use crate::internal::util::{nonzero_usize_array_to_usize_array, try_usize_array_to_nonzero_usize_array};
 
 /// An `n`-dimensional coordinate space shaped like a box with box-like points.
@@ -56,14 +56,21 @@ pub struct BoxCoordinateSpace<const DIMENSION: usize> {
 
     /// The total number of possible points or positions in this coordinate space.
     ///
-    /// This just serves as a cache of the result of [`self.dimensions.product()`][Product::product].
+    /// This just serves as a cache of the result of
+    /// [`self.dimensions.checked_product()`][CheckedProduct::checked_product].
     size: NonZeroUsize,
 }
 
 impl <const DIMENSION: usize> BoxCoordinateSpace<DIMENSION> {
     /// Construct a new `BoxCoordinateSpace` from the given (size) dimensions.
     ///
-    /// Remember that `DIMENSION` must be non-zero.
+    /// # Parameters
+    ///
+    /// `dimensions` --- the width, height, depth, etc. of the coordinate space.
+    ///                  As the (mathematical) dimension must be non-zero, this
+    ///                  array cannot be empty. Additionally, the product of all
+    ///                  dimensions must fit within a `usize`. (Mazes this large
+    ///                  won't fit in memory anyway).
     ///
     /// # Examples
     ///
@@ -87,13 +94,21 @@ impl <const DIMENSION: usize> BoxCoordinateSpace<DIMENSION> {
             panic!("DIMENSION must be >= 1")
         }
 
-        Self { dimensions: nonzero_usize_array_to_usize_array(dimensions), size: dimensions.product() }
+        let size = dimensions.checked_product().expect("The dimensions specified are too large. The number of points in the space does not fit within a usize.");
+
+        Self { dimensions: nonzero_usize_array_to_usize_array(dimensions), size }
     }
 
     /// Construct a new `BoxCoordinateSpace` from the given (size) dimensions.
     ///
-    /// Remember that all dimensions of the space must be at least 1,
-    /// and `DIMENSION` must also be non-zero.
+    /// # Parameters
+    ///
+    /// `dimensions` --- the width, height, depth, etc. of the coordinate space.
+    ///                  As the (mathematical) dimension must be non-zero, this
+    ///                  array cannot be empty. All dimensions must be non-zero
+    ///                  as wel. Additionally, the product of all dimensions must
+    ///                  fit within a `usize`. (Mazes this large won't fit in
+    ///                  memory anyway).
     ///
     /// # Examples
     ///
@@ -104,7 +119,7 @@ impl <const DIMENSION: usize> BoxCoordinateSpace<DIMENSION> {
     /// ```
     #[must_use]
     pub fn new_checked(dimensions: [usize; DIMENSION]) -> Self {
-        Self::new(try_usize_array_to_nonzero_usize_array(dimensions).expect("dimension was zero"))
+        Self::new(try_usize_array_to_nonzero_usize_array(dimensions).expect("All dimensions must be non-zero"))
     }
 
     /// Return the (size) dimensions of this coordinate space.

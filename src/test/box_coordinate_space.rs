@@ -1,3 +1,4 @@
+use fluent_asserter::prelude::*;
 use crate::implm::point::boxy::BoxCoordinateSpace;
 use crate::interface::point::CoordinateSpace;
 
@@ -24,6 +25,8 @@ fn test_size() {
     assert_eq!(usize::from(BoxCoordinateSpace::<3>::new_checked([2, 2, 2]).logical_size()), 8);
     assert_eq!(usize::from(BoxCoordinateSpace::<3>::new_checked([9, 9, 9]).logical_size()), 729);
     assert_eq!(usize::from(BoxCoordinateSpace::<3>::new_checked([61, 73, 12]).logical_size()), 53436);
+
+    assert_that_code!(|| BoxCoordinateSpace::new_checked([usize::MAX, usize::MAX])).panics().with_message("The dimensions specified are too large. The number of points in the space does not fit within a usize.")
 }
 
 #[test]
