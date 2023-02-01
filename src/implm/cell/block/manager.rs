@@ -13,7 +13,7 @@ use crate::interface::point::CoordinateSpace;
 use crate::interface::render::MazeRendererNonSeeking;
 use crate::internal::array_util::{Product, Sum};
 use crate::internal::noise_util::pt;
-use crate::internal::util::nonzero_usize_array_to_usize_array;
+use crate::internal::util::{nonzero_usize_array_to_usize_array, try_usize_array_to_nonzero_usize_array};
 
 /// TODO write a description
 ///
@@ -33,7 +33,7 @@ use crate::internal::util::nonzero_usize_array_to_usize_array;
 /// type MazeBuffer = VecBuffer<CellType>;
 ///
 /// let maze = BoxSpaceBlockCellManagerBuilder::<MazeBuffer, 2>::new(coord_space)
-///                                             .scale_factor(scale_factor)
+///                                             .scale_factor_checked(scale_factor)
 ///                                             .padding(padding)
 ///                                             .build();
 /// ```
@@ -393,10 +393,14 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
         }
     }
 
-    pub fn scale_factor(mut self, scale_factor: [usize; DIMENSION]) -> Self {
-        self.scale_factor = scale_factor;
+    pub fn scale_factor(mut self, scale_factor: [NonZeroUsize; DIMENSION]) -> Self {
+        self.scale_factor = nonzero_usize_array_to_usize_array(scale_factor);
 
         return self
+    }
+
+    pub fn scale_factor_checked(self, scale_factor: [usize; DIMENSION]) -> Self {
+        self.scale_factor(try_usize_array_to_nonzero_usize_array(scale_factor).expect("All scalars must be non-zero"))
     }
 
     pub fn padding(mut self, padding: [[usize; 2]; DIMENSION]) -> Self {
