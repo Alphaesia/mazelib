@@ -45,7 +45,7 @@ impl <const DIMENSION: usize> Iterator for BoxCoordinateSpaceIterator<DIMENSION>
                 let mut pt = pt;
 
                 for dim in 0..DIMENSION {
-                    if pt[dim] + 1 == self.space[dim] {
+                    if pt[dim] + 1 == usize::from(self.space[dim]) {
                         pt[dim] = 0;
                     } else {
                         pt[dim] += 1;
@@ -64,14 +64,14 @@ impl <const DIMENSION: usize> Iterator for BoxCoordinateSpaceIterator<DIMENSION>
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
-        let max = self.space.dimensions().product();
+        let max = usize::from(self.space.dimensions().product());
 
         let remaining = match self.pos {
             Some(pos) => {
                 let mut running_total = max;
 
                 for dim in DIMENSION..1 {
-                    running_total -= pos[dim] * self.space[dim - 1];
+                    running_total -= pos[dim] * usize::from(self.space[dim - 1]);
                 }
 
                 running_total -= pos[0];

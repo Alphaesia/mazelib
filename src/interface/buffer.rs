@@ -9,6 +9,7 @@
 //! 1. [`MazeBuffer`] -- the buffer trait.
 
 use std::fmt::Debug;
+use std::num::NonZeroUsize;
 
 use crate::interface::cell::{CellID, CellValue};
 
@@ -32,11 +33,15 @@ use crate::interface::cell::{CellID, CellValue};
 pub trait MazeBuffer<CellVal: CellValue> : Debug + Send {
     /// Construct a new buffer.
     ///
-    /// `cell_count` is the size of the maze's cell space, and is the number of cells that the
-    /// buffer is required to track. This is the buffer's size and capacity. It cannot be changed
-    /// once a buffer is constructed.
+    ///  # Parameters
+    /// `cell_count` --- the size of the maze's cell space, and is the number of cells that
+    ///                  the buffer is required to track. This is the buffer's size and
+    ///                  capacity. It cannot be changed once a buffer is constructed. As a
+    ///                  maze must always have at least one point, and every point maps to
+    ///                  at least one cell, all mazes must have at least one cell, hence
+    ///                  `cell_count` is a `NonZeroUsize`.
     #[must_use]
-    fn new(cell_count: usize) -> Self;
+    fn new(cell_count: NonZeroUsize) -> Self;
 
     /// Get the value of a given cell.
     ///

@@ -77,7 +77,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Bo
         let mut offset = pt[0];
 
         for i in 1..DIMENSION {
-            offset += pt[i] * self.coord_space().dimensions()[i - 1];
+            offset += pt[i] * usize::from(self.coord_space().dimensions()[i - 1]);
         }
 
         CellID(offset)

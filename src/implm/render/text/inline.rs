@@ -6,10 +6,11 @@ use crate::implm::render::text::line_break::WriteLineBreak;
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::{CellID, CellManager};
 use crate::interface::render::MazeRendererNonSeeking;
+use crate::internal::util::nonzero_usize_array_to_usize_array;
 
 impl <Buffer: MazeBuffer<InlineCellValue<2>>> MazeRendererNonSeeking<BoxSpaceInlineCellManager<Buffer, 2>> for BoxSpaceTextMazeRenderer {
     fn render<Output: Write>(&self, maze: &BoxSpaceInlineCellManager<Buffer, 2>, output: &mut Output) -> Result<()> {
-        let [width, height] = maze.coord_space().dimensions();
+        let [width, height] = nonzero_usize_array_to_usize_array(maze.coord_space().dimensions());
 
         // Below +1's: cause we're looking at walls not cells
 

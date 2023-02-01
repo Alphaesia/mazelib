@@ -1,4 +1,5 @@
 use std::fmt::{Debug, Formatter};
+use std::num::NonZeroUsize;
 
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::{CellID, CellValue};
@@ -13,8 +14,8 @@ pub struct ArrayBuffer<CellVal: CellValue, const MAX_CELLS: usize> {
 }
 
 impl <CellVal: CellValue, const CELLS: usize> MazeBuffer<CellVal> for ArrayBuffer<CellVal, CELLS> {
-    fn new(cell_count: usize) -> Self {
-        assert_eq!(cell_count, CELLS, "Maze requires a different amount of cells than specified");
+    fn new(cell_count: NonZeroUsize) -> Self {
+        assert_eq!(usize::from(cell_count), CELLS, "Maze requires a different amount of cells than specified");
 
         Self { buf: [CellVal::default(); CELLS] }
     }

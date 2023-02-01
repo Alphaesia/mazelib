@@ -52,7 +52,7 @@ impl <M: Maze<CoordSpace=BoxCoordinateSpace<DIMENSION>>, const DIMENSION: usize>
                 candidate[dim] += 1;
 
                 // ...that is inside the coordinate space...
-                return if candidate[dim] < maze.coord_space().dimensions()[dim] {
+                return if candidate[dim] < usize::from(maze.coord_space().dimensions()[dim]) {
                     Some(candidate)
                 } else {
                     None

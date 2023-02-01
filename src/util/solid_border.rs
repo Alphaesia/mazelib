@@ -85,7 +85,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> So
                     on_boundary = true;
                 }
 
-                if *dim == maze.coord_space().dimensions()[i] - 1 {
+                if *dim == usize::from(maze.coord_space().dimensions()[i]) - 1 {
                     walls[i][1] = InlineCellValueEdgeType::BOUNDARY;
                     on_boundary = true;
                 }
@@ -98,7 +98,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> So
             for i in 0..DIMENSION {
                 cell[i] += 1;
 
-                if cell[i] != maze.coord_space().dimensions()[i] {
+                if cell[i] != usize::from(maze.coord_space().dimensions()[i]) {
                     continue 'outer
                 } else {
                     cell[i] = 0;

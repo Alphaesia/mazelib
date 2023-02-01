@@ -8,7 +8,7 @@ use crate::implm::point::boxy::CoordinateTuplet;
 use crate::implm::point::boxy::BoxCoordinateSpaceIterator;
 use crate::interface::point::CoordinateSpace;
 use crate::internal::array_util::CheckedProduct;
-use crate::internal::util::{nonzero_usize_array_to_usize_array, try_usize_array_to_nonzero_usize_array};
+use crate::internal::util::try_usize_array_to_nonzero_usize_array;
 
 /// An `n`-dimensional coordinate space shaped like a box with box-like points.
 ///
@@ -52,7 +52,7 @@ pub struct BoxCoordinateSpace<const DIMENSION: usize> {
     /// The most minor coordinate comes first. The ordering is also consistent
     /// with the ordering of co-ordinates for the associated CoordinateTuplets.
     /// (e.g. (x, y, z), (width, height, depth))
-    dimensions: [usize; DIMENSION],
+    dimensions: [NonZeroUsize; DIMENSION],
 
     /// The total number of possible points or positions in this coordinate space.
     ///
@@ -96,7 +96,7 @@ impl <const DIMENSION: usize> BoxCoordinateSpace<DIMENSION> {
 
         let size = dimensions.checked_product().expect("The dimensions specified are too large. The number of points in the space does not fit within a usize.");
 
-        Self { dimensions: nonzero_usize_array_to_usize_array(dimensions), size }
+        Self { dimensions, size }
     }
 
     /// Construct a new `BoxCoordinateSpace` from the given (size) dimensions.
@@ -124,7 +124,7 @@ impl <const DIMENSION: usize> BoxCoordinateSpace<DIMENSION> {
 
     /// Return the (size) dimensions of this coordinate space.
     #[must_use]
-    pub fn dimensions(&self) -> [usize; DIMENSION] {
+    pub fn dimensions(&self) -> [NonZeroUsize; DIMENSION] {
         self.dimensions
     }
 
@@ -132,7 +132,7 @@ impl <const DIMENSION: usize> BoxCoordinateSpace<DIMENSION> {
     #[must_use]
     pub fn is_adjacent_to_edge(&self, pt: <Self as CoordinateSpace>::PtType) -> bool {
         for i in 0..DIMENSION {
-            if pt[i] == 0 || pt[i] == self[i] - 1 {
+            if pt[i] == 0 || pt[i] == usize::from(self[i]) - 1 {
                 return true
             }
         }
@@ -157,7 +157,7 @@ impl <const DIMENSION: usize> CoordinateSpace for BoxCoordinateSpace<DIMENSION> 
                 neighbours.push(pt.offset(dim, -1))
             }
 
-            if pt[dim] + 1 < self.dimensions[dim] {
+            if pt[dim] + 1 < usize::from(self.dimensions[dim]) {
                 neighbours.push(pt.offset(dim, 1))
             }
         }
@@ -194,12 +194,12 @@ impl <const DIMENSION: usize> CoordinateSpace for BoxCoordinateSpace<DIMENSION> 
     }
 
     fn choose(&self, rng: &mut (impl Rng + ?Sized)) -> Self::PtType {
-        self.dimensions.map(|dim| rng.gen_range(0..dim)).into()
+        self.dimensions.map(|dim| rng.gen_range(0..usize::from(dim))).into()
     }
 }
 
 impl <const DIMENSION: usize> Index<usize> for BoxCoordinateSpace<DIMENSION> {
-    type Output = usize;
+    type Output = NonZeroUsize;
 
     fn index(&self, index: usize) -> &Self::Output {
         &self.dimensions[index]

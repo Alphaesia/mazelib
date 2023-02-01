@@ -1,5 +1,6 @@
 use std::fmt::{Debug, Formatter};
 use std::marker::PhantomData;
+use std::num::NonZeroUsize;
 
 use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
 use crate::implm::cell::block::location::BlockCellLocation;
@@ -12,6 +13,7 @@ use crate::interface::point::CoordinateSpace;
 use crate::interface::render::MazeRendererNonSeeking;
 use crate::internal::array_util::{Product, Sum};
 use crate::internal::noise_util::pt;
+use crate::internal::util::nonzero_usize_array_to_usize_array;
 
 /// TODO write a description
 ///
@@ -49,9 +51,9 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// A [`MazeBuffer`] will be created from the value of type parameter `Buffer`.
     #[must_use]
     fn new(space: BoxCoordinateSpace<DIMENSION>, scale_factor: [usize; DIMENSION], padding: [[usize; 2]; DIMENSION]) -> Self {
-        let full_dimensions = Self::scale_dimensions(space.dimensions(), scale_factor).zip(padding).map(|(scaled_dim, padding)| scaled_dim + padding.sum());
+        let full_dimensions = Self::scale_dimensions(nonzero_usize_array_to_usize_array(space.dimensions()), scale_factor).zip(padding).map(|(scaled_dim, padding)| scaled_dim + padding.sum());
 
-        let cells_required = full_dimensions.product();
+        let cells_required = NonZeroUsize::new(full_dimensions.product()).expect("All dimensions must be non-zero");
 
         Self { buffer: Buffer::new(cells_required), space, scale_factor, full_dimensions, padding }
     }

@@ -1,4 +1,5 @@
 use std::fmt::{Debug, Formatter};
+use std::num::NonZeroUsize;
 
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::{CellID, CellValue};
@@ -11,8 +12,8 @@ pub struct VecBuffer<CellVal: CellValue> {
 }
 
 impl <CellVal: CellValue> MazeBuffer<CellVal> for VecBuffer<CellVal> {
-    fn new(cell_count: usize) -> Self {
-        Self { buf: vec![CellVal::default(); cell_count] }
+    fn new(cell_count: NonZeroUsize) -> Self {
+        Self { buf: vec![CellVal::default(); usize::from(cell_count)] }
     }
 
     fn get(&self, cell: CellID) -> CellVal {
