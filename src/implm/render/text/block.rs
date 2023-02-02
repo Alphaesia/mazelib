@@ -7,10 +7,11 @@ use crate::implm::render::text::line_break::WriteLineBreak;
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::CellID;
 use crate::interface::render::MazeRendererNonSeeking;
+use crate::internal::util::nonzero_usize_array_to_usize_array;
 
 impl <Buffer: MazeBuffer<BlockCellValue>> MazeRendererNonSeeking<BoxSpaceBlockCellMaze<Buffer, 2>> for BoxSpaceTextMazeRenderer {
     fn render<Output: Write>(&self, maze: &BoxSpaceBlockCellMaze<Buffer, 2>, output: &mut Output) -> Result<()> {
-        let [width, height] = maze.get_full_dimensions();
+        let [width, height] = nonzero_usize_array_to_usize_array(maze.get_full_dimensions());
 
         for y in 0..height {
             for x in 0..width {

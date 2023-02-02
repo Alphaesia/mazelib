@@ -8,12 +8,13 @@ use crate::implm::render::minecraft::{BoxSpaceSchematicMazeRenderer, SchematicMa
 use crate::implm::render::minecraft::schem::{SpongeSchematicV3, SpongeSchematicV3BlockContainer, SpongeSchematicV3MetadataObject, SpongeSchematicV3SchematicObject};
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::render::MazeRendererNonSeeking;
+use crate::internal::util::nonzero_usize_array_to_usize_array;
 
 impl <Buffer: MazeBuffer<BlockCellValue>> MazeRendererNonSeeking<BoxSpaceBlockCellMaze<Buffer, 2>> for BoxSpaceSchematicMazeRenderer {
     fn render<Output: Write>(&self, maze: &BoxSpaceBlockCellMaze<Buffer, 2>, output: &mut Output) -> Result<()> {
         // Spec: https://github.com/SpongePowered/Schematic-Specification/blob/master/versions/schematic-3.md
 
-        let [width, length] = maze.get_full_dimensions().map(|dim| TryInto::<u16>::try_into(dim).expect("Cannot render mazes with dimensions larger than u16"));
+        let [width, length] = nonzero_usize_array_to_usize_array(maze.get_full_dimensions()).map(|dim| TryInto::<u16>::try_into(dim).expect("Cannot render mazes with dimensions larger than u16"));
 
         let mut palette: HashMap<String, i32> = HashMap::new();
 

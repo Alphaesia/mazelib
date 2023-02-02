@@ -46,7 +46,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> SolidBorder<Bo
 
         'outer: loop {
             for (i, dim) in cell.iter().enumerate() {
-                if *dim == 0 || *dim == maze.get_full_dimensions()[i] - 1 {
+                if *dim == 0 || *dim == usize::from(maze.get_full_dimensions()[i]) - 1 {
                     maze.set_cell_value_type(cell.into(), BlockCellValueType::BOUNDARY);
                     break
                 }
@@ -55,7 +55,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> SolidBorder<Bo
             for i in 0..DIMENSION {
                 cell[i] += 1;
 
-                if cell[i] != maze.get_full_dimensions()[i] {
+                if cell[i] != usize::from(maze.get_full_dimensions()[i]) {
                     continue 'outer
                 } else {
                     cell[i] = 0;

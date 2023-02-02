@@ -13,7 +13,7 @@ use crate::interface::point::CoordinateSpace;
 use crate::interface::render::MazeRendererNonSeeking;
 use crate::internal::array_util::{CheckedProduct, CheckedSum};
 use crate::internal::noise_util::pt;
-use crate::internal::util::{nonzero_usize_array_to_usize_array, NONZERO_USIZE_TWO, try_usize_array_to_nonzero_usize_array};
+use crate::internal::util::{NONZERO_USIZE_TWO, try_usize_array_to_nonzero_usize_array};
 
 /// TODO write a description
 ///
@@ -40,9 +40,9 @@ use crate::internal::util::{nonzero_usize_array_to_usize_array, NONZERO_USIZE_TW
 pub struct BoxSpaceBlockCellManager<Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> {
     buffer: Buffer,
     space: BoxCoordinateSpace<DIMENSION>,
-    scale_factor: [usize; DIMENSION],
+    scale_factor: [NonZeroUsize; DIMENSION],
     padding: [[usize; 2]; DIMENSION],
-    full_dimensions: [usize; DIMENSION],
+    full_dimensions: [NonZeroUsize; DIMENSION],
 }
 
 // Constructor (private - use the builder)
@@ -87,7 +87,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
 
         let cells_required = full_dimensions.checked_product().expect("The full dimensions specified are too large. The number of cells in the maze does not fit within a usize.");
 
-        Self { buffer: Buffer::new(cells_required), space, scale_factor: nonzero_usize_array_to_usize_array(scale_factor), full_dimensions: nonzero_usize_array_to_usize_array(full_dimensions), padding }
+        Self { buffer: Buffer::new(cells_required), space, scale_factor, full_dimensions, padding }
     }
 }
 
@@ -100,7 +100,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
 
     /// The dimensions of the coordinate space, scaled by the resolution, plus padding.
     #[must_use]
-    pub fn get_full_dimensions(&self) -> [usize; DIMENSION] {
+    pub fn get_full_dimensions(&self) -> [NonZeroUsize; DIMENSION] {
         self.full_dimensions
     }
 
@@ -112,7 +112,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// Does not affect the distance of points from the outer edge of the maze (see
     /// [`padding()`][Self::padding]).
     #[must_use]
-    pub fn scale_factor(&self) -> [usize; DIMENSION] {
+    pub fn scale_factor(&self) -> [NonZeroUsize; DIMENSION] {
         self.scale_factor
     }
 
@@ -129,7 +129,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
         let mut pt: [usize; DIMENSION] = pt.into();
 
         for i in 0..DIMENSION {
-            pt[i] *= self.scale_factor[i];
+            pt[i] *= usize::from(self.scale_factor[i]);
             pt[i] += self.padding[i][0];
         }
 
@@ -240,13 +240,13 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
         return None
     }
 
-    /// Convert a [`crate::interface::cell::CellLocation`] to a [`crate::interface::cell::CellID`]
+    /// Convert a [`crate::interface::cell::CellLocation`] to a [`CellID`]
     #[must_use]
     fn cell_loc_to_id(&self, cell_loc: <Self as CellManager>::CellLoc) -> CellID {
         let mut offset = cell_loc[0];
 
         for i in 1..DIMENSION {
-            offset += cell_loc[i] * self.full_dimensions[i - 1];
+            offset += cell_loc[i] * usize::from(self.full_dimensions[i - 1]);
         }
 
         CellID(offset)
@@ -262,7 +262,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
                 }
             }
 
-            if cell_loc[i] + 1 < self.full_dimensions[i] {
+            if cell_loc[i] + 1 < usize::from(self.full_dimensions[i]) {
                 let neighbour = self.get_cell_value_mut(cell_loc.offset(i, 1));
 
                 if neighbour.cell_type == UNVISITED {
