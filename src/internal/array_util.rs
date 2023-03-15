@@ -1,3 +1,4 @@
+use std::mem::MaybeUninit;
 use std::num::NonZeroUsize;
 use crate::internal::util::NONZERO_USIZE_ONE;
 
@@ -151,12 +152,38 @@ impl <const LENGTH: usize> CheckedProduct for [NonZeroUsize; LENGTH] {
 }
 
 pub trait And<T> {
-    fn and(&self, other: T) -> T;
+    fn and(&self, other: &T) -> T;
 }
 
 impl <const LENGTH: usize> And<[bool; LENGTH]> for [bool; LENGTH] {
     /// Element-wise AND two lists of booleans
-    fn and(&self, other: [bool; LENGTH]) -> [bool; LENGTH] {
-        self.zip(other).map(|(lhs, rhs)| lhs && rhs)
+    fn and(&self, other: &[bool; LENGTH]) -> [bool; LENGTH] {
+        self.zip_map(other, |lhs, rhs| *lhs && *rhs)
+    }
+}
+
+pub trait ArrayZipMap<T, const LENGTH: usize> {
+    fn zip_map<U, R>(&self, other: &[U; LENGTH], map: fn(&T, &U) -> R) -> [R; LENGTH];
+}
+
+impl <T, const LENGTH: usize> ArrayZipMap<T, LENGTH> for [T; LENGTH] {
+    fn zip_map<U, R>(&self, other: &[U; LENGTH], map: fn(&T, &U) -> R) -> [R; LENGTH] {
+        /*
+         * SAFETY:
+         * Safe because we assign to every element in the array in the loop below
+         * and don't read from it beforehand. The array and for-loop clearly have
+         * the same size.
+         *
+         * The reason why we use this unsafe method is because we can't create the
+         * result array if R does not implement Default. And because we use NonZero*
+         * a lot, which doesn't implement it, we must create an uninitialised array.
+         */
+        let mut result: [R; LENGTH] = unsafe { MaybeUninit::uninit().assume_init() };
+
+        for i in 0..LENGTH {
+            result[i] = map(&self[i], &other[i]);
+        }
+
+        return result;
     }
 }

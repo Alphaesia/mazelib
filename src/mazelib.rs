@@ -164,7 +164,6 @@
 //! [Think Labyrinth!](http://www.astrolog.org/labyrnth.htm>) has a great glossary on technical
 //! maze terms that you can find at <http://www.astrolog.org/labyrnth/glossary.htm>.
 
-#![feature(array_zip)]
 #![feature(array_try_map)]
 #![feature(min_specialization)]
 #![feature(doc_auto_cfg)]

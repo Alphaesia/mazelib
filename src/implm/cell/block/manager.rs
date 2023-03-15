@@ -11,7 +11,7 @@ use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::{CellID, CellManager, ConnectionType};
 use crate::interface::point::CoordinateSpace;
 use crate::interface::render::MazeRendererNonSeeking;
-use crate::internal::array_util::{CheckedProduct, CheckedSum};
+use crate::internal::array_util::{ArrayZipMap, CheckedProduct, CheckedSum};
 use crate::internal::noise_util::pt;
 use crate::internal::util::{NONZERO_USIZE_TWO, try_usize_array_to_nonzero_usize_array};
 
@@ -71,17 +71,16 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     #[must_use]
     fn new(space: BoxCoordinateSpace<DIMENSION>, scale_factor: [NonZeroUsize; DIMENSION], padding: [[usize; 2]; DIMENSION]) -> Self {
         // Arithmetic is so easy and beautiful and succinct
-        let full_dimensions = space.dimensions().zip(scale_factor)
-            .map(|(dim, scalar)| {
+        let full_dimensions = space.dimensions()
+            .zip_map(&scale_factor, |dim, scalar| {
                 // NonZeroUsize::new only returns None if the scaled dimension == usize::MAX (which I don't
                 // think is mathematically even possible, but in such a hypothetical case) the +1 would cause
                 // the sum to overflow to zero
-                (usize::from(dim) - 1).checked_mul(usize::from(scalar))
+                (usize::from(*dim) - 1).checked_mul(usize::from(*scalar))
                     .and_then(|scaled_dim| NonZeroUsize::new(scaled_dim + 1))
                     .expect("The scaled dimensions do not all fit within a usize")
             })
-            .zip(padding)
-            .map(|(scaled_dim, padding)| {
+            .zip_map(&padding, |scaled_dim, padding| {
                 padding.checked_sum().and_then(|summed_padding| scaled_dim.checked_add(summed_padding)).expect("The full dimensions do not all fit within a usize")
             });
 
