@@ -41,9 +41,7 @@ impl <const DIMENSION: usize> Iterator for BoxCoordinateSpaceIterator<DIMENSION>
         // Increment iterator position then return it
         match self.pos {
             None => self.pos = Some([0; DIMENSION].into()),
-            Some(pt) => {
-                let mut pt = pt;
-
+            Some(mut pt) => {
                 for dim in 0..DIMENSION {
                     if pt[dim] + 1 == usize::from(self.space[dim]) {
                         pt[dim] = 0;

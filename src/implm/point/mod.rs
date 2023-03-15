@@ -9,3 +9,4 @@
 //! * [`Point`][crate::interface::point::Point] --- the interface traits.
 
 pub mod boxy;
+pub mod polar;

@@ -3,6 +3,7 @@ use std::fmt::{Debug, Display, Formatter};
 use std::ops::{Index, IndexMut};
 
 use crate::interface::point::Point;
+use crate::internal::util::offset_usize;
 
 /// A tuplet of unsigned integers that uniquely represent a point in `n`-dimensional space.
 ///
@@ -15,7 +16,8 @@ pub struct CoordinateTuplet<const DIMENSION: usize>(pub [usize; DIMENSION]);
 impl <const DIMENSION: usize> Point for CoordinateTuplet<DIMENSION> {}
 
 impl <const DIMENSION: usize> CoordinateTuplet<DIMENSION> {
-    /// Get the point at a given offset from this point along the given [axis].
+    /// Get the point at a given offset from this point along the given
+    /// [axis](super::BoxCoordinateSpace#coordinate-axes).
     ///
     /// # Examples
     ///
@@ -27,16 +29,10 @@ impl <const DIMENSION: usize> CoordinateTuplet<DIMENSION> {
     /// assert_eq!(CoordinateTuplet([2, 5, 2]), pt.offset(1, 3));
     /// assert_eq!(CoordinateTuplet([1, 2, 2]), pt.offset(0, -1));
     /// ```
-    ///
-    /// [axis]: self::super::BoxCoordinateSpace#coordinate-axes
     pub fn offset(&self, axis: usize, offset: isize) -> Self {
         let mut new = *self;
 
-        if offset >= 0 {
-            new[axis] += TryInto::<usize>::try_into(offset).unwrap();
-        } else {
-            new[axis] -= TryInto::<usize>::try_into(offset.abs()).unwrap();
-        }
+        new[axis] = offset_usize(new[axis], offset);
 
         return new;
     }

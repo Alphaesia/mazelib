@@ -21,3 +21,14 @@ pub fn nonzero_usize_array_to_usize_array<const LENGTH: usize>(array: [NonZeroUs
 pub fn try_usize_array_to_nonzero_usize_array<const LENGTH: usize>(array: [usize; LENGTH]) -> Result<[NonZeroUsize; LENGTH], TryFromIntError> {
     array.try_map(|x| NonZeroUsize::try_from(x))
 }
+
+#[inline]
+pub fn offset_usize(mut value: usize, offset: isize) -> usize {
+    if offset >= 0 {
+        value += TryInto::<usize>::try_into(offset).unwrap();
+    } else {
+        value -= TryInto::<usize>::try_into(offset.abs()).unwrap();
+    }
+
+    return value
+}

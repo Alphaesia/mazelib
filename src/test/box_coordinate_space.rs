@@ -26,7 +26,14 @@ fn test_size() {
     assert_eq!(usize::from(BoxCoordinateSpace::<3>::new_checked([9, 9, 9]).logical_size()), 729);
     assert_eq!(usize::from(BoxCoordinateSpace::<3>::new_checked([61, 73, 12]).logical_size()), 53436);
 
-    assert_that_code!(|| BoxCoordinateSpace::new_checked([usize::MAX, usize::MAX])).panics().with_message("The dimensions specified are too large. The number of points in the space does not fit within a usize.")
+    assert_that_code!(|| BoxCoordinateSpace::new_checked([0])).panics().with_having_message("All dimensions must be non-zero");
+    assert_that_code!(|| BoxCoordinateSpace::new_checked([0, 1])).panics().with_having_message("All dimensions must be non-zero");
+    assert_that_code!(|| BoxCoordinateSpace::new_checked([1, 0])).panics().with_having_message("All dimensions must be non-zero");
+    assert_that_code!(|| BoxCoordinateSpace::new_checked([1, 0, 0])).panics().with_having_message("All dimensions must be non-zero");
+    assert_that_code!(|| BoxCoordinateSpace::new_checked([1, 1, 0])).panics().with_having_message("All dimensions must be non-zero");
+    assert_that_code!(|| BoxCoordinateSpace::new_checked([0, 1, 1])).panics().with_having_message("All dimensions must be non-zero");
+
+    assert_that_code!(|| BoxCoordinateSpace::new_checked([usize::MAX, usize::MAX])).panics().with_message("The dimensions specified are too large. The number of points in the space does not fit within a usize.");
 }
 
 #[test]
