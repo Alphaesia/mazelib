@@ -6,7 +6,7 @@ use crate::interface::cell::{CellID, CellValue};
 
 /// A [buffer][MazeBuffer] that stores its cells in a [`Vec`] allocated on the heap.
 ///
-/// This is the buffer that you will almost always want to use.
+/// This is the buffer implementation that you will almost always want to use.
 pub struct VecBuffer<CellVal: CellValue> {
     buf: Vec<CellVal>,
 }

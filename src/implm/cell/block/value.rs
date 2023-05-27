@@ -3,7 +3,7 @@ use crate::interface::cell::CellValue;
 /// A cell type where cells are either passage cells or wall
 /// wall cells, with no in between. They are called Block Cells
 /// because the resulting mazes look blocky / pixellated.
-#[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
+#[derive(Copy, Clone, Eq, PartialEq, Hash, Default, Debug)]
 pub struct BlockCellValue {
     /// The specific type or value of the cell. For more information
     /// see [`BlockCellValueType`].
@@ -14,8 +14,9 @@ pub struct BlockCellValue {
     pub marked: bool,
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Default, Debug)]
 pub enum BlockCellValueType {
+    #[default]
     UNVISITED,
     BOUNDARY,
     WALL,
@@ -34,9 +35,4 @@ impl CellValue for BlockCellValue {
     fn set_marked(&mut self, marked: bool) {
         self.marked = marked
     }
-}
-
-impl Default for BlockCellValue {
-    #[must_use]
-    fn default() -> Self { Self { cell_type: BlockCellValueType::UNVISITED, marked: false } }
 }

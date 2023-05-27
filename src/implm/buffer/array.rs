@@ -8,28 +8,44 @@ use crate::interface::cell::{CellID, CellValue};
 ///
 /// `MAX_CELLS` is the capacity of the backing array.
 ///
-/// You should probably use [`VecBuffer`][crate::implm::buffer::VecBuffer] instead.
+/// You should probably use [`VecBuffer`][crate::implm::buffer::VecBuffer] instead,
+/// which is a more flexible and ergonomic alternative. `ArrayBuffer` is only warranted
+/// in specific niche scenarios. It primarily exists to provide a second, contrasting
+/// implementation of `MazeBuffer`.
 pub struct ArrayBuffer<CellVal: CellValue, const MAX_CELLS: usize> {
+    size: NonZeroUsize,
     buf: [CellVal; MAX_CELLS],
 }
 
 impl <CellVal: CellValue, const CELLS: usize> MazeBuffer<CellVal> for ArrayBuffer<CellVal, CELLS> {
     fn new(cell_count: NonZeroUsize) -> Self {
-        assert_eq!(usize::from(cell_count), CELLS, "Maze requires a different amount of cells than specified");
+        assert!(usize::from(cell_count) <= CELLS, "cell_count is greater than the buffer's capacity");
 
-        Self { buf: [CellVal::default(); CELLS] }
+        Self { size: cell_count, buf: [CellVal::default(); CELLS] }
     }
 
     fn get(&self, cell: CellID) -> CellVal {
-        self.buf[cell.0]
+        if cell.0 >= usize::from(self.size) {
+            panic!("Cell is out of bounds");
+        }
+
+        return self.buf[cell.0];
     }
 
     fn get_mut(&mut self, cell: CellID) -> &mut CellVal {
-        &mut self.buf[cell.0]
+        if cell.0 >= usize::from(self.size) {
+            panic!("Cell is out of bounds");
+        }
+
+        return &mut self.buf[cell.0];
     }
 
     fn set(&mut self, cell: CellID, new_value: CellVal) {
-        self.buf[cell.0] = new_value
+        if cell.0 >= usize::from(self.size) {
+            panic!("Cell is out of bounds");
+        }
+
+        return self.buf[cell.0] = new_value;
     }
 }
 

@@ -114,7 +114,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Bo
 
         let from_before_to = from_pos < to_pos;
 
-        let mut from_existing = self.get_mut(from);
+        let from_existing = self.get_mut(from);
 
         if from_before_to {
             from_existing.edges[axis_of_adjacency][1] = edge_type;
@@ -124,7 +124,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Bo
 
         Self::set_unvisited_edges_to_wall(&mut from_existing.edges);
 
-        let mut to_existing = self.get_mut(to);
+        let to_existing = self.get_mut(to);
 
         if from_before_to {
             to_existing.edges[axis_of_adjacency][0] = edge_type;
