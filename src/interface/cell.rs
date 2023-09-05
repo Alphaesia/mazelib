@@ -192,6 +192,7 @@ pub enum ConnectionType {
 /// for the purposes of storing mazes.
 ///
 /// The exact semantics of how cells are given their identifiers is
-/// unspecified and up to each [`CellManager`][crate::interface::cell::CellManager].
+/// unspecified and up to each [`CellManager`].
 /// Typically it will differ between implementations, and is not API.
+#[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
 pub struct CellID(pub usize);

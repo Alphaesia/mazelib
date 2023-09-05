@@ -18,7 +18,7 @@ use crate::interface::point::CoordinateSpace;
 ///
 /// It was invented by [Walter D. Pullen](https://www.astrolog.org/home.htm).
 ///
-/// # Example
+/// # Examples
 ///
 /// ![A typical output of Hunt-and-Kill.][example]
 ///

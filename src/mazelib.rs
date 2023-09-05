@@ -164,13 +164,19 @@
 //! [Think Labyrinth!](http://www.astrolog.org/labyrnth.htm>) has a great glossary on technical
 //! maze terms that you can find at <http://www.astrolog.org/labyrnth/glossary.htm>.
 
+// Useful unstable features
 #![feature(array_try_map)]
 #![feature(min_specialization)]
 #![feature(doc_auto_cfg)]
+#![feature(rustdoc_missing_doc_code_examples)]
 
+// Suspicious documentation
+#![warn(missing_docs, rustdoc::missing_crate_level_docs, rustdoc::missing_doc_code_examples)]
+#![warn(rustdoc::unescaped_backticks)]
 #![deny(rustdoc::broken_intra_doc_links)]
 
-#![allow(clippy::needless_return, clippy::needless_range_loop, clippy::bool_comparison)]  // Stylistic choices
+// Stylistic choices
+#![allow(clippy::needless_return, clippy::needless_range_loop, clippy::bool_comparison)]
 
 pub mod interface;
 pub mod implm;

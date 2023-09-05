@@ -1,9 +1,8 @@
 //! Working maze storage.
 //!
-//! Mazes are typically stored in memory, but do not have to be. It
-//! is up to the implementation of the [`MazeBuffer`].
+//! Mazes are stored in [`MazeBuffer`]s. These typically store the mazes in memory.
 //!
-//! For exporting mazes to persistent forms (like images), see [`super::render`].
+//! For exporting mazes to persistent forms (like images), see [`crate::interface::render`].
 //!
 //! # Recommended Reading
 //! 1. [`MazeBuffer`] -- the buffer trait.
@@ -26,10 +25,14 @@ use crate::interface::cell::{CellID, CellValue};
 /// directly. The maze's cell manager is responsible for the construction of the buffer.
 ///
 /// While most buffers would store their contents in memory, it is conceivable that a buffer
-/// could stream the maze from disk (or elsewhere). This would allow mazes too big to fit in
+/// could stream the maze from disk (or elsewhere). This would allow mazes too large to fit in
 /// memory to be generated.
 pub trait MazeBuffer<CellVal: CellValue> : Debug + Send {
     /// Construct a new buffer.
+    ///
+    /// As discussed in the type documentation, typically you wouldn't invoke this function
+    /// directly. Normally you'd use a [`MazeBuffer`] which would abstract away interacting with
+    /// the buffer from you.
     ///
     ///  # Parameters
     /// `cell_count` --- the size of the maze's cell space, and the number of cells that the
@@ -38,6 +41,19 @@ pub trait MazeBuffer<CellVal: CellValue> : Debug + Send {
     ///                  be changed once a buffer is constructed. As a maze must always have at
     ///                  least one point, and every point maps to at least one cell, all mazes
     ///                  must have at least one cell, hence `cell_count` is a `NonZeroUsize`.
+    ///
+    /// # Examples
+    /// ```
+    /// # use mazelib::implm::buffer::VecBuffer;
+    /// # use mazelib::implm::cell::block::BlockCellValue;
+    /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
+    /// # use mazelib::interface::buffer::MazeBuffer;
+    /// # use mazelib::interface::point::CoordinateSpace;
+    /// #
+    /// let coord_space = BoxCoordinateSpace::new_checked([3, 3]);
+    ///
+    /// let buffer = VecBuffer::<BlockCellValue>::new(coord_space.logical_size());
+    /// ```
     #[must_use]
     fn new(cell_count: NonZeroUsize) -> Self;
 
@@ -45,6 +61,20 @@ pub trait MazeBuffer<CellVal: CellValue> : Debug + Send {
     ///
     /// # Parameters
     /// `cell` --- the ID of the cell to retrieve. Must be inbounds (<= this buffer's size).
+    ///
+    /// # Examples
+    /// ```
+    /// # use std::num::NonZeroUsize;
+    /// # use mazelib::implm::buffer::VecBuffer;
+    /// # use mazelib::implm::cell::block::BlockCellValue;
+    /// # use mazelib::interface::buffer::MazeBuffer;
+    /// # use mazelib::interface::cell::CellID;
+    /// #
+    /// // Make a new buffer
+    /// let buffer = VecBuffer::<BlockCellValue>::new(NonZeroUsize::new(1).expect("If this fails the sky is falling"));
+    ///
+    /// assert_eq!(BlockCellValue::default(), buffer.get(CellID(0)));
+    /// ```
     #[must_use]
     fn get(&self, cell: CellID) -> CellVal;
 
@@ -55,6 +85,30 @@ pub trait MazeBuffer<CellVal: CellValue> : Debug + Send {
     ///
     /// # Parameters
     /// `cell` --- the ID of the cell to retrieve. Must be inbounds (≤ this buffer's size).
+    ///
+    /// # Examples
+    /// ```
+    /// # use std::num::NonZeroUsize;
+    /// # use mazelib::implm::buffer::VecBuffer;
+    /// # use mazelib::implm::cell::block::{BlockCellValue, BlockCellValueType};
+    /// # use mazelib::interface::buffer::MazeBuffer;
+    /// # use mazelib::interface::cell::CellID;
+    /// #
+    /// // Make a new buffer
+    /// let mut buffer = VecBuffer::<BlockCellValue>::new(NonZeroUsize::new(1).expect("If this fails the sky is falling"));
+    ///
+    /// let cell_id = CellID(0);
+    /// let cell = BlockCellValue { cell_type: BlockCellValueType::PASSAGE, marked: false };
+    ///
+    /// buffer.set(cell_id, cell);
+    ///
+    /// assert!(buffer.get(cell_id).marked == false);
+    ///
+    /// buffer.get_mut(cell_id).marked = true;
+    ///
+    /// assert!(buffer.get(cell_id).marked);
+    /// # Option::<NonZeroUsize>(())
+    /// ```
     #[must_use]
     fn get_mut(&mut self, cell: CellID) -> &mut CellVal;
 
@@ -65,5 +119,24 @@ pub trait MazeBuffer<CellVal: CellValue> : Debug + Send {
     ///
     /// # Parameters
     /// `cell` --- the ID of the cell to modify. Must be inbounds (≤ this buffer's size).
+    ///
+    /// # Examples
+    /// ```
+    /// # use std::num::NonZeroUsize;
+    /// # use mazelib::implm::buffer::VecBuffer;
+    /// # use mazelib::implm::cell::block::{BlockCellValue, BlockCellValueType};
+    /// # use mazelib::interface::buffer::MazeBuffer;
+    /// # use mazelib::interface::cell::CellID;
+    /// #
+    /// // Make a new buffer
+    /// let mut buffer = VecBuffer::<BlockCellValue>::new(NonZeroUsize::new(1).expect("If this fails the sky is falling"));
+    ///
+    /// let cell_id = CellID(0);
+    /// let cell = BlockCellValue { cell_type: BlockCellValueType::PASSAGE, marked: false };
+    ///
+    /// buffer.set(cell_id, cell);
+    ///
+    /// assert_eq!(cell, buffer.get(cell_id));
+    /// ```
     fn set(&mut self, cell: CellID, new_value: CellVal);
 }

@@ -22,7 +22,7 @@ use crate::interface::point::CoordinateSpace;
 /// requires no memory beyond the maze itself and has comparable speed, there is no reason
 /// to favour Recursive Backtracker over Hunt-and-Kill.
 ///
-/// # Example
+/// # Examples
 ///
 /// ![A typical output of Recursive Backtracker.][example]
 ///

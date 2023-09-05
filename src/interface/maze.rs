@@ -5,9 +5,8 @@
 //!
 //! # Recommended Reading
 //! 1. [`Maze`] -- the maze carrier trait.
-//! 2. [`CellManager`][crate::interface::cell::CellManager] --
-//!    the primary interface of a maze carrier (`CellManager`
-//!    is a supertrait of `Maze`).
+//! 2. [`CellManager`] -- the primary interface of a maze carrier
+//!    (`CellManager` is a supertrait of `Maze`).
 
 use crate::interface::cell::CellManager;
 

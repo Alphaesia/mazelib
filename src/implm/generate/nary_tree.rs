@@ -26,7 +26,7 @@ use crate::interface::maze::Maze;
 /// Using this algorithm will require careful consideration of the diagonal bias,
 /// as it is extremely easy to traverse the maze along the grain.
 ///
-/// # Example
+/// # Examples
 ///
 /// ![A typical output of n-ary Tree.][example]
 ///
