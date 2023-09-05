@@ -107,7 +107,6 @@ pub trait MazeBuffer<CellVal: CellValue> : Debug + Send {
     /// buffer.get_mut(cell_id).marked = true;
     ///
     /// assert!(buffer.get(cell_id).marked);
-    /// # Option::<NonZeroUsize>(())
     /// ```
     #[must_use]
     fn get_mut(&mut self, cell: CellID) -> &mut CellVal;
