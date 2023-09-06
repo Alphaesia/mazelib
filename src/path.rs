@@ -12,8 +12,9 @@ pub struct Path<T: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + 
     vec: Vec<T>,
 }
 
-pub type PointPath<CoordSpace: CoordinateSpace> = Path<CoordSpace::PtType>;
-pub type CellPath<CellType: CellValue> = Path<CellType>;
+// TODO make these type aliases once again once lazy_type_alias is stabilised
+pub struct PointPath<CoordSpace: CoordinateSpace>(Path<CoordSpace::PtType>);
+pub struct CellPath<CellType: CellValue>(Path<CellType>);
 
 impl <T: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Debug> Path<T> {
     pub fn new() -> Self {
