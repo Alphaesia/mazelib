@@ -42,7 +42,7 @@ All standard maze generators:
 * Wilson's
 * Aldous-Broder's
 * Eller's
-* Recursive Division'
+* Recursive Division
 
 Support end-users creating custom generators.
 

@@ -183,10 +183,6 @@
 //! ## Solver
 //!
 //! ...
-//!
-//! ## Template
-//!
-//! ...
 #![doc = embed_doc_image::embed_image!("example-maze-unannotated", "src/doc/img/maze-model/example-maze-unannotated.png")]
 #![doc = embed_doc_image::embed_image!("example-maze-cell-outlines", "src/doc/img/maze-model/example-maze-cell-outlines.png")]
 #![doc = embed_doc_image::embed_image!("example-maze-cell-outlines-with-annotated-ids", "src/doc/img/maze-model/example-maze-cell-outlines-with-annotated-ids.png")]

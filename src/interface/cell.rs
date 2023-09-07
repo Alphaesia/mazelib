@@ -41,9 +41,9 @@ pub struct CellID(pub usize);
 /// marks.
 pub trait CellValue: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Default + Debug {
     /// If the cell has not been fully generated (visited). Partially-generated
-    /// cells are not considered fully visited. This is because when applying
-    /// templates, such as a solid boundary around the edge of the maze, the cells
-    /// that get touched should still be considered by generators.
+    /// cells are not considered fully visited. Some operations applied to mazes, such as creating
+    /// a solid boundary around the edge, may visit cells, but those cells should not be excluded
+    /// from generators.
     #[must_use]
     fn is_fully_visited(&self) -> bool;
 

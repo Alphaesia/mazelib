@@ -116,7 +116,7 @@
 //!
 //! # Reading Order
 //!
-//! Firstly, read the previous section in this page on the [crate architecture](#architecture).
+//! Firstly, read the previous section in this page on the [crate's architecture](#architecture).
 //!
 //! Then, you should read the module-level docs of [`interface`]. It explains all of the
 //! key interfaces and their role in our maze model.
@@ -124,11 +124,14 @@
 //! After that, you'll probably want to check out [`interface::coordinator::MazeCoordinator`].
 //! This is the central trait which all of the machinery interacts with, and is the main
 //! interface between you and the maze. The documentation for
-//! [`interface::generate::MazeGenerator`] will likely be of use. The details of the
-//! other interfaces are not too important unless you're implementing an interface.
+//! [`interface::generate::MazeGenerator`] will likely also be of use. The details of the
+//! other interfaces are not too important unless you're implementing those interfaces.
 //!
-//! Lastly, explore [`implm`]. It contains standard implementations of all of the
+//! Then, explore [`implm`]. It contains standard implementations of all of the
 //! interfaces. You'll almost certainly want to use some of them, so have a look around.
+//!
+//! Finally, take a look at some of the utilities provided in [`util`]. They're fairly simple but
+//! it's nice not to have to reimplement them yourself.
 //!
 //! ## Further Reading
 //!
@@ -161,7 +164,7 @@
 //!
 //! # Glossary
 //!
-//! [`implm`] defines some core concepts such as "cell" and "point". For all other jargon,
+//! [`interface`] defines some core concepts such as "cell" and "point". For all other jargon,
 //! [Think Labyrinth!](http://www.astrolog.org/labyrnth.htm>) has a great glossary on technical
 //! maze terms that you can find at <http://www.astrolog.org/labyrnth/glossary.htm>.
 
