@@ -1,5 +1,6 @@
 #![cfg(any(feature = "img", doc))]
 
+use std::io::Write;
 use image::ImageFormat;
 
 use crate::interface::coordinator::MazeCoordinator;
@@ -18,4 +19,4 @@ impl BoxSpaceImageMazeRenderer {
     }
 }
 
-pub trait ImageMazeRenderer<M: MazeCoordinator> : MazeRenderer<M> {}
+pub trait ImageMazeRenderer<M: MazeCoordinator, O: Write> : MazeRenderer<M, O> {}

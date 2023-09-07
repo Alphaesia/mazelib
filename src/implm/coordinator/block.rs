@@ -11,7 +11,7 @@ use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::{CellID, ConnectionType};
 use crate::interface::coordinator::MazeCoordinator;
 use crate::interface::point::CoordinateSpace;
-use crate::interface::render::MazeRendererNonSeeking;
+use crate::interface::render::MazeRenderer;
 use crate::internal::array_util::{ArrayZipMap, CheckedProduct, CheckedSum};
 use crate::internal::noise_util::pt;
 use crate::internal::util::{NONZERO_USIZE_TWO, try_usize_array_to_nonzero_usize_array};

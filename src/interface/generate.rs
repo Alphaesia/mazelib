@@ -60,8 +60,7 @@ pub trait MazeGenerator<M: MazeCoordinator> {
 
 /// Simple sugar for [`MazeGenerator`]s.
 ///
-/// Lets you elide constructing generators with parameterless constructors (specifically,
-/// for generators that implement [`Default`]).
+/// Lets you elide constructing generators when they implement [`Default`].
 ///
 /// ```
 /// # use mazelib::interface::generate::MazeGenerator;

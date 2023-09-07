@@ -16,7 +16,7 @@
 //! use mazelib::implm::point::boxy::BoxCoordinateSpace;
 //! use mazelib::implm::render::text::BoxSpaceTextMazeRenderer;
 //! use mazelib::interface::generate::DefaultMazeGenerator;
-//! use mazelib::interface::render::DefaultMazeRendererNonSeeking;
+//! use mazelib::interface::render::DefaultMazeRenderer;
 //! use mazelib::util::apply_solid_border;
 //!
 //! let [width, height] = [5, 5];

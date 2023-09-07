@@ -10,7 +10,7 @@ use crate::implm::generate::{HuntAndKillGenerator, NAryTreeGenerator, RecursiveB
 use crate::implm::point::boxy::BoxCoordinateSpace;
 use crate::implm::render::text::BoxSpaceTextMazeRenderer;
 use crate::interface::generate::MazeGenerator;
-use crate::interface::render::MazeRendererNonSeeking;
+use crate::interface::render::MazeRenderer;
 use crate::internal::util::get_line_sep;
 
 #[test]

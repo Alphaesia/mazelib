@@ -1,5 +1,6 @@
 #![cfg(any(feature = "minecraft", doc))]
 
+use std::io::Write;
 use crate::interface::coordinator::MazeCoordinator;
 use crate::interface::render::MazeRenderer;
 
@@ -28,4 +29,4 @@ impl BoxSpaceSchematicMazeRenderer {
     }
 }
 
-pub trait SchematicMazeRenderer<M: MazeCoordinator> : MazeRenderer<M> {}
+pub trait SchematicMazeRenderer<M: MazeCoordinator, O: Write> : MazeRenderer<M, O> {}

@@ -1,5 +1,6 @@
+use std::io::Write;
 use crate::interface::coordinator::MazeCoordinator;
-use crate::interface::render::MazeRendererNonSeeking;
+use crate::interface::render::MazeRenderer;
 
 mod block;
 mod inline;
@@ -12,7 +13,7 @@ pub struct BoxSpaceTextMazeRenderer {
     _private: ()
 }
 
-pub trait TextMazeRenderer<CellSpace: MazeCoordinator> : MazeRendererNonSeeking<CellSpace> {}
+pub trait TextMazeRenderer<M: MazeCoordinator, O: Write> : MazeRenderer<M, O> {}
 
 impl BoxSpaceTextMazeRenderer {
     pub fn new() -> Self {

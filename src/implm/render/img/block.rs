@@ -9,8 +9,8 @@ use crate::interface::buffer::MazeBuffer;
 use crate::interface::render::MazeRenderer;
 use crate::internal::util::nonzero_usize_array_to_usize_array;
 
-impl <Buffer: MazeBuffer<BlockCellValue>> MazeRenderer<BoxSpaceBlockCellMazeCoordinator<Buffer, 2>> for BoxSpaceImageMazeRenderer {
-    fn render<Output: Write + Seek>(&self, maze: &BoxSpaceBlockCellMazeCoordinator<Buffer, 2>, output: &mut Output) -> Result<()> {
+impl <Buffer: MazeBuffer<BlockCellValue>, Output: Write + Seek> MazeRenderer<BoxSpaceBlockCellMazeCoordinator<Buffer, 2>, Output> for BoxSpaceImageMazeRenderer {
+    fn render(&self, maze: &BoxSpaceBlockCellMazeCoordinator<Buffer, 2>, output: &mut Output) -> Result<()> {
         let [width, height] = nonzero_usize_array_to_usize_array(maze.get_full_dimensions()).map(|dim| TryInto::<u32>::try_into(dim).expect("Cannot render mazes with dimensions larger than u32"));
 
         let mut img = RgbaImage::new(width, height);
@@ -41,4 +41,4 @@ impl <Buffer: MazeBuffer<BlockCellValue>> MazeRenderer<BoxSpaceBlockCellMazeCoor
     }
 }
 
-impl <Buffer: MazeBuffer<BlockCellValue>> ImageMazeRenderer<BoxSpaceBlockCellMazeCoordinator<Buffer, 2>> for BoxSpaceImageMazeRenderer {}
+impl <Buffer: MazeBuffer<BlockCellValue>, Output: Write + Seek> ImageMazeRenderer<BoxSpaceBlockCellMazeCoordinator<Buffer, 2>, Output> for BoxSpaceImageMazeRenderer {}

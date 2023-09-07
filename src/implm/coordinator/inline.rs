@@ -8,7 +8,7 @@ use crate::implm::render::text::BoxSpaceTextMazeRenderer;
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::{CellID, ConnectionType};
 use crate::interface::point::CoordinateSpace;
-use crate::interface::render::MazeRendererNonSeeking;
+use crate::interface::render::MazeRenderer;
 use crate::internal::array_util::Product;
 use crate::pt;
 use crate::implm::cell::block::BlockCellLocation;

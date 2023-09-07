@@ -7,11 +7,11 @@ use crate::implm::render::text::line_break::WriteLineBreak;
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::CellID;
 use crate::interface::coordinator::MazeCoordinator;
-use crate::interface::render::MazeRendererNonSeeking;
+use crate::interface::render::MazeRenderer;
 use crate::internal::util::nonzero_usize_array_to_usize_array;
 
-impl <Buffer: MazeBuffer<InlineCellValue<2>>> MazeRendererNonSeeking<BoxSpaceInlineCellMazeCoordinator<Buffer, 2>> for BoxSpaceTextMazeRenderer {
-    fn render<Output: Write>(&self, maze: &BoxSpaceInlineCellMazeCoordinator<Buffer, 2>, output: &mut Output) -> Result<()> {
+impl <Buffer: MazeBuffer<InlineCellValue<2>>, Output: Write> MazeRenderer<BoxSpaceInlineCellMazeCoordinator<Buffer, 2>, Output> for BoxSpaceTextMazeRenderer {
+    fn render(&self, maze: &BoxSpaceInlineCellMazeCoordinator<Buffer, 2>, output: &mut Output) -> Result<()> {
         let [width, height] = nonzero_usize_array_to_usize_array(maze.coord_space().dimensions());
 
         // Below +1's: cause we're looking at walls not cells
@@ -238,4 +238,4 @@ impl BoxSpaceTextMazeRenderer {
     }
 }
 
-impl <Buffer: MazeBuffer<InlineCellValue<2>>> TextMazeRenderer<BoxSpaceInlineCellMazeCoordinator<Buffer, 2>> for BoxSpaceTextMazeRenderer {}
+impl <Buffer: MazeBuffer<InlineCellValue<2>>, Output: Write> TextMazeRenderer<BoxSpaceInlineCellMazeCoordinator<Buffer, 2>, Output> for BoxSpaceTextMazeRenderer {}

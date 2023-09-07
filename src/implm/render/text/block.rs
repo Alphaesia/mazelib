@@ -6,11 +6,11 @@ use crate::implm::render::text::{BoxSpaceTextMazeRenderer, TextMazeRenderer};
 use crate::implm::render::text::line_break::WriteLineBreak;
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::CellID;
-use crate::interface::render::MazeRendererNonSeeking;
+use crate::interface::render::MazeRenderer;
 use crate::internal::util::nonzero_usize_array_to_usize_array;
 
-impl <Buffer: MazeBuffer<BlockCellValue>> MazeRendererNonSeeking<BoxSpaceBlockCellMazeCoordinator<Buffer, 2>> for BoxSpaceTextMazeRenderer {
-    fn render<Output: Write>(&self, maze: &BoxSpaceBlockCellMazeCoordinator<Buffer, 2>, output: &mut Output) -> Result<()> {
+impl <Buffer: MazeBuffer<BlockCellValue>, Output: Write> MazeRenderer<BoxSpaceBlockCellMazeCoordinator<Buffer, 2>, Output> for BoxSpaceTextMazeRenderer {
+    fn render(&self, maze: &BoxSpaceBlockCellMazeCoordinator<Buffer, 2>, output: &mut Output) -> Result<()> {
         let [width, height] = nonzero_usize_array_to_usize_array(maze.get_full_dimensions());
 
         for y in 0..height {
@@ -34,4 +34,4 @@ impl <Buffer: MazeBuffer<BlockCellValue>> MazeRendererNonSeeking<BoxSpaceBlockCe
     }
 }
 
-impl <Buffer: MazeBuffer<BlockCellValue>> TextMazeRenderer<BoxSpaceBlockCellMazeCoordinator<Buffer, 2>> for BoxSpaceTextMazeRenderer {}
+impl <Buffer: MazeBuffer<BlockCellValue>, Output: Write> TextMazeRenderer<BoxSpaceBlockCellMazeCoordinator<Buffer, 2>, Output> for BoxSpaceTextMazeRenderer {}
