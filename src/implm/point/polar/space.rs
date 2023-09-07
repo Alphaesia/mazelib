@@ -1,9 +1,66 @@
 use std::num::NonZeroUsize;
+use embed_doc_image::embed_doc_image;
 use rand::Rng;
 use crate::implm::point::polar::point::PolarCoordinate;
 use crate::implm::point::polar::PolarCoordinateSpaceIterator;
 use crate::interface::point::CoordinateSpace;
 
+/// A discretised polar (circular) coordinate space.
+///
+/// A polar coordinate space is a circle that is divided up into *rings* and *sectors*. Rings are
+/// concentric circles starting at the center and emanating outwards. Sectors are slices of the
+/// circle. A polar coordinate space has a set number of rings and sectors. All rings and all
+/// sectors are equally-sized.
+///
+/// Here is an example of a polar coordinate space:
+///
+/// ![A diagram visually explaining polar coordinates. There are five concentric circles divided into eight sectors, but the top-left corner of the circles is missing. The spaces between the circles are labelled rings 0 to 4, where 0 is the closest to the center. The spaces between the sector lines are labelled sectors 0 to 5, starting from the sector just to the right of the top of the diagram. Sectors 6 and 7 are omitted.][polar-coordinate-space-example]
+///
+/// For more details on what polar coordinates are see
+/// [`PolarCoordinate`][super::PolarCoordinate].
+///
+/// The origin of a polar coordinate space is at the point (0 ∠ 0).
+///
+/// # Adjacency
+///
+/// Two rings are adjacent if their ring numbers differ by exactly one. Two sectors are adjacent
+/// if their sector numbers differ by exactly one *or* if one sector has a sector number of zero
+/// and the other has a sector number of `self.sectors() - 1` (that is to say, they are the first
+/// and last sectors).
+///
+/// Two polar coordinates are adjacent if they are in the same ring and their sectors are adjacent,
+/// or if their rings are adjacent and they are in the same sector.
+/// 
+/// ## Adjacency Example
+/// 
+/// ```
+/// # use mazelib::implm::point::polar::{PolarCoordinate, PolarCoordinateSpace};
+/// # use mazelib::interface::point::CoordinateSpace;
+/// #
+/// let [rings, sectors] = [5, 7];
+/// let coord_space = PolarCoordinateSpace::new_checked(rings, sectors);
+///
+/// assert!(coord_space.are_adjacent(
+///     PolarCoordinate { ring: 0, sector: 0 },
+///     PolarCoordinate { ring: 0, sector: 1 },  // Offset by 1
+/// ));
+/// 
+/// assert!(coord_space.are_adjacent(
+///     PolarCoordinate { ring: 0, sector: 0 },
+///     PolarCoordinate { ring: 0, sector: 6 },  // Wraparound
+/// ));
+///
+/// assert!(coord_space.are_adjacent(
+///     PolarCoordinate { ring: 0, sector: 0 },
+///     PolarCoordinate { ring: 0, sector: 0 },  // Identical
+/// ) == false);
+///
+/// assert!(coord_space.are_adjacent(
+///     PolarCoordinate { ring: 0, sector: 0 },
+///     PolarCoordinate { ring: 0, sector: 7 },  // Out of bounds
+/// ) == false);
+/// ```
+#[embed_doc_image("polar-coordinate-space-example", "src/doc/img/point/polar/polar-coordinate-space-example.png")]
 #[derive(Copy, Clone, Debug)]
 pub struct PolarCoordinateSpace {
     rings: NonZeroUsize,
@@ -12,20 +69,89 @@ pub struct PolarCoordinateSpace {
 }
 
 impl PolarCoordinateSpace {
+    /// Construct a new `PolarCoordinateSpace` from the given dimensions.
+    ///
+    /// `rings * sectors` must also fit within a `usize`. (Mazes this large won't fit in memory
+    /// anyway).
+    ///
+    /// # Parameters
+    ///
+    /// `rings`   --- the number of rings the circle should be divided into.  
+    /// `sectors` --- the number of sectors the circle should be divided into.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # unsafe {
+    /// # use std::num::NonZeroUsize;
+    /// # use mazelib::implm::point::polar::PolarCoordinateSpace;
+    /// #
+    /// // If you're using hard-coded constants like in this example,
+    /// // you may prefer new_checked() for the ergonomics
+    /// let coord_space = PolarCoordinateSpace::new(NonZeroUsize::new_unchecked(5), NonZeroUsize::new_unchecked(7));
+    /// # }
+    /// ```
+    ///
+    /// # See Also
+    ///
+    /// [`new_checked()`][Self::new_checked]
+    #[must_use]
     pub fn new(rings: NonZeroUsize, sectors: NonZeroUsize) -> Self {
         let size = rings.checked_mul(sectors).expect("The dimensions specified are too large. The number of points in the space does not fit within a usize.");
 
         Self { rings, sectors, size }
     }
 
+    /// Construct a new `PolarCoordinateSpace` from the given dimensions.
+    ///
+    /// `rings * sectors` must also fit within a `usize`. (Mazes this large won't fit in memory
+    /// anyway).
+    ///
+    /// # Parameters
+    ///
+    /// `rings`   --- the number of rings the circle should be divided into.  
+    /// `sectors` --- the number of sectors the circle should be divided into.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use mazelib::implm::point::polar::PolarCoordinateSpace;
+    /// #
+    /// let coord_space = PolarCoordinateSpace::new_checked(5, 7);
+    /// ```
+    #[must_use]
     pub fn new_checked(rings: usize, sectors: usize) -> Self {
         Self::new(NonZeroUsize::new(rings).expect("rings must be non-zero"), NonZeroUsize::new(sectors).expect("sectors must be non-zero"))
     }
 
+    /// Return the number of rings in this coordinate space.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use mazelib::implm::point::polar::PolarCoordinateSpace;
+    /// #
+    /// let [rings, sectors] = [5, 7];
+    /// let coord_space = PolarCoordinateSpace::new_checked(rings, sectors);
+    /// 
+    /// assert_eq!(rings, coord_space.rings().into());
+    #[must_use]
     pub fn rings(&self) -> NonZeroUsize {
         self.rings
     }
 
+    /// Return the number of sectors in this coordinate space.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use mazelib::implm::point::polar::PolarCoordinateSpace;
+    /// #
+    /// let [rings, sectors] = [5, 7];
+    /// let coord_space = PolarCoordinateSpace::new_checked(rings, sectors);
+    ///
+    /// assert_eq!(sectors, coord_space.sectors().into());
+    #[must_use]
     pub fn sectors(&self) -> NonZeroUsize {
         self.sectors
     }

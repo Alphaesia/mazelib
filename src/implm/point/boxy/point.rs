@@ -10,6 +10,15 @@ use crate::internal::util::offset_usize;
 /// The most minor co-ordinate comes first (e.g. `(x, y, z)`, `(width, height, depth)`).
 ///
 /// Note: While the name is Coordinate**Tuplet**, it is an array not a tuple.
+///
+/// # Examples
+///
+/// It's just a regular struct with all fields public, so you can construct it directly.
+///
+/// ```
+/// # use mazelib::implm::point::boxy::CoordinateTuplet;
+/// # 
+/// CoordinateTuplet { 0: [1, 2, 3 ] };
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub struct CoordinateTuplet<const DIMENSION: usize>(pub [usize; DIMENSION]);
 

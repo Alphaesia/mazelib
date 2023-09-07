@@ -1,5 +1,5 @@
 //! Box coordinate spaces. This includes square mazes, rectangular mazes, cuboid mazes,
-//! and other hyperrectangular constructions.
+//! and other hyper-rectangular constructions.
 //!
 //! Commonly used coordinate spaces:
 //! * [TwoDimensionalBoxCoordinateSpace]

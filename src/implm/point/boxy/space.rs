@@ -18,6 +18,8 @@ use crate::internal::util::try_usize_array_to_nonzero_usize_array;
 /// All (size) dimensions of the space must be at least 1. The (mathematical)
 /// dimension (`DIMENSION`) must be also be at least 1.
 ///
+/// The origin of a boxy coordinate space is at the point where every coordinate is zero.
+///
 /// # Coordinate Axes
 ///
 /// As a `BoxCoordinateSpace` has `n` dimensions, there are `n` coordinate axes.
@@ -106,7 +108,7 @@ impl <const DIMENSION: usize> BoxCoordinateSpace<DIMENSION> {
     /// `dimensions` --- the width, height, depth, etc. of the coordinate space.
     ///                  As the (mathematical) dimension must be non-zero, this
     ///                  array cannot be empty. All dimensions must be non-zero
-    ///                  as wel. Additionally, the product of all dimensions must
+    ///                  as well. Additionally, the product of all dimensions must
     ///                  fit within a `usize`. (Mazes this large won't fit in
     ///                  memory anyway).
     ///

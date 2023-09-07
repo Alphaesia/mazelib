@@ -22,6 +22,30 @@ impl<const DIMENSION: usize> IntoIterator for &BoxCoordinateSpace<DIMENSION> {
     }
 }
 
+/// An iterator for iterating over all of the points in a polar coordinate space.
+///
+/// Points are yielded by their coordinate in ascending order, with more minor coordinates having
+/// precedence.
+///
+/// Can only be obtained by calling
+/// [`BoxCoordinateSpace::iter()`][crate::interface::point::CoordinateSpace::iter] or
+/// [`BoxCoordinateSpace::iter_from()`][crate::interface::point::CoordinateSpace::iter_from].
+///
+/// # Examples
+///
+/// ```
+/// # use mazelib::implm::point::boxy::{BoxCoordinateSpace, CoordinatePair};
+/// # use mazelib::interface::point::CoordinateSpace;
+/// #
+/// let mut iter = BoxCoordinateSpace::new_checked([2, 2]).iter();
+///
+/// assert_eq!(Some(CoordinatePair { 0: [0, 0] }), iter.next());
+/// assert_eq!(Some(CoordinatePair { 0: [1, 0] }), iter.next());
+/// assert_eq!(Some(CoordinatePair { 0: [0, 1] }), iter.next());
+/// assert_eq!(Some(CoordinatePair { 0: [1, 1] }), iter.next());
+/// assert_eq!(None, iter.next());
+/// assert_eq!(None, iter.next());
+/// ```
 pub struct BoxCoordinateSpaceIterator<const DIMENSION: usize> {
     space: BoxCoordinateSpace<DIMENSION>,
     pos: Option<CoordinateTuplet<DIMENSION>>

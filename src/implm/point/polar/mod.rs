@@ -1,3 +1,7 @@
+//! Polar (circular) coordinate spaces.
+//!
+//! For more information on what polar coordinates are, see [`PolarCoordinate`].
+
 mod space;
 mod point;
 mod iterator;
