@@ -4,11 +4,11 @@ use std::marker::PhantomData;
 use crate::implm::cell::inline::InlineCellValue;
 use crate::implm::cell::inline::InlineCellValueEdgeType;
 use crate::implm::point::boxy::BoxCoordinateSpace;
-use crate::implm::render::text::BoxSpaceTextMazeRenderer;
+use crate::implm::export::text::BoxSpaceTextMazeExporter;
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::{CellID, ConnectionType};
 use crate::interface::point::CoordinateSpace;
-use crate::interface::render::MazeRenderer;
+use crate::interface::export::MazeExporter;
 use crate::internal::array_util::Product;
 use crate::pt;
 use crate::implm::cell::block::BlockCellLocation;
@@ -272,15 +272,15 @@ impl <Buffer: MazeBuffer<InlineCellValue<2>>> Debug for BoxSpaceInlineCellMazeCo
 
         writeln!(f)?;
 
-        let mut render = Vec::<u8>::new();
+        let mut text_export = Vec::<u8>::new();
 
-        if let Err(err) = BoxSpaceTextMazeRenderer::new().render(self, &mut render) {
+        if let Err(err) = BoxSpaceTextMazeExporter::new().export(self, &mut text_export) {
             panic!("{}", err)
         }
 
-        let render = std::str::from_utf8(&render).expect("BoxSpaceTextMazeRenderer did not produce valid UTF-8");
+        let text_export = std::str::from_utf8(&text_export).expect("BoxSpaceTextMazeExporter did not produce valid UTF-8");
 
-        for line in render.lines() {
+        for line in text_export.lines() {
             writeln!(f, "\t{}", line)?;
         };
 

@@ -12,11 +12,11 @@ use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinatorBuilder;
 use mazelib::implm::coordinator::inline::BoxSpaceInlineCellMazeCoordinatorBuilder;
 use mazelib::implm::generate::{HuntAndKillGenerator, NAryTreeGenerator, RecursiveBacktrackerGenerator};
 use mazelib::implm::point::boxy::BoxCoordinateSpace;
-#[cfg(feature = "img")] use mazelib::implm::render::img::BoxSpaceImageMazeRenderer;
-#[cfg(feature = "minecraft")] use mazelib::implm::render::minecraft::BoxSpaceSchematicMazeRenderer;
-use mazelib::implm::render::text::BoxSpaceTextMazeRenderer;
+#[cfg(feature = "img")] use mazelib::implm::export::img::BoxSpaceImageMazeExporter;
+#[cfg(feature = "minecraft")] use mazelib::implm::export::minecraft::BoxSpaceSchematicMazeExporter;
+use mazelib::implm::export::text::BoxSpaceTextMazeExporter;
 use mazelib::interface::generate::DefaultMazeGenerator;
-use mazelib::interface::render::DefaultMazeRendererNonSeeking;
+use mazelib::interface::export::DefaultMazeExporter;
 use mazelib::util::apply_solid_border;
 
 fn main() {
@@ -27,7 +27,7 @@ fn main() {
     type BufferType = VecBuffer<CellType>;
     type Maze = BoxSpaceInlineCellMazeCoordinatorBuilder<BufferType, DIMENSION>;
     type Generator = HuntAndKillGenerator;
-    type Renderer = BoxSpaceTextMazeRenderer;
+    type Exporter = BoxSpaceTextMazeExporter;
 
     let mut rng = thread_rng();
 
@@ -41,5 +41,5 @@ fn main() {
 
     let output = std::io::stdout();
 
-    Renderer::render(&maze, &mut BufWriter::new(output)).unwrap();
+    Exporter::export(&maze, &mut BufWriter::new(output)).unwrap();
 }

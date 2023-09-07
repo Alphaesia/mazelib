@@ -4,7 +4,7 @@
 //!
 //! # See Also
 //!
-//! * [`MazeBuffer`](crate::interface::buffer::MazeBuffer) --- the interface trait
+//! * [`MazeBuffer`][crate::interface::buffer::MazeBuffer] --- the interface trait
 
 mod vec;
 mod array;

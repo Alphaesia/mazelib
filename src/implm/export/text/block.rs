@@ -2,15 +2,15 @@ use std::io::{Result, Write};
 
 use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
 use crate::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinator;
-use crate::implm::render::text::{BoxSpaceTextMazeRenderer, TextMazeRenderer};
-use crate::implm::render::text::line_break::WriteLineBreak;
+use crate::implm::export::text::{BoxSpaceTextMazeExporter, TextMazeExporter};
+use crate::implm::export::text::line_break::WriteLineBreak;
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::CellID;
-use crate::interface::render::MazeRenderer;
+use crate::interface::export::MazeExporter;
 use crate::internal::util::nonzero_usize_array_to_usize_array;
 
-impl <Buffer: MazeBuffer<BlockCellValue>, Output: Write> MazeRenderer<BoxSpaceBlockCellMazeCoordinator<Buffer, 2>, Output> for BoxSpaceTextMazeRenderer {
-    fn render(&self, maze: &BoxSpaceBlockCellMazeCoordinator<Buffer, 2>, output: &mut Output) -> Result<()> {
+impl <Buffer: MazeBuffer<BlockCellValue>, Output: Write> MazeExporter<BoxSpaceBlockCellMazeCoordinator<Buffer, 2>, Output> for BoxSpaceTextMazeExporter {
+    fn export(&self, maze: &BoxSpaceBlockCellMazeCoordinator<Buffer, 2>, output: &mut Output) -> Result<()> {
         let [width, height] = nonzero_usize_array_to_usize_array(maze.get_full_dimensions());
 
         for y in 0..height {
@@ -34,4 +34,4 @@ impl <Buffer: MazeBuffer<BlockCellValue>, Output: Write> MazeRenderer<BoxSpaceBl
     }
 }
 
-impl <Buffer: MazeBuffer<BlockCellValue>, Output: Write> TextMazeRenderer<BoxSpaceBlockCellMazeCoordinator<Buffer, 2>, Output> for BoxSpaceTextMazeRenderer {}
+impl <Buffer: MazeBuffer<BlockCellValue>, Output: Write> TextMazeExporter<BoxSpaceBlockCellMazeCoordinator<Buffer, 2>, Output> for BoxSpaceTextMazeExporter {}

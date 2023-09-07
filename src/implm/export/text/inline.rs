@@ -2,16 +2,16 @@ use std::io::{Result, Write};
 
 use crate::implm::cell::inline::{InlineCellValue, InlineCellValueEdgeType as EdgeType};
 use crate::implm::coordinator::inline::BoxSpaceInlineCellMazeCoordinator;
-use crate::implm::render::text::{BoxSpaceTextMazeRenderer, TextMazeRenderer};
-use crate::implm::render::text::line_break::WriteLineBreak;
+use crate::implm::export::text::{BoxSpaceTextMazeExporter, TextMazeExporter};
+use crate::implm::export::text::line_break::WriteLineBreak;
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::CellID;
 use crate::interface::coordinator::MazeCoordinator;
-use crate::interface::render::MazeRenderer;
+use crate::interface::export::MazeExporter;
 use crate::internal::util::nonzero_usize_array_to_usize_array;
 
-impl <Buffer: MazeBuffer<InlineCellValue<2>>, Output: Write> MazeRenderer<BoxSpaceInlineCellMazeCoordinator<Buffer, 2>, Output> for BoxSpaceTextMazeRenderer {
-    fn render(&self, maze: &BoxSpaceInlineCellMazeCoordinator<Buffer, 2>, output: &mut Output) -> Result<()> {
+impl <Buffer: MazeBuffer<InlineCellValue<2>>, Output: Write> MazeExporter<BoxSpaceInlineCellMazeCoordinator<Buffer, 2>, Output> for BoxSpaceTextMazeExporter {
+    fn export(&self, maze: &BoxSpaceInlineCellMazeCoordinator<Buffer, 2>, output: &mut Output) -> Result<()> {
         let [width, height] = nonzero_usize_array_to_usize_array(maze.coord_space().dimensions());
 
         // Below +1's: cause we're looking at walls not cells
@@ -26,7 +26,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<2>>, Output: Write> MazeRenderer<BoxSpa
 
         for y in 0..height {
             // TODO can we get rid of these and just write to the output directly?
-            // We render two lines simultaneously
+            // We export two lines simultaneously
             let mut line_top_walls: String = String::with_capacity(width * 2 + 1);
             let mut line_side_walls: String = String::with_capacity(width * 2 + 1);
 
@@ -134,7 +134,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<2>>, Output: Write> MazeRenderer<BoxSpa
     }
 }
 
-impl BoxSpaceTextMazeRenderer {
+impl BoxSpaceTextMazeExporter {
     // not recommended reading
     fn get_box_char(left_wall: EdgeType, top_wall: EdgeType, right_wall: EdgeType, bottom_wall: EdgeType) -> char {
         match (left_wall, top_wall, right_wall, bottom_wall) {
@@ -238,4 +238,4 @@ impl BoxSpaceTextMazeRenderer {
     }
 }
 
-impl <Buffer: MazeBuffer<InlineCellValue<2>>, Output: Write> TextMazeRenderer<BoxSpaceInlineCellMazeCoordinator<Buffer, 2>, Output> for BoxSpaceTextMazeRenderer {}
+impl <Buffer: MazeBuffer<InlineCellValue<2>>, Output: Write> TextMazeExporter<BoxSpaceInlineCellMazeCoordinator<Buffer, 2>, Output> for BoxSpaceTextMazeExporter {}

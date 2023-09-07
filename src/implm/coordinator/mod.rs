@@ -7,7 +7,7 @@
 //!
 //! # See Also
 //!
-//! * [`MazeCoordinator`](crate::interface::coordinator::MazeCoordinator) --- the interface trait
+//! * [`MazeCoordinator`][crate::interface::coordinator::MazeCoordinator] --- the interface trait
 
 pub mod block;
 pub mod inline;

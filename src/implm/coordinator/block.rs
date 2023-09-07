@@ -6,12 +6,12 @@ use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
 use crate::implm::cell::block::BlockCellLocation;
 use crate::implm::cell::block::BlockCellValueType::{BOUNDARY, PASSAGE, UNVISITED, WALL};
 use crate::implm::point::boxy::BoxCoordinateSpace;
-use crate::implm::render::text::BoxSpaceTextMazeRenderer;
+use crate::implm::export::text::BoxSpaceTextMazeExporter;
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::{CellID, ConnectionType};
 use crate::interface::coordinator::MazeCoordinator;
 use crate::interface::point::CoordinateSpace;
-use crate::interface::render::MazeRenderer;
+use crate::interface::export::MazeExporter;
 use crate::internal::array_util::{ArrayZipMap, CheckedProduct, CheckedSum};
 use crate::internal::noise_util::pt;
 use crate::internal::util::{NONZERO_USIZE_TWO, try_usize_array_to_nonzero_usize_array};
@@ -474,15 +474,15 @@ impl <Buffer: MazeBuffer<BlockCellValue>> Debug for BoxSpaceBlockCellMazeCoordin
 
         writeln!(f)?;
 
-        let mut render = Vec::<u8>::new();
+        let mut text_export = Vec::<u8>::new();
 
-        if let Err(err) = BoxSpaceTextMazeRenderer::new().render(self, &mut render) {
+        if let Err(err) = BoxSpaceTextMazeExporter::new().export(self, &mut text_export) {
             panic!("{}", err)
         }
 
-        let render = std::str::from_utf8(&render).expect("BoxSpaceTextMazeRenderer did not produce valid UTF-8");
+        let text_export = std::str::from_utf8(&text_export).expect("BoxSpaceTextMazeExporter did not produce valid UTF-8");
 
-        for line in render.lines() {
+        for line in text_export.lines() {
             writeln!(f, "\t{}", line)?;
         };
 

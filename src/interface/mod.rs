@@ -9,7 +9,7 @@
 //! to tie them all together. We'll go through them one-by-one.
 //!
 //! There are also other entities which, while separate from mazes, interact with them deeply.
-//! Some examples include [renderers](#renderer), [generators](#generator), and [solvers](#solver).
+//! Some examples include [generators](#generator), [solvers](#solver), and [exporters](#exporter).
 //!
 //! # Core Maze Concepts
 //!
@@ -30,7 +30,7 @@
 //! handled by points, which we'll come to next. Rather, *cells represent the physical structure
 //! of the maze*. If you were to build the maze, cells tell you what materials you need to place
 //! where --- "Do I need a piece of wall here, or a path?" (And we do indeed build the maze, using
-//! renderers, which will also be discussed later).
+//! exporters, which will also be discussed later).
 //!
 //! Cells are primarily defined by way they connect to other cells.
 //! Cells are not restricted to being square. They can be
@@ -153,7 +153,7 @@
 //! Buffers are represented by the [`MazeBuffer`][self::buffer::MazeBuffer] trait.
 //!
 //! Buffers do not handle exporting mazes into more permanent forms. That is handled by
-//! [renderers](#renderer).
+//! [exporters](#exporter).
 //!
 //! ## Coordinator
 //!
@@ -172,17 +172,24 @@
 //!
 //! # External Concepts
 //!
-//! ## Renderer
-//!
-//! ...
-//!
 //! ## Generator
 //!
-//! ...
+//! TODO
 //!
 //! ## Solver
 //!
-//! ...
+//! TODO
+//!
+//! ## Exporter
+//!
+//! Once a maze has been generated / solved / manipulated / etc., you'll likely want to take it out
+//! of memory and turn it into something you can look at. Exporters will take a maze and encode it
+//! into a given format. There are no restrictions on what they can produce. It could be anywhere
+//! from an ASCII diagram or image to a super-niche binary format for a particular game. Most
+//! exporters though are only capable with dealing with with a small number of maze coordinators
+//! due to restrictions inherent in the format. You're not exporting a 3D maze to a 2D image after
+//! all. Exporters are represented by the [`MazeExporter`][crate::interface::export::MazeExporter]
+//! trait.
 #![doc = embed_doc_image::embed_image!("example-maze-unannotated", "src/doc/img/maze-model/example-maze-unannotated.png")]
 #![doc = embed_doc_image::embed_image!("example-maze-cell-outlines", "src/doc/img/maze-model/example-maze-cell-outlines.png")]
 #![doc = embed_doc_image::embed_image!("example-maze-cell-outlines-with-annotated-ids", "src/doc/img/maze-model/example-maze-cell-outlines-with-annotated-ids.png")]
@@ -193,5 +200,5 @@ pub mod buffer;
 pub mod cell;
 pub mod point;
 pub mod coordinator;
-pub mod render;
+pub mod export;
 pub mod generate;

@@ -8,9 +8,9 @@ use crate::implm::coordinator::block::{BoxSpaceBlockCellMazeCoordinator, BoxSpac
 use crate::implm::coordinator::inline::{BoxSpaceInlineCellMazeCoordinator, BoxSpaceInlineCellMazeCoordinatorBuilder};
 use crate::implm::generate::{HuntAndKillGenerator, NAryTreeGenerator, RecursiveBacktrackerGenerator};
 use crate::implm::point::boxy::BoxCoordinateSpace;
-use crate::implm::render::text::BoxSpaceTextMazeRenderer;
+use crate::implm::export::text::BoxSpaceTextMazeExporter;
 use crate::interface::generate::MazeGenerator;
-use crate::interface::render::MazeRenderer;
+use crate::interface::export::MazeExporter;
 use crate::internal::util::get_line_sep;
 
 #[test]
@@ -44,7 +44,7 @@ fn test_hunt_and_kill_block_cell_generation() {
 
     Generator::new().generate_with_rng(&mut maze, &mut rng);
 
-    let actual = render_block_cell_maze(&maze);
+    let actual = export_block_cell_maze(&maze);
 
     assert_eq!(expected, actual)
 }
@@ -80,7 +80,7 @@ fn test_hunt_and_kill_inline_cell_generation() {
 
     Generator::new().generate_with_rng(&mut maze, &mut rng);
 
-    let actual = render_inline_cell_maze(&maze);
+    let actual = export_inline_cell_maze(&maze);
 
     assert_eq!(expected, actual)
 }
@@ -116,7 +116,7 @@ fn test_nary_tree_block_cell_generation() {
 
     Generator::new().generate_with_rng(&mut maze, &mut rng);
 
-    let actual = render_block_cell_maze(&maze);
+    let actual = export_block_cell_maze(&maze);
 
     assert_eq!(expected, actual)
 }
@@ -152,7 +152,7 @@ fn test_nary_tree_inline_cell_generation() {
 
     Generator::new().generate_with_rng(&mut maze, &mut rng);
 
-    let actual = render_inline_cell_maze(&maze);
+    let actual = export_inline_cell_maze(&maze);
 
     assert_eq!(expected, actual)
 }
@@ -188,7 +188,7 @@ fn test_recursive_backtracker_block_cell_generation() {
 
     Generator::new().generate_with_rng(&mut maze, &mut rng);
 
-    let actual = render_block_cell_maze(&maze);
+    let actual = export_block_cell_maze(&maze);
 
     assert_eq!(expected, actual)
 }
@@ -224,7 +224,7 @@ fn test_recursive_backtracker_inline_cell_generation() {
 
     Generator::new().generate_with_rng(&mut maze, &mut rng);
 
-    let actual = render_inline_cell_maze(&maze);
+    let actual = export_inline_cell_maze(&maze);
 
     assert_eq!(expected, actual)
 }
@@ -241,20 +241,20 @@ fn get_new_inline_cell_maze() -> BoxSpaceInlineCellMazeCoordinator::<VecBuffer<I
     BoxSpaceInlineCellMazeCoordinatorBuilder::<VecBuffer<InlineCellValue<2>>, 2>::new(BoxCoordinateSpace::<2>::new_checked([9, 9])).build()
 }
 
-fn render_block_cell_maze(maze: &BoxSpaceBlockCellMazeCoordinator<VecBuffer<BlockCellValue>, 2>) -> String {
+fn export_block_cell_maze(maze: &BoxSpaceBlockCellMazeCoordinator<VecBuffer<BlockCellValue>, 2>) -> String {
     let mut str_buffer = Vec::<u8>::new();
 
-    BoxSpaceTextMazeRenderer::new().render(maze, &mut str_buffer).unwrap();
+    BoxSpaceTextMazeExporter::new().export(maze, &mut str_buffer).unwrap();
 
     let as_string = String::from_utf8(str_buffer).unwrap();
 
     return as_string;
 }
 
-fn render_inline_cell_maze(maze: &BoxSpaceInlineCellMazeCoordinator::<VecBuffer<InlineCellValue<2>>, 2>) -> String {
+fn export_inline_cell_maze(maze: &BoxSpaceInlineCellMazeCoordinator::<VecBuffer<InlineCellValue<2>>, 2>) -> String {
     let mut str_buffer = Vec::<u8>::new();
 
-    BoxSpaceTextMazeRenderer::new().render(maze, &mut str_buffer).unwrap();
+    BoxSpaceTextMazeExporter::new().export(maze, &mut str_buffer).unwrap();
 
     let as_string = String::from_utf8(str_buffer).unwrap();
 

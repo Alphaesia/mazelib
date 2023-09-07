@@ -14,9 +14,9 @@
 //! use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinatorBuilder;
 //! use mazelib::implm::generate::HuntAndKillGenerator;
 //! use mazelib::implm::point::boxy::BoxCoordinateSpace;
-//! use mazelib::implm::render::text::BoxSpaceTextMazeRenderer;
+//! use mazelib::implm::export::text::BoxSpaceTextMazeExporter;
 //! use mazelib::interface::generate::DefaultMazeGenerator;
-//! use mazelib::interface::render::DefaultMazeRenderer;
+//! use mazelib::interface::export::DefaultMazeExporter;
 //! use mazelib::util::apply_solid_border;
 //!
 //! let [width, height] = [5, 5];
@@ -41,7 +41,7 @@
 //!
 //! // Print the maze as text
 //! # #[allow(unused_must_use)]
-//! BoxSpaceTextMazeRenderer::render(&maze, &mut std::io::stdout());
+//! BoxSpaceTextMazeExporter::export(&maze, &mut std::io::stdout());
 //! ```
 //! produces
 //! ```text

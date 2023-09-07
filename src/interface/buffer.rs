@@ -2,7 +2,7 @@
 //!
 //! Mazes are stored in [`MazeBuffer`]s. These typically store the mazes in memory.
 //!
-//! For exporting mazes to persistent forms (like images), see [`crate::interface::render`].
+//! For exporting mazes to persistent forms (like images), see [`crate::interface::export`].
 //!
 //! # Recommended Reading
 //! 1. [`MazeBuffer`] -- the buffer trait.

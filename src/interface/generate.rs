@@ -15,10 +15,9 @@ use crate::interface::coordinator::MazeCoordinator;
 
 /// A maze generator.
 ///
-/// A generator traverses a maze's [graph][crate::interface::point::CoordinateSpace],
-/// setting <abbr title="Connections between points">edges</abbr> to be passages or walls
-/// as it goes. How exactly this is done differs between implementations. In fact, this
-/// is the main differentiator between generators.
+/// A generator traverses a maze's [graph][crate::interface::point::CoordinateSpace], setting
+/// connections to be passages or walls as it goes. How exactly this is done differs between
+/// implementations. In fact, this is the main differentiator between generators.
 ///
 /// Generators do not consider mazes at the cellular level. They only jump from point to
 /// point.

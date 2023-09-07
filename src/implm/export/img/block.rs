@@ -4,14 +4,14 @@ use image::{ImageError, Rgba, RgbaImage};
 
 use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
 use crate::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinator;
-use crate::implm::render::img::{BoxSpaceImageMazeRenderer, ImageMazeRenderer};
+use crate::implm::export::img::{BoxSpaceImageMazeExporter, ImageMazeExporter};
 use crate::interface::buffer::MazeBuffer;
-use crate::interface::render::MazeRenderer;
+use crate::interface::export::MazeExporter;
 use crate::internal::util::nonzero_usize_array_to_usize_array;
 
-impl <Buffer: MazeBuffer<BlockCellValue>, Output: Write + Seek> MazeRenderer<BoxSpaceBlockCellMazeCoordinator<Buffer, 2>, Output> for BoxSpaceImageMazeRenderer {
-    fn render(&self, maze: &BoxSpaceBlockCellMazeCoordinator<Buffer, 2>, output: &mut Output) -> Result<()> {
-        let [width, height] = nonzero_usize_array_to_usize_array(maze.get_full_dimensions()).map(|dim| TryInto::<u32>::try_into(dim).expect("Cannot render mazes with dimensions larger than u32"));
+impl <Buffer: MazeBuffer<BlockCellValue>, Output: Write + Seek> MazeExporter<BoxSpaceBlockCellMazeCoordinator<Buffer, 2>, Output> for BoxSpaceImageMazeExporter {
+    fn export(&self, maze: &BoxSpaceBlockCellMazeCoordinator<Buffer, 2>, output: &mut Output) -> Result<()> {
+        let [width, height] = nonzero_usize_array_to_usize_array(maze.get_full_dimensions()).map(|dim| TryInto::<u32>::try_into(dim).expect("Cannot export mazes with dimensions larger than u32"));
 
         let mut img = RgbaImage::new(width, height);
 
@@ -41,4 +41,4 @@ impl <Buffer: MazeBuffer<BlockCellValue>, Output: Write + Seek> MazeRenderer<Box
     }
 }
 
-impl <Buffer: MazeBuffer<BlockCellValue>, Output: Write + Seek> ImageMazeRenderer<BoxSpaceBlockCellMazeCoordinator<Buffer, 2>, Output> for BoxSpaceImageMazeRenderer {}
+impl <Buffer: MazeBuffer<BlockCellValue>, Output: Write + Seek> ImageMazeExporter<BoxSpaceBlockCellMazeCoordinator<Buffer, 2>, Output> for BoxSpaceImageMazeExporter {}

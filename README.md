@@ -69,14 +69,14 @@ Finding any solution path, and the shortest path.
 
 Support end-users creating custom solvers.
 
-### Rendering
+### Exporting
 
-Render mazes to a variety of formats, such as:
+Export mazes to a variety of formats, such as:
 * Text (Unicode)
 * Images (PNG, Bitmap, etc.)
 * [Sponge Schematics](https://github.com/SpongePowered/Schematic-Specification/blob/master/versions/schematic-3.md)
 
-Support end-users creating custom renderers.
+Support end-users creating custom exporters.
 
 ### Performance
 
