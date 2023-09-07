@@ -17,7 +17,7 @@ use mazelib::implm::point::boxy::BoxCoordinateSpace;
 use mazelib::implm::render::text::BoxSpaceTextMazeRenderer;
 use mazelib::interface::generate::DefaultMazeGenerator;
 use mazelib::interface::render::DefaultMazeRendererNonSeeking;
-use mazelib::util::solid_border;
+use mazelib::util::apply_solid_border;
 
 fn main() {
     const DIMENSION: usize = 2;
@@ -35,7 +35,7 @@ fn main() {
 
     let mut maze = Maze::new(space).build();
 
-    solid_border(&mut maze);
+    apply_solid_border(&mut maze);
 
     Generator::generate_with_rng(&mut maze, &mut rng);
 

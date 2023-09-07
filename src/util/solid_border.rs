@@ -8,7 +8,7 @@ use crate::interface::coordinator::MazeCoordinator;
 use crate::interface::point::CoordinateSpace;
 
 /// Convert all *cells* (not points) adjacent to the edge of a box maze into border cells.
-pub fn solid_border<M: MazeCoordinator<CoordSpace=BoxCoordinateSpace<DIMENSION>>, const DIMENSION: usize>(maze: &mut M) {
+pub fn apply_solid_border<M: MazeCoordinator<CoordSpace=BoxCoordinateSpace<DIMENSION>>, const DIMENSION: usize>(maze: &mut M) {
     <FixSpecialisationPls as SolidBorder<M>>::apply(maze);
 }
 

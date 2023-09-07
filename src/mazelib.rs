@@ -17,7 +17,7 @@
 //! use mazelib::implm::render::text::BoxSpaceTextMazeRenderer;
 //! use mazelib::interface::generate::DefaultMazeGenerator;
 //! use mazelib::interface::render::DefaultMazeRendererNonSeeking;
-//! use mazelib::util::solid_border;
+//! use mazelib::util::apply_solid_border;
 //!
 //! let [width, height] = [5, 5];
 //!
@@ -34,7 +34,7 @@
 //! let mut maze = BoxSpaceBlockCellMazeCoordinatorBuilder::<Buffer, 2>::new(coord_space).build();
 //!
 //! // Give our maze a nice thick border
-//! solid_border(&mut maze);
+//! apply_solid_border(&mut maze);
 //!
 //! // Generate the maze
 //! HuntAndKillGenerator::generate(&mut maze);

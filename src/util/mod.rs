@@ -2,7 +2,7 @@
 
 mod solid_border;
 
-pub use self::solid_border::solid_border;
+pub use self::solid_border::apply_solid_border;
 
 use crate::interface::cell::CellValue;
 use crate::interface::coordinator::MazeCoordinator;
