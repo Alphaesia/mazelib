@@ -4,7 +4,7 @@ use rand::seq::IteratorRandom;
 
 use crate::implm::point::boxy::{BoxCoordinateSpace, CoordinateTuplet};
 use crate::interface::generate::MazeGenerator;
-use crate::interface::maze::Maze;
+use crate::interface::coordinator::MazeCoordinator;
 
 /// The ***n*-ary Tree** algorithm is a generalisation of the *Binary Tree* algorithm
 /// to higher dimensions.
@@ -39,7 +39,7 @@ pub struct NAryTreeGenerator {
     _private: ()
 }
 
-impl <M: Maze<CoordSpace=BoxCoordinateSpace<DIMENSION>>, const DIMENSION: usize> MazeGenerator<M> for NAryTreeGenerator {
+impl <M: MazeCoordinator<CoordSpace=BoxCoordinateSpace<DIMENSION>>, const DIMENSION: usize> MazeGenerator<M> for NAryTreeGenerator {
     fn generate_with_rng(&mut self, maze: &mut M, rng: &mut (impl Rng + ?Sized)) {
         // For every point in the maze,
         maze.coord_space().into_iter().for_each(|pt| {

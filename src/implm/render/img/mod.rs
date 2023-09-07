@@ -2,7 +2,7 @@
 
 use image::ImageFormat;
 
-use crate::interface::maze::Maze;
+use crate::interface::coordinator::MazeCoordinator;
 use crate::interface::render::MazeRenderer;
 
 mod block;
@@ -18,4 +18,4 @@ impl BoxSpaceImageMazeRenderer {
     }
 }
 
-pub trait ImageMazeRenderer<M: Maze> : MazeRenderer<M> {}
+pub trait ImageMazeRenderer<M: MazeCoordinator> : MazeRenderer<M> {}

@@ -1,6 +1,6 @@
 #![cfg(any(feature = "minecraft", doc))]
 
-use crate::interface::maze::Maze;
+use crate::interface::coordinator::MazeCoordinator;
 use crate::interface::render::MazeRenderer;
 
 mod block;
@@ -28,4 +28,4 @@ impl BoxSpaceSchematicMazeRenderer {
     }
 }
 
-pub trait SchematicMazeRenderer<M: Maze> : MazeRenderer<M> {}
+pub trait SchematicMazeRenderer<M: MazeCoordinator> : MazeRenderer<M> {}

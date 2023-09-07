@@ -1,6 +1,6 @@
 //! Some basic built-in buffer implementations.
 //!
-//! In almost all cases, you will want to use a [`VecBuffer`].
+//! In almost all cases you will want to use a [`VecBuffer`].
 //!
 //! # See Also
 //!

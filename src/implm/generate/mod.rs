@@ -28,7 +28,7 @@
 //! ![A typical output of n-ary Tree.][example-nary-tree]
 //!
 //! # See Also
-//! * [`MazeGenerator`][crate::interface::generate::MazeGenerator]
+//! * [`MazeGenerator`][crate::interface::generate::MazeGenerator] --- the interface trait
 #![doc = ::embed_doc_image::embed_image!("example-hunt-and-kill", "src/doc/img/generator/hunt-and-kill/example.png")]
 #![doc = ::embed_doc_image::embed_image!("example-recursive-backtracker", "src/doc/img/generator/recursive-backtracker/example.png")]
 #![doc = ::embed_doc_image::embed_image!("example-nary-tree", "src/doc/img/generator/nary-tree/example.png")]

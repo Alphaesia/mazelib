@@ -8,9 +8,9 @@ use rand::thread_rng;
 use mazelib::implm::buffer::VecBuffer;
 use mazelib::implm::cell::block::BlockCellValue;
 use mazelib::implm::cell::inline::InlineCellValue;
+use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinatorBuilder;
+use mazelib::implm::coordinator::inline::BoxSpaceInlineCellMazeCoordinatorBuilder;
 use mazelib::implm::generate::{HuntAndKillGenerator, NAryTreeGenerator, RecursiveBacktrackerGenerator};
-use mazelib::implm::maze::block::BoxSpaceBlockCellMazeBuilder;
-use mazelib::implm::maze::inline::BoxSpaceInlineCellMazeBuilder;
 use mazelib::implm::point::boxy::BoxCoordinateSpace;
 #[cfg(feature = "img")] use mazelib::implm::render::img::BoxSpaceImageMazeRenderer;
 #[cfg(feature = "minecraft")] use mazelib::implm::render::minecraft::BoxSpaceSchematicMazeRenderer;
@@ -25,7 +25,7 @@ fn main() {
     type Space = BoxCoordinateSpace<DIMENSION>;
     type CellType = InlineCellValue<DIMENSION>;
     type BufferType = VecBuffer<CellType>;
-    type Maze = BoxSpaceInlineCellMazeBuilder<BufferType, DIMENSION>;
+    type Maze = BoxSpaceInlineCellMazeCoordinatorBuilder<BufferType, DIMENSION>;
     type Generator = HuntAndKillGenerator;
     type Renderer = BoxSpaceTextMazeRenderer;
 

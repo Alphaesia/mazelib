@@ -1,4 +1,4 @@
-use crate::interface::cell::CellManager;
+use crate::interface::coordinator::MazeCoordinator;
 use crate::interface::render::MazeRendererNonSeeking;
 
 mod block;
@@ -12,7 +12,7 @@ pub struct BoxSpaceTextMazeRenderer {
     _private: ()
 }
 
-pub trait TextMazeRenderer<CellSpace: CellManager> : MazeRendererNonSeeking<CellSpace> {}
+pub trait TextMazeRenderer<CellSpace: MazeCoordinator> : MazeRendererNonSeeking<CellSpace> {}
 
 impl BoxSpaceTextMazeRenderer {
     pub fn new() -> Self {

@@ -5,7 +5,7 @@ mod solid_border;
 pub use self::solid_border::solid_border;
 
 use crate::interface::cell::CellValue;
-use crate::interface::maze::Maze;
+use crate::interface::coordinator::MazeCoordinator;
 use crate::interface::point::CoordinateSpace;
 
 /// Convert all unvisited *points* (not cells) in a maze into wall cells.
@@ -15,7 +15,7 @@ use crate::interface::point::CoordinateSpace;
 ///     if point is unvisited:
 ///         maze.make_wall(point)
 /// ```
-pub fn convert_unvisited_points_to_walls(maze: &mut impl Maze) {
+pub fn convert_unvisited_points_to_walls(maze: &mut impl MazeCoordinator) {
     for pt in maze.coord_space().iter() {
         if maze.get(pt).is_fully_visited() == false {
             maze.make_wall(pt)

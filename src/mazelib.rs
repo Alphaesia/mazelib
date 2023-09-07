@@ -11,8 +11,8 @@
 //! ```
 //! use mazelib::implm::buffer::VecBuffer;
 //! use mazelib::implm::cell::block::BlockCellValue;
+//! use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinatorBuilder;
 //! use mazelib::implm::generate::HuntAndKillGenerator;
-//! use mazelib::implm::maze::block::BoxSpaceBlockCellMazeBuilder;
 //! use mazelib::implm::point::boxy::BoxCoordinateSpace;
 //! use mazelib::implm::render::text::BoxSpaceTextMazeRenderer;
 //! use mazelib::interface::generate::DefaultMazeGenerator;
@@ -27,10 +27,11 @@
 //! type Buffer = VecBuffer<BlockCellValue>;
 //!
 //! // Create the maze "object". The name of the maze type hints at what it supports:
-//! // "BoxSpace" means it expects a BoxCoordinateSpace.
-//! // "BlockCell" means it will use BlockCells for cells.
+//! // "BoxSpace" means it expects a BoxCoordinateSpace
+//! // "BlockCell" means it will use BlockCells for cells
+//! // "MazeCoordinator" means it's a maze object (roughly)
 //! // 2 means we're creating a 2D maze
-//! let mut maze = BoxSpaceBlockCellMazeBuilder::<Buffer, 2>::new(coord_space).build();
+//! let mut maze = BoxSpaceBlockCellMazeCoordinatorBuilder::<Buffer, 2>::new(coord_space).build();
 //!
 //! // Give our maze a nice thick border
 //! solid_border(&mut maze);
@@ -71,7 +72,7 @@
 //! ```
 //! # use mazelib::implm::buffer::VecBuffer;
 //! # use mazelib::implm::cell::inline::InlineCellValue;
-//! # use mazelib::implm::maze::inline::BoxSpaceInlineCellMazeBuilder;
+//! # use mazelib::implm::coordinator::inline::BoxSpaceInlineCellMazeCoordinatorBuilder;
 //! # use mazelib::implm::point::boxy::BoxCoordinateSpace;
 //! #
 //! # const DIMENSION: usize = 2;
@@ -80,7 +81,7 @@
 //! // 2 for a 2D maze
 //! type Buffer = VecBuffer<InlineCellValue<2>>;
 //!
-//! let mut maze = BoxSpaceInlineCellMazeBuilder::<Buffer, 2>::new(coord_space).build();
+//! let mut maze = BoxSpaceInlineCellMazeCoordinatorBuilder::<Buffer, 2>::new(coord_space).build();
 //! ```
 //! produces
 //! ```text
@@ -120,7 +121,7 @@
 //! Then, you should read the module-level docs of [`interface`]. It explains all of the
 //! key interfaces and their role in our maze model.
 //!
-//! After that, you'll probably want to check out [`interface::cell::CellManager`].
+//! After that, you'll probably want to check out [`interface::coordinator::MazeCoordinator`].
 //! This is the central trait which all of the machinery interacts with, and is the main
 //! interface between you and the maze. The documentation for
 //! [`interface::generate::MazeGenerator`] will likely be of use. The details of the
@@ -171,7 +172,7 @@
 #![feature(rustdoc_missing_doc_code_examples)]
 
 // Suspicious documentation
-#![warn(missing_docs, rustdoc::missing_crate_level_docs, rustdoc::missing_doc_code_examples)]
+#![warn(missing_docs, rustdoc::missing_crate_level_docs)]
 #![warn(rustdoc::unescaped_backticks)]
 #![deny(rustdoc::broken_intra_doc_links)]
 

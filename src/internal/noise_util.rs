@@ -2,7 +2,7 @@
 #[macro_export]
 macro_rules! pt {
     () => {
-        <<Self as CellManager>::CoordSpace as CoordinateSpace>::PtType
+        <<Self as MazeCoordinator>::CoordSpace as CoordinateSpace>::PtType
     };
 }
 

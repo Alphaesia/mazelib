@@ -1,33 +1,17 @@
-// TODO surround the images in <figure>s and <figcaption>s
 // TODO fix the alignment of all of the annotations in the figures
 //! The core abstractions of our maze model.
 //!
-//! This crate splits up mazes into distinct parts, all at different levels of abstraction.
-//! It is important to understand these, as these divisions are the foundation for the library
-//! and will dictate how it is interacted with.
+//! There are a number of different concepts that all contribute to make a maze a maze. It is
+//! important to understand them as they are the foundation for this library.
 //!
-//! There are five core components that combined make up a maze:
-//! 1. [Cells]
-//! 2. [Points]
-//! 3. [Coordinate Spaces]
-//! 4. [Buffers]
-//! 5. [Cell Managers]
+//! Mazes are made up of: a [cell space](#cell), a [cell class](#cell),
+//! a [coordinate space](#coordinate-space), a [buffer](#buffer), and a [coordinator](#coordinator)
+//! to tie them all together. We'll go through them one-by-one.
 //!
-//! These components are all held together in one bundle by [Maze Carriers].
+//! There are also other entities which, while separate from mazes, interact with them deeply.
+//! Some examples include [renderers](#renderer), [generators](#generator), and [solvers](#solver).
 //!
-//! There are also external components that interact with mazes but do not constitute them:
-//! * [Renderers]
-//! * [Generators]
-//! * [Solvers]
-//! * [Templates]
-//!
-//! This page explains the key concepts you will need to understand the library, so you should
-//! read this top to bottom completely before reading the rest of the documentation.
-//!
-//! # Core Components
-//!
-//! The core components of a maze. It is the combination of all of these components together that
-//! constitute a maze.
+//! # Core Maze Concepts
 //!
 //! ## Cell
 //!
@@ -48,15 +32,14 @@
 //! where --- "Do I need a piece of wall here, or a path?" (And we do indeed build the maze, using
 //! renderers, which will also be discussed later).
 //!
-//! Cells are primarily defined by way they connect to other cells. Each type of cell is called a
-//! *cell class*. Each maze only has cells from a single class.
-//!
+//! Cells are primarily defined by way they connect to other cells.
 //! Cells are not restricted to being square. They can be
 //! [triangles](https://www.astrolog.org/labyrnth/maze/delta.gif),
 //! [hexagons](https://www.astrolog.org/labyrnth/maze/sigma.gif),
 //! [circular sectors](https://www.astrolog.org/labyrnth/maze/theta.gif),
 //! [multiple shapes](https://www.astrolog.org/labyrnth/maze/upsilon.gif), or
 //! [completely irregular](https://www.astrolog.org/labyrnth/maze/crack.gif).
+//! Each type of cell is called a *cell class*. Each maze uses a single class.
 //!
 //! Cell classes are generally designed to be paired up with specific (classes of) coordinate
 //! spaces.
@@ -72,13 +55,15 @@
 //! UUID) of a cell location is specific to each cell class. Cell locations are represented by the
 //! [`CellLocation`][self::cell::CellLocation] trait. The set of all legal cell locations in
 //! the context of a maze is known as the maze's *cell space*. The cell space is every position in
-//! a maze where it is possible to physically exist. In a way, it is the fabric of reality. There is
-//! no trait for cell spaces as they are implicitly derived from a maze's cell class and coordinate
-//! space.
+//! a maze where it is possible to physically exist. In a way, it is the fabric of reality. The cell
+//! space of a maze (and the type of cell location used) is derived from the maze's coordinate space
+//! (loosely, how big the maze is) and its cell class (how the cells connect). Because all the
+//! information about a cell space can be derived, it is not explicitly represented anywhere in this
+//! library.
 //!
 //! Every cell in a maze is assigned an arbitrary ordinal integer (0, 1, 2, ...) called its
 //! *cell id*. It is represented by the [`CellID`][crate::interface::cell::CellID] struct. How
-//! locations are mapped to IDs is up to the [maze's coordinator](#cell-manager) (discussed later).
+//! locations are mapped to IDs is up to the [maze's coordinator (discussed later)](#coordinator).
 //! However, if the cell space has an origin, that origin is always mapped to ID 0.
 //!
 //! Here's an example of how locations *could* be mapped to IDs:
@@ -96,8 +81,9 @@
 //! ## Point
 //!
 //! A [point][self::point::Point] is a *potential junction* of a maze. This includes features
-//! such as intersections, junctions, and straight hallways. Passages are simply two connected
-//! points. They are represented by the [`Point`][self::point::Point] trait.
+//! such as intersections, junctions, and straight hallways. Passageways are simply two connected
+//! points with passage cells between them. More generally, a point is a logical location in a maze.
+//! They are represented by the [`Point`][self::point::Point] trait.
 //!
 //! Here are all the points annotated on the maze from before:
 //!
@@ -114,9 +100,13 @@
 //! it easier (and faster) to compute things. Our example maze has 144 cells, but only 16 points
 //! --- an order of magnitude less.
 //!
-//! There does not need to exist a one-to-one mapping between points. A point might be mapped to
-//! multiple cells, and a cell might not be mapped to a point at all. Precisely how they are mapped
-//! is up to the maze's coordinator (which we'll come to soon).
+//! Unlike cells, which have both a location and a value, points are only a location. Instead points
+//! are mapped to specific cells. The value of the point is the value of the cell(s) it maps to.
+//! Though as discussed we're more interested in the relationship between points than the points
+//! themselves. We look at the cells between and including two points. There does not need to exist
+//! a one-to-one mapping between points and cells. A point might be mapped to multiple cells, and a
+//! cell might not be mapped to a point at all. Precisely how they are mapped is up to the maze's
+//! coordinator (which we'll come to soon).
 //!
 //! You may notice that on the figure the entrances and exits are not marked as points. This is an
 //! example of how the cell space captures nuances of the physical layout that aren't relevant for
@@ -126,8 +116,8 @@
 //! ## Coordinate Space
 //!
 //! The [coordinate space][self::point::CoordinateSpace] is the topology the maze. It defines the
-//! set of points (potential junctions) that exist in a maze, and how they (could) connect. This
-//! dictates the size and shape of the maze.
+//! set of points (potential junctions) that exist in a maze, and how they connect. This dictates
+//! the size and shape of the maze.
 //!
 //! Like how a maze's cell space is the set of all positions where it is possible to physically
 //! exist, a maze's coordinate space is the set of all positions we care about (have semantic
@@ -165,22 +155,22 @@
 //! Buffers do not handle exporting mazes into more permanent forms. That is handled by
 //! [renderers](#renderer).
 //!
-//! ## Cell Manager
+//! ## Coordinator
 //!
-//! The [CellManager][self::cell::CellManager] manages the cells.
+//! So a maze has both a coordinate space and a cell space. But how do you map one to the other?
+//! And if you want to make a passageway from point A to point B, which cells do you have to
+//! change? This is the job of the coordinator. The coordinator knows how to convert high-level
+//! queries (*"Is there a passageway from point A to B?"*) into low-level checks on specific cells.
 //!
-//! Due to their role in handling conversions to and from cells, CellManager implementations
-//! are often specific to only a specific combination of CoordinateSpace and type of cell
-//! ([`CellValue`][self::cell::CellValue]).
+//! The coordinator is the glue that ties the maze together. It concretises the abstract coordinate
+//! space into physical cells, and stores those cells in the buffer. The coordinator owns all of
+//! the components of the maze and is effectively the maze itself. If you ever want to interact
+//! with a maze directly, you will almost always do it through the coordinator.
 //!
-//! # Maze Carrier
+//! In practical terms, the coordinator is the most important concept for using this library. It is
+//! represented by the [`MazeCoordinator`][crate::interface::coordinator::MazeCoordinator] trait.
 //!
-//! A [Maze Carrier][self::maze::Maze] holds the five core components of a maze together.
-//! They are represented by the [`Maze`][self::maze::Maze] trait.
-//!
-//! They are used as references to the maze as a whole.
-//!
-//! # External Components
+//! # External Concepts
 //!
 //! ## Renderer
 //!
@@ -197,26 +187,15 @@
 //! ## Template
 //!
 //! ...
-//!
-//! [Cells]: #cell
-//! [Points]: #points
-//! [Coordinate Spaces]: #coordinate-space
-//! [Buffers]: #buffer
-//! [Cell Managers]: #cell-manager
-//! [Maze Carriers]: #maze-carrier
-//! [Renderers]: #renderer
-//! [Generators]: #generator
-//! [Solvers]: #solver
-//! [Templates]: #template
-#![doc = ::embed_doc_image::embed_image!("example-maze-unannotated", "src/doc/img/maze-model/example-maze-unannotated.png")]
-#![doc = ::embed_doc_image::embed_image!("example-maze-cell-outlines", "src/doc/img/maze-model/example-maze-cell-outlines.png")]
-#![doc = ::embed_doc_image::embed_image!("example-maze-cell-outlines-with-annotated-ids", "src/doc/img/maze-model/example-maze-cell-outlines-with-annotated-ids.png")]
-#![doc = ::embed_doc_image::embed_image!("example-maze-points", "src/doc/img/maze-model/example-maze-points.png")]
-#![doc = ::embed_doc_image::embed_image!("example-maze-points-connected", "src/doc/img/maze-model/example-maze-points-connected.png")]
+#![doc = embed_doc_image::embed_image!("example-maze-unannotated", "src/doc/img/maze-model/example-maze-unannotated.png")]
+#![doc = embed_doc_image::embed_image!("example-maze-cell-outlines", "src/doc/img/maze-model/example-maze-cell-outlines.png")]
+#![doc = embed_doc_image::embed_image!("example-maze-cell-outlines-with-annotated-ids", "src/doc/img/maze-model/example-maze-cell-outlines-with-annotated-ids.png")]
+#![doc = embed_doc_image::embed_image!("example-maze-points", "src/doc/img/maze-model/example-maze-points.png")]
+#![doc = embed_doc_image::embed_image!("example-maze-points-connected", "src/doc/img/maze-model/example-maze-points-connected.png")]
 
 pub mod buffer;
-pub mod point;
 pub mod cell;
-pub mod maze;
+pub mod point;
+pub mod coordinator;
 pub mod render;
 pub mod generate;

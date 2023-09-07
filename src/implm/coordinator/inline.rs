@@ -2,28 +2,29 @@ use std::fmt::{Debug, Formatter};
 use std::marker::PhantomData;
 
 use crate::implm::cell::inline::InlineCellValue;
-use crate::implm::cell::inline::value::InlineCellValueEdgeType;
+use crate::implm::cell::inline::InlineCellValueEdgeType;
 use crate::implm::point::boxy::BoxCoordinateSpace;
 use crate::implm::render::text::BoxSpaceTextMazeRenderer;
 use crate::interface::buffer::MazeBuffer;
-use crate::interface::cell::{CellID, CellManager, ConnectionType};
+use crate::interface::cell::{CellID, ConnectionType};
 use crate::interface::point::CoordinateSpace;
 use crate::interface::render::MazeRendererNonSeeking;
 use crate::internal::array_util::Product;
 use crate::pt;
 use crate::implm::cell::block::BlockCellLocation;
+use crate::interface::coordinator::MazeCoordinator;
 
-/// As this manager implements a one-to-one mapping between points and cells, there is
+/// As this coordinator implements a one-to-one mapping between points and cells, there is
 /// no separate [`CellLocation`][crate::interface::cell::CellLocation] struct.
 /// [`CoordinateTuplet`][crate::implm::point::boxy::CoordinateTuplet]s are converted directly
 /// into [`CellID`]s.
-pub struct BoxSpaceInlineCellManager<Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> {
+pub struct BoxSpaceInlineCellMazeCoordinator<Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> {
     buffer: Buffer,
     space: BoxCoordinateSpace<DIMENSION>,
 }
 
 // Constructor (private - use the builder)
-impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> BoxSpaceInlineCellManager<Buffer, DIMENSION> {
+impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> BoxSpaceInlineCellMazeCoordinator<Buffer, DIMENSION> {
     /// Construct a new maze from a given coordinate space.
     /// A [`MazeBuffer`] will be created from the value of type parameter `Buffer`.
     #[must_use]
@@ -33,7 +34,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Bo
 }
 
 // Public functions
-impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> BoxSpaceInlineCellManager<Buffer, DIMENSION> {
+impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> BoxSpaceInlineCellMazeCoordinator<Buffer, DIMENSION> {
     #[must_use]
     pub fn buffer(&self) -> &Buffer {
         &self.buffer
@@ -44,14 +45,14 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Bo
     /// Since with a [InlineCellValue] it is impossible to get the maze into an
     /// inconsistent state, this function is not considered `unsafe`.
     ///
-    /// In most cases you should use the methods on [CellManager] instead of this.
-    pub fn set(&mut self, cell: pt!(), value: <Self as CellManager>::CellVal) {
+    /// In most cases you should use the methods on [MazeCoordinator] instead of this.
+    pub fn set(&mut self, cell: pt!(), value: <Self as MazeCoordinator>::CellVal) {
         self.buffer.set(self.pt_to_cell_id(cell), value)
     }
 }
 
 // Internal functions
-impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> BoxSpaceInlineCellManager<Buffer, DIMENSION> {
+impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> BoxSpaceInlineCellMazeCoordinator<Buffer, DIMENSION> {
     //noinspection RsSelfConvention
     /// Get the axis in which two points are adjacent.
     ///
@@ -84,7 +85,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Bo
     }
 
     #[must_use]
-    fn get_mut(&mut self, pt: pt!()) -> &mut <Self as CellManager>::CellVal {
+    fn get_mut(&mut self, pt: pt!()) -> &mut <Self as MazeCoordinator>::CellVal {
         self.buffer.get_mut(self.pt_to_cell_id(pt))
     }
 
@@ -136,7 +137,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Bo
     }
 }
 
-impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> CellManager for BoxSpaceInlineCellManager<Buffer, DIMENSION> {
+impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> MazeCoordinator for BoxSpaceInlineCellMazeCoordinator<Buffer, DIMENSION> {
     type CoordSpace = BoxCoordinateSpace<DIMENSION>;
     type CellLoc = BlockCellLocation<DIMENSION>;
     type CellVal = InlineCellValue<DIMENSION>;
@@ -218,12 +219,12 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Ce
     }
 }
 
-pub struct BoxSpaceInlineCellManagerBuilder<Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> {
+pub struct BoxSpaceInlineCellMazeCoordinatorBuilder<Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> {
     _buffer: PhantomData<Buffer>,
     space: BoxCoordinateSpace<DIMENSION>,
 }
 
-impl<Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> BoxSpaceInlineCellManagerBuilder<Buffer, DIMENSION> {
+impl<Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> BoxSpaceInlineCellMazeCoordinatorBuilder<Buffer, DIMENSION> {
     pub fn new(space: BoxCoordinateSpace<DIMENSION>) -> Self {
         Self {
             _buffer: PhantomData,
@@ -231,24 +232,24 @@ impl<Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Box
         }
     }
 
-    pub fn build(&self) -> BoxSpaceInlineCellManager<Buffer, DIMENSION> {
-        BoxSpaceInlineCellManager::new(self.space)
+    pub fn build(&self) -> BoxSpaceInlineCellMazeCoordinator<Buffer, DIMENSION> {
+        BoxSpaceInlineCellMazeCoordinator::new(self.space)
     }
 }
 
 /*
  * We want to show the state of the maze in the debug output for 2D mazes.
  *
- * To this end, we must manually implement Debug for BoxSpaceInlineCellManager,
+ * To this end, we must manually implement Debug for BoxSpaceInlineCellMazeCoordinator,
  * then provide a specialisation where DIMENSION = 2.
  *
  * The reason we must manually implement Debug is because #[derive(Debug)] does
  * not mark its implementation as `default`, which we need in order to specialise.
  */
 
-impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> BoxSpaceInlineCellManager<Buffer, DIMENSION> {
+impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> BoxSpaceInlineCellMazeCoordinator<Buffer, DIMENSION> {
     fn write_main_dbg_fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "BoxSpaceBlockCellManager {{")?;
+        writeln!(f, "BoxSpaceInlineCellMazeCoordinator {{")?;
         writeln!(f, "\tbuffer: {:?}", self.buffer)?;
         writeln!(f, "\tspace: {:?}", self.space)?;
 
@@ -256,7 +257,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Bo
     }
 }
 
-impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Debug for BoxSpaceInlineCellManager<Buffer, DIMENSION> {
+impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Debug for BoxSpaceInlineCellMazeCoordinator<Buffer, DIMENSION> {
     default fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         self.write_main_dbg_fmt(f)?;
         writeln!(f, "}}")?;
@@ -265,7 +266,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> De
     }
 }
 
-impl <Buffer: MazeBuffer<InlineCellValue<2>>> Debug for BoxSpaceInlineCellManager<Buffer, 2> {
+impl <Buffer: MazeBuffer<InlineCellValue<2>>> Debug for BoxSpaceInlineCellMazeCoordinator<Buffer, 2> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         self.write_main_dbg_fmt(f)?;
 

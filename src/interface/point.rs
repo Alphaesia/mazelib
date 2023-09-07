@@ -1,3 +1,14 @@
+//! Abstract positioning in mazes.
+//!
+//! When analysing mazes (generating them, solving them, etc.), it's helpful to think only in terms
+//! of potential junctions, rather than stepping cell-by-cell throughout the maze. Points represent
+//! the positions in the maze that are meaningful for analysis.
+//!
+//! # Recommended Reading
+//!
+//! 1. [`CoordinateSpace`] --- the trait that defines the logical size of mazes.
+//! 2. [`crate::interface::cell::ConnectionType`] --- to see the different ways points can connect.
+
 use std::fmt::Debug;
 use std::hash::Hash;
 use std::num::NonZeroUsize;
@@ -23,7 +34,7 @@ use rand::Rng;
 ///
 /// # use mazelib::implm::buffer::VecBuffer;
 /// # use mazelib::implm::cell::block::BlockCellValue;
-/// # use mazelib::implm::maze::block::BoxSpaceBlockCellMazeBuilder;
+/// # use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinatorBuilder;
 /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
 /// #
 /// # type Buffer = VecBuffer<BlockCellValue>;
@@ -33,7 +44,7 @@ use rand::Rng;
 /// let space = BoxCoordinateSpace::new_checked(dimensions);
 ///
 /// // Will need to pick your own buffer
-/// let maze = BoxSpaceBlockCellMazeBuilder::<Buffer, _>::new(space).build();
+/// let maze = BoxSpaceBlockCellMazeCoordinatorBuilder::<Buffer, _>::new(space).build();
 /// ```
 ///
 /// # See Also

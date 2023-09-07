@@ -1,12 +1,13 @@
 use fluent_asserter::prelude::*;
 use crate::implm::buffer::VecBuffer;
 use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
-use crate::implm::maze::block::BoxSpaceBlockCellMazeBuilder as MazeBuilder;
+use crate::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinatorBuilder as MazeBuilder;
 use crate::implm::point::boxy::BoxCoordinateSpace;
 use crate::interface::buffer::MazeBuffer;
-use crate::interface::cell::{CellID, CellManager};
+use crate::interface::cell::CellID;
+use crate::interface::coordinator::MazeCoordinator;
 
-// We test both at a cell-manager level and a buffer level
+// We test both at a coordinator level and a buffer level
 // (i.e. ignoring and taking into account the resolution)
 
 // TODO add tests for mazes with padding

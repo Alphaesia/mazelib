@@ -3,7 +3,7 @@ use rand::Rng;
 
 use crate::implm::generate::util::carve_to_unvisited_neighbour;
 use crate::interface::generate::MazeGenerator;
-use crate::interface::maze::Maze;
+use crate::interface::coordinator::MazeCoordinator;
 use crate::interface::point::CoordinateSpace;
 
 /// The **Recursive Backtracker** algorithm is a variant of depth-first search which selects
@@ -39,7 +39,7 @@ pub struct RecursiveBacktrackerGenerator {
     _private: ()
 }
 
-impl <M: Maze> MazeGenerator<M> for RecursiveBacktrackerGenerator {
+impl <M: MazeCoordinator> MazeGenerator<M> for RecursiveBacktrackerGenerator {
     fn generate_with_rng(&mut self, maze: &mut M, rng: &mut (impl Rng + ?Sized)) {
         // Start at the origin
         let mut current_pt = maze.coord_space().choose(rng);

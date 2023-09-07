@@ -9,6 +9,6 @@
 pub mod buffer;
 pub mod point;
 pub mod cell;
-pub mod maze;
+pub mod coordinator;
 pub mod render;
 pub mod generate;

@@ -1,137 +1,37 @@
-//! Reading and manipulating mazes at a high level.
+//! Physical maze structure.
 //!
-//! Mazes are fundamentally a collection of cells. These collections are stored in
+//! Mazes are fundamentally a collection of cells. These cells define the physical structure of the
+//! maze. The collections of cells are stored in
 //! [`MazeBuffer`][crate::interface::buffer::MazeBuffer]s.
-//!
-//! While a collection of cells constitutes a maze, they need to be interpreted before any
-//! useful analysis can be done. This is the purpose of the [`CellManager`] - to hold the
-//! necessary information for interpreting cells.
 //!
 //! # Recommended Reading
 //!
 //! 1. [`crate::interface`'s section on cells][crate::interface#cell] --- a detailed introduction
 //! to cells and what they are.
 //! 2. [`ConnectionType`] --- the ways that points can be connected.
-//! 3. [`CellManager`] --- the unifying glue and centre of the maze model.
 
 use std::fmt::Debug;
 use std::hash::Hash;
-
-use crate::interface::point::CoordinateSpace;
-use crate::internal::noise_util::pt;
-
-/// Translates between [points][crate::interface::point::Point], [cell locations][CellLocation],
-/// and [cell identifiers][CellID]. Executes queries on mazes and modifications to mazes.
-///
-/// [Cells have no inherent meaning][crate::interface]. They must be interpreted in context.
-/// This is exactly what a Cell Manager does.
-///
-/// Due to requiring intimate knowledge of how the coordinate space works and how the cell space
-/// works, each Cell Manager is specific to a single CoordinateSpace-CellValue pair. There
-/// is generally only one such manager for each pair.
-pub trait CellManager: Debug {
-    /*
-     * Note: In the source, `<<Self as CellManager>::CoordSpace as CoordinateSpace>::PtType` is
-     * contracted to `pt!()` for brevity.
-     */
-
-    /// The type of coordinate space this cell manager supports.
-    type CoordSpace: CoordinateSpace;
-
-    /// The location type for the cell type this cell manager uses.
-    type CellLoc: CellLocation;
-
-    /// The value type for the cell type this cell manager uses.
-    type CellVal: CellValue;
-
-    /// Return the coordinate space for this maze.
-    #[must_use]
-    fn coord_space(&self) -> &Self::CoordSpace;
-
-    /// Return the value of the point `pt`.
-    #[must_use]
-    fn get(&self, pt: pt!()) -> Self::CellVal;
-
-    /// Return the type of connection (graph theory: *edge*) between two points.
-    ///
-    /// If you attempted to walk from `from` to `to` this is what you would encounter.
-    ///
-    /// The order of the arguments is important and has semantic meaning. Swapping
-    /// the arguments may produce different results.
-    ///
-    /// This method follows the
-    /// [priority order outlined in `ConnectionType`][ConnectionType#priority].
-    #[must_use]
-    fn get_connection(&self, from: pt!(), to: pt!()) -> ConnectionType;
-
-    /// Return true when [`get_connection(from, to)`][Self::get_connection] returns
-    /// [`ConnectionType::PASSAGE`].
-    #[must_use]
-    fn is_passage_between(&self, from: pt!(), to: pt!()) -> bool {
-        self.get_connection(from, to) == ConnectionType::PASSAGE
-    }
-
-    /// Return true when [`get_connection(from, to)`][Self::get_connection] returns
-    /// [`ConnectionType::WALL`].
-    #[must_use]
-    fn is_wall_between(&self, from: pt!(), to: pt!()) -> bool {
-        self.get_connection(from, to) == ConnectionType::WALL
-    }
-
-    /// Return true when [`get_connection(from, to)`][Self::get_connection] returns
-    /// [`ConnectionType::BOUNDARY`].
-    #[must_use]
-    fn is_boundary_between(&self, from: pt!(), to: pt!()) -> bool {
-        self.get_connection(from, to) == ConnectionType::BOUNDARY
-    }
-
-    /// Return true when [`get_connection(from, to)`][Self::get_connection] returns
-    /// [`ConnectionType::UNVISITED`].
-    #[must_use]
-    fn is_unvisited_between(&self, from: pt!(), to: pt!()) -> bool {
-        self.get_connection(from, to) == ConnectionType::UNVISITED
-    }
-
-    /// Make a passage at `pt`.
-    fn make_passage(&mut self, pt: pt!());
-
-    /// Make a passage from `from` to `to`. The points must be adjacent.
-    /// If they are not, this function will panic with debug assertions enabled.
-    /// Passing in non-adjacent points without debug assertions enabled is undefined.
-    ///
-    /// The order of the arguments is important and has semantic meaning. Swapping
-    /// the arguments may produce different results.
-    fn make_passage_between(&mut self, from: pt!(), to: pt!());
-
-    /// Make a wall at `pt`.
-    fn make_wall(&mut self, pt: pt!());
-
-    /// Make a wall from `from` to `to`. The points must be adjacent.
-    /// If they are not, this function will panic with debug assertions enabled.
-    /// Passing in non-adjacent points without debug assertions enabled is undefined.
-    ///
-    /// The order of the arguments is important and has semantic meaning. Swapping
-    /// the arguments may produce different results.
-    fn make_wall_between(&mut self, from: pt!(), to: pt!());
-
-    /// Make a boundary at `pt`.
-    fn make_boundary(&mut self, pt: pt!());
-
-    /// Make a boundary from `from` to `to`. The points must be adjacent.
-    /// If they are not, this function will panic with debug assertions enabled.
-    /// Passing in non-adjacent points without debug assertions enabled is undefined.
-    ///
-    /// The order of the arguments is important and has semantic meaning. Swapping
-    /// the arguments may produce different results.
-    fn make_boundary_between(&mut self, from: pt!(), to: pt!());
-}
 
 /// Location of a cell.
 ///
 /// They are physical positions in a maze. They also act as a cell's "address". For
 /// example, to query a cell's [value][CellValue], you give the cell's `CellLocation`
-/// to the [`CellManager`].
+/// to the [`MazeCoordinator`][crate::interface::coordinator::MazeCoordinator].
 pub trait CellLocation: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Debug {}
+
+/// A unique identifier for a cell within a given maze.
+///
+/// Identifiers are sequential and start from zero.
+///
+/// They are primarily used by [buffers][crate::interface::buffer::MazeBuffer]
+/// for the purposes of storing mazes.
+///
+/// The exact semantics of how cells are given their identifiers is
+/// unspecified and up to each [`MazeCoordinator`][crate::interface::coordinator::MazeCoordinator].
+/// Typically it will differ between implementations, and is not API.
+#[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
+pub struct CellID(pub usize);
 
 /// Value of a cell.
 ///
@@ -172,7 +72,7 @@ pub enum ConnectionType {
     PASSAGE,
     /// A connection is considered a wall if one cannot move through
     /// it in any capacity. Walls may be converted into passages by
-    /// generation algorithms.
+    /// generators.
     WALL,
     /// Like a wall, but it will never be touched by a generator.
     /// Boundaries are ideal for the outlines of mazes and other
@@ -183,16 +83,3 @@ pub enum ConnectionType {
     /// from within the maze itself after generation is complete.
     UNVISITED
 }
-
-/// A unique identifier for a cell within a given maze.
-///
-/// Identifiers are sequential and start from zero.
-///
-/// They are primarily used by [buffers][crate::interface::buffer::MazeBuffer]
-/// for the purposes of storing mazes.
-///
-/// The exact semantics of how cells are given their identifiers is
-/// unspecified and up to each [`CellManager`].
-/// Typically it will differ between implementations, and is not API.
-#[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
-pub struct CellID(pub usize);

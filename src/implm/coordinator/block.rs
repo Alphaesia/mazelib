@@ -3,12 +3,13 @@ use std::marker::PhantomData;
 use std::num::NonZeroUsize;
 
 use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
-use crate::implm::cell::block::location::BlockCellLocation;
-use crate::implm::cell::block::value::BlockCellValueType::{BOUNDARY, PASSAGE, UNVISITED, WALL};
+use crate::implm::cell::block::BlockCellLocation;
+use crate::implm::cell::block::BlockCellValueType::{BOUNDARY, PASSAGE, UNVISITED, WALL};
 use crate::implm::point::boxy::BoxCoordinateSpace;
 use crate::implm::render::text::BoxSpaceTextMazeRenderer;
 use crate::interface::buffer::MazeBuffer;
-use crate::interface::cell::{CellID, CellManager, ConnectionType};
+use crate::interface::cell::{CellID, ConnectionType};
+use crate::interface::coordinator::MazeCoordinator;
 use crate::interface::point::CoordinateSpace;
 use crate::interface::render::MazeRendererNonSeeking;
 use crate::internal::array_util::{ArrayZipMap, CheckedProduct, CheckedSum};
@@ -22,8 +23,9 @@ use crate::internal::util::{NONZERO_USIZE_TWO, try_usize_array_to_nonzero_usize_
 /// With scaling and padding:
 /// ```
 /// use mazelib::implm::point::boxy::TwoDimensionalBoxCoordinateSpace;
-/// use mazelib::implm::cell::block::{BlockCellValue, BoxSpaceBlockCellManagerBuilder};
+/// use mazelib::implm::cell::block::BlockCellValue;
 /// use mazelib::implm::buffer::VecBuffer;
+/// use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinatorBuilder;
 ///
 /// let coord_space = TwoDimensionalBoxCoordinateSpace::new_checked([11, 11]); // Standard 2D coordinate space
 /// let scale_factor = [2, 2]; // A simple scale factor of 2 for a clean look
@@ -32,12 +34,12 @@ use crate::internal::util::{NONZERO_USIZE_TWO, try_usize_array_to_nonzero_usize_
 ///
 /// type MazeBuffer = VecBuffer<CellType>;
 ///
-/// let maze = BoxSpaceBlockCellManagerBuilder::<MazeBuffer, 2>::new(coord_space)
+/// let maze = BoxSpaceBlockCellMazeCoordinatorBuilder::<MazeBuffer, 2>::new(coord_space)
 ///                                             .scale_factor_checked(scale_factor)
 ///                                             .padding(padding)
 ///                                             .build();
 /// ```
-pub struct BoxSpaceBlockCellManager<Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> {
+pub struct BoxSpaceBlockCellMazeCoordinator<Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> {
     buffer: Buffer,
     space: BoxCoordinateSpace<DIMENSION>,
     scale_factor: [NonZeroUsize; DIMENSION],
@@ -46,7 +48,7 @@ pub struct BoxSpaceBlockCellManager<Buffer: MazeBuffer<BlockCellValue>, const DI
 }
 
 // Constructor (private - use the builder)
-impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockCellManager<Buffer, DIMENSION> {
+impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockCellMazeCoordinator<Buffer, DIMENSION> {
     /// Construct a new maze from a given coordinate space, scale factor, and padding.
     ///
     /// # Parameters
@@ -91,7 +93,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
 }
 
 // Public functions
-impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockCellManager<Buffer, DIMENSION> {
+impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockCellMazeCoordinator<Buffer, DIMENSION> {
     #[must_use]
     pub fn buffer(&self) -> &Buffer {
         &self.buffer
@@ -124,7 +126,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
 
     /// Map a point to a cell location.
     #[must_use]
-    pub fn map_pt_to_cell_loc(&self, pt: pt!()) -> <Self as CellManager>::CellLoc {
+    pub fn map_pt_to_cell_loc(&self, pt: pt!()) -> <Self as MazeCoordinator>::CellLoc {
         let mut pt: [usize; DIMENSION] = pt.into();
 
         for i in 0..DIMENSION {
@@ -139,17 +141,18 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     ///
     /// *See also: [`get()`][Self::get].*
     #[must_use]
-    pub fn get_mut(&mut self, pt: pt!()) -> &mut <Self as CellManager>::CellVal {
+    pub fn get_mut(&mut self, pt: pt!()) -> &mut <Self as MazeCoordinator>::CellVal {
         self.get_cell_value_mut(self.map_pt_to_cell_loc(pt))
     }
 
     /// Sugar for
     /// ```
     /// # use mazelib::implm::buffer::VecBuffer;
-    /// # use mazelib::implm::cell::block::{BlockCellValue, BlockCellValueType, BoxSpaceBlockCellManagerBuilder};
+    /// # use mazelib::implm::cell::block::{BlockCellValue, BlockCellValueType};
     /// # use mazelib::implm::cell::inline::InlineCellValue;
+    /// # use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinatorBuilder;
     /// # use mazelib::implm::point::boxy::{BoxCoordinateSpace, CoordinateTuplet};
-    /// # let mut maze = BoxSpaceBlockCellManagerBuilder::<VecBuffer<BlockCellValue>, 1>::new(BoxCoordinateSpace::new_checked([1])).build();
+    /// # let mut maze = BoxSpaceBlockCellMazeCoordinatorBuilder::<VecBuffer<BlockCellValue>, 1>::new(BoxCoordinateSpace::new_checked([1])).build();
     /// # let pt: CoordinateTuplet<1> = [0].into();
     /// # let cell_type = BlockCellValueType::PASSAGE;
     /// #
@@ -165,11 +168,11 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
 
     /// Get the value of any cell.
     ///
-    /// In most cases you should use the methods on [`CellManager::get()`]. The only
+    /// In most cases you should use the methods on [`MazeCoordinator::get()`]. The only
     /// reason you should use this method is to access a cell that is not mapped by
     /// the coordinated space.
     #[must_use]
-    pub fn get_cell_value(&self, loc: <Self as CellManager>::CellLoc) -> BlockCellValue {
+    pub fn get_cell_value(&self, loc: <Self as MazeCoordinator>::CellLoc) -> BlockCellValue {
         self.buffer.get(self.cell_loc_to_id(loc))
     }
 
@@ -181,7 +184,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     ///
     /// See also: [`Self::get_cell_value()`].
     #[must_use]
-    pub fn get_cell_value_mut(&mut self, loc: <Self as CellManager>::CellLoc) -> &mut BlockCellValue {
+    pub fn get_cell_value_mut(&mut self, loc: <Self as MazeCoordinator>::CellLoc) -> &mut BlockCellValue {
         self.buffer.get_mut(self.cell_loc_to_id(loc))
     }
 
@@ -190,21 +193,22 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// Since with a [BlockCellValue] it is impossible to get the maze into an
     /// inconsistent state, this function is not considered `unsafe`.
     ///
-    /// In most cases you should use the methods on [CellManager]. The only reason
+    /// In most cases you should use the methods on [MazeCoordinator]. The only reason
     /// you should use this method is to access a cell that is not mapped by the
     /// coordinated space.
     #[must_use]
-    pub fn set_cell_value(&mut self, loc: <Self as CellManager>::CellLoc, value: BlockCellValue) {
+    pub fn set_cell_value(&mut self, loc: <Self as MazeCoordinator>::CellLoc, value: BlockCellValue) {
         self.buffer.set(self.cell_loc_to_id(loc), value)
     }
 
     /// Sugar for
     /// ```
     /// # use mazelib::implm::buffer::VecBuffer;
-    /// # use mazelib::implm::cell::block::{BlockCellLocation, BlockCellValue, BlockCellValueType, BoxSpaceBlockCellManagerBuilder};
+    /// # use mazelib::implm::cell::block::{BlockCellLocation, BlockCellValue, BlockCellValueType};
     /// # use mazelib::implm::cell::inline::InlineCellValue;
+    /// # use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinatorBuilder;
     /// # use mazelib::implm::point::boxy::{BoxCoordinateSpace, CoordinateTuplet};
-    /// # let mut maze = BoxSpaceBlockCellManagerBuilder::<VecBuffer<BlockCellValue>, 1>::new(BoxCoordinateSpace::new_checked([1])).build();
+    /// # let mut maze = BoxSpaceBlockCellMazeCoordinatorBuilder::<VecBuffer<BlockCellValue>, 1>::new(BoxCoordinateSpace::new_checked([1])).build();
     /// # let loc: BlockCellLocation<1> = [0].into();
     /// # let cell_type = BlockCellValueType::PASSAGE;
     /// #
@@ -212,13 +216,13 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// ```
     ///
     /// Please see [`Self::get_cell_value_mut()`] for details.
-    pub fn set_cell_value_type(&mut self, loc: <Self as CellManager>::CellLoc, cell_type: BlockCellValueType) {
+    pub fn set_cell_value_type(&mut self, loc: <Self as MazeCoordinator>::CellLoc, cell_type: BlockCellValueType) {
         self.get_cell_value_mut(loc).cell_type = cell_type;
     }
 }
 
 // Internal functions
-impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockCellManager<Buffer, DIMENSION> {
+impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockCellMazeCoordinator<Buffer, DIMENSION> {
     //noinspection RsSelfConvention
     /// Get the axis in which two points are adjacent.
     ///
@@ -241,7 +245,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
 
     /// Convert a [`crate::interface::cell::CellLocation`] to a [`CellID`]
     #[must_use]
-    fn cell_loc_to_id(&self, cell_loc: <Self as CellManager>::CellLoc) -> CellID {
+    fn cell_loc_to_id(&self, cell_loc: <Self as MazeCoordinator>::CellLoc) -> CellID {
         let mut offset = cell_loc[0];
 
         for i in 1..DIMENSION {
@@ -251,7 +255,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
         CellID(offset)
     }
 
-    fn set_unvisited_neighbours_to_wall(&mut self, cell_loc: <Self as CellManager>::CellLoc) {
+    fn set_unvisited_neighbours_to_wall(&mut self, cell_loc: <Self as MazeCoordinator>::CellLoc) {
         for i in 0..DIMENSION {
             if cell_loc[i] > 0 {
                 let neighbour = self.get_cell_value_mut(cell_loc.offset(i, -1));
@@ -272,7 +276,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     }
 }
 
-impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> CellManager for BoxSpaceBlockCellManager<Buffer, DIMENSION> {
+impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> MazeCoordinator for BoxSpaceBlockCellMazeCoordinator<Buffer, DIMENSION> {
     type CoordSpace = BoxCoordinateSpace<DIMENSION>;
     type CellLoc = BlockCellLocation<DIMENSION>;
     type CellVal = BlockCellValue;
@@ -394,14 +398,14 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> CellManager fo
     }
 }
 
-pub struct BoxSpaceBlockCellManagerBuilder<Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> {
+pub struct BoxSpaceBlockCellMazeCoordinatorBuilder<Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> {
     _buffer: PhantomData<Buffer>,  // We're not actually interested in constructing a buffer yet
     space: BoxCoordinateSpace<DIMENSION>,
     scale_factor: [NonZeroUsize; DIMENSION],
     padding: [[usize; 2]; DIMENSION],
 }
 
-impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockCellManagerBuilder<Buffer, DIMENSION> {
+impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockCellMazeCoordinatorBuilder<Buffer, DIMENSION> {
     pub fn new(space: BoxCoordinateSpace<DIMENSION>) -> Self {
         Self {
             _buffer: PhantomData,
@@ -427,24 +431,24 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
         return self
     }
 
-    pub fn build(&self) -> BoxSpaceBlockCellManager<Buffer, DIMENSION> {
-        BoxSpaceBlockCellManager::new(self.space, self.scale_factor, self.padding)
+    pub fn build(&self) -> BoxSpaceBlockCellMazeCoordinator<Buffer, DIMENSION> {
+        BoxSpaceBlockCellMazeCoordinator::new(self.space, self.scale_factor, self.padding)
     }
 }
 
 /*
  * We want to show the state of the maze in the debug output for 2D mazes.
  *
- * To this end, we must manually implement Debug for BoxSpaceBlockCellManager,
+ * To this end, we must manually implement Debug for BoxSpaceBlockCellMazeCoordinator,
  * then provide a specialisation where DIMENSION = 2.
  *
  * The reason we must manually implement Debug is because #[derive(Debug)] does
  * not mark its implementation as `default`, which we need in order to specialise.
  */
 
-impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockCellManager<Buffer, DIMENSION> {
+impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockCellMazeCoordinator<Buffer, DIMENSION> {
     fn write_main_dbg_fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "BoxSpaceBlockCellManager {{")?;
+        writeln!(f, "BoxSpaceBlockCellMazeCoordinator {{")?;
         writeln!(f, "\tbuffer: {:?}", self.buffer)?;
         writeln!(f, "\tspace: {:?}", self.space)?;
         writeln!(f, "\tresolution: {:?}", self.scale_factor)?;
@@ -455,7 +459,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     }
 }
 
-impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> Debug for BoxSpaceBlockCellManager<Buffer, DIMENSION> {
+impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> Debug for BoxSpaceBlockCellMazeCoordinator<Buffer, DIMENSION> {
     default fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         self.write_main_dbg_fmt(f)?;
         writeln!(f, "}}")?;
@@ -464,7 +468,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> Debug for BoxS
     }
 }
 
-impl <Buffer: MazeBuffer<BlockCellValue>> Debug for BoxSpaceBlockCellManager<Buffer, 2> {
+impl <Buffer: MazeBuffer<BlockCellValue>> Debug for BoxSpaceBlockCellMazeCoordinator<Buffer, 2> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         self.write_main_dbg_fmt(f)?;
 

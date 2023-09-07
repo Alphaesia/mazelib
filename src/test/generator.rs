@@ -4,9 +4,9 @@ use rand_chacha::ChaCha8Rng;
 use crate::implm::buffer::VecBuffer;
 use crate::implm::cell::block::BlockCellValue;
 use crate::implm::cell::inline::InlineCellValue;
+use crate::implm::coordinator::block::{BoxSpaceBlockCellMazeCoordinator, BoxSpaceBlockCellMazeCoordinatorBuilder};
+use crate::implm::coordinator::inline::{BoxSpaceInlineCellMazeCoordinator, BoxSpaceInlineCellMazeCoordinatorBuilder};
 use crate::implm::generate::{HuntAndKillGenerator, NAryTreeGenerator, RecursiveBacktrackerGenerator};
-use crate::implm::maze::block::{BoxSpaceBlockCellMaze, BoxSpaceBlockCellMazeBuilder};
-use crate::implm::maze::inline::{BoxSpaceInlineCellMaze, BoxSpaceInlineCellMazeBuilder};
 use crate::implm::point::boxy::BoxCoordinateSpace;
 use crate::implm::render::text::BoxSpaceTextMazeRenderer;
 use crate::interface::generate::MazeGenerator;
@@ -233,15 +233,15 @@ fn get_test_rng() -> ChaCha8Rng {
     ChaCha8Rng::seed_from_u64(0)
 }
 
-fn get_new_block_cell_maze() -> BoxSpaceBlockCellMaze<VecBuffer<BlockCellValue>, 2> {
-    BoxSpaceBlockCellMazeBuilder::<VecBuffer<BlockCellValue>, 2>::new(BoxCoordinateSpace::<2>::new_checked([9, 9])).build()
+fn get_new_block_cell_maze() -> BoxSpaceBlockCellMazeCoordinator<VecBuffer<BlockCellValue>, 2> {
+    BoxSpaceBlockCellMazeCoordinatorBuilder::<VecBuffer<BlockCellValue>, 2>::new(BoxCoordinateSpace::<2>::new_checked([9, 9])).build()
 }
 
-fn get_new_inline_cell_maze() -> BoxSpaceInlineCellMaze::<VecBuffer<InlineCellValue<2>>, 2> {
-    BoxSpaceInlineCellMazeBuilder::<VecBuffer<InlineCellValue<2>>, 2>::new(BoxCoordinateSpace::<2>::new_checked([9, 9])).build()
+fn get_new_inline_cell_maze() -> BoxSpaceInlineCellMazeCoordinator::<VecBuffer<InlineCellValue<2>>, 2> {
+    BoxSpaceInlineCellMazeCoordinatorBuilder::<VecBuffer<InlineCellValue<2>>, 2>::new(BoxCoordinateSpace::<2>::new_checked([9, 9])).build()
 }
 
-fn render_block_cell_maze(maze: &BoxSpaceBlockCellMaze<VecBuffer<BlockCellValue>, 2>) -> String {
+fn render_block_cell_maze(maze: &BoxSpaceBlockCellMazeCoordinator<VecBuffer<BlockCellValue>, 2>) -> String {
     let mut str_buffer = Vec::<u8>::new();
 
     BoxSpaceTextMazeRenderer::new().render(maze, &mut str_buffer).unwrap();
@@ -251,7 +251,7 @@ fn render_block_cell_maze(maze: &BoxSpaceBlockCellMaze<VecBuffer<BlockCellValue>
     return as_string;
 }
 
-fn render_inline_cell_maze(maze: &BoxSpaceInlineCellMaze::<VecBuffer<InlineCellValue<2>>, 2>) -> String {
+fn render_inline_cell_maze(maze: &BoxSpaceInlineCellMazeCoordinator::<VecBuffer<InlineCellValue<2>>, 2>) -> String {
     let mut str_buffer = Vec::<u8>::new();
 
     BoxSpaceTextMazeRenderer::new().render(maze, &mut str_buffer).unwrap();
