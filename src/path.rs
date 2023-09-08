@@ -41,7 +41,7 @@ use crate::interface::point::CoordinateSpace;
 ///     // ...
 /// }
 /// ```
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct Path<T: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Debug> {
     locs: Vec<T>,
 }
@@ -216,12 +216,16 @@ impl <T: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Debug> Pat
     /// assert!(Path::from_vec(vec![3, 2, 1, 2]).is_simple() == false);
     /// ```
     pub fn is_simple(&self) -> bool {
-        let mut seen_pts = HashSet::new();
+        Self::is_subpath_simple(&self.locs)
+    }
 
-        for pt in &self.locs {
+    fn is_subpath_simple(subpath: &[T]) -> bool {
+        let mut seen_locs = HashSet::new();
+
+        for loc in subpath {
             // Minor abuse of ::replace as a replacement for insert_if_missing
             // If already in the set, then this path must not be simple
-            match seen_pts.replace(pt) {
+            match seen_locs.replace(loc) {
                 Some(_) => return false,
                 None => {}
             }
@@ -245,10 +249,11 @@ impl <T: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Debug> Pat
     /// #
     /// let mut path = Path::from_vec(vec![3, 2, 1, 2, 3]);
     /// 
-    /// let mut simplified_path = path.make_simple();
+    /// path.make_simple();
+    /// assert_eq!(Path::from_vec(vec![3]), path);
     /// 
-    /// assert_eq!(Path::from_vec(vec![3]), simplified_path);
-    /// assert_eq!(Path::from_vec(vec![3]), simplified_path.make_simple());
+    /// path.make_simple();  // Idempotent
+    /// assert_eq!(Path::from_vec(vec![3]), path);
     /// ```
     pub fn make_simple(&mut self) {
         // Track the first time we've seen each location (not in a removed range),
@@ -294,7 +299,7 @@ impl <T: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Debug> Pat
 
                     // Any location that is removed shouldn't be eligible for a new removal range (as we've already
                     // removed it, and any new range would start later than the existing range)
-                    first_seen_indices_of_locs.retain(|_pt, first_seen_index| new_removal_range.contains(first_seen_index) == false);
+                    first_seen_indices_of_locs.retain(|_loc, first_seen_index| new_removal_range.contains(first_seen_index) == false);
 
                     // Remove all the ranges that we're condensing...
                     ranges_to_remove.drain(ranges_to_condense_start..ranges_to_remove.len());
@@ -336,12 +341,13 @@ impl <T: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Debug> Pat
     /// assert!(Path::from_vec(vec![1         ]).is_cycle() == false);
     /// ```
     pub fn is_cycle(&self) -> bool {
-        self.locs.len() >= 1 && self.locs[0] == self.locs[self.locs.len() - 1]
+        self.locs.len() > 1 && self.locs[0] == self.locs[self.locs.len() - 1]
     }
 
     /// Return whether this path is a simple cycle.
     ///
-    /// A simple cycle is a simple path that is also a cycle.
+    /// A simple cycle is a path that is a cycle and has no repeated locations, except for the
+    /// first and last locations.
     ///
     /// # Examples
     ///
@@ -358,7 +364,7 @@ impl <T: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Debug> Pat
     /// * [`Self::is_cycle`]
     pub fn is_simple_cycle(&self) -> bool {
         // Cycle check is cheaper so lets do it first
-        self.is_cycle() && self.is_simple()
+        self.is_cycle() && Self::is_subpath_simple(&self.locs[0..(self.locs.len() - 1)])
     }
 }
 

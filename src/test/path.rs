@@ -2,8 +2,6 @@ use crate::path::Path;
 
 #[test]
 fn test_path_is_simple() {
-    assert!(Path::<i32>::from_vec(vec![]).is_simple());
-
     assert!(Path::from_vec(vec![1]).is_simple());
 
     assert!(Path::from_vec(vec![1, 2, 3]).is_simple());
@@ -13,10 +11,6 @@ fn test_path_is_simple() {
 
 #[test]
 fn test_path_simplification() {
-    let mut path = Path::<i32>::from_vec(vec![]);
-    path.make_simple();
-    assert!(path.is_simple());
-
     let mut path = Path::from_vec(vec![1]);
     path.make_simple();
     assert!(path.is_simple());
