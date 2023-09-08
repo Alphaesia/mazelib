@@ -53,18 +53,17 @@
 //!
 //! A cell location is a unique absolute position in the maze. The structure (e.g. 2-tuple, 3-tuple,
 //! UUID) of a cell location is specific to each cell class. Cell locations are represented by the
-//! [`CellLocation`][self::cell::CellLocation] trait. The set of all legal cell locations in
-//! the context of a maze is known as the maze's *cell space*. The cell space is every position in
-//! a maze where it is possible to physically exist. In a way, it is the fabric of reality. The cell
-//! space of a maze (and the type of cell location used) is derived from the maze's coordinate space
-//! (loosely, how big the maze is) and its cell class (how the cells connect). Because all the
-//! information about a cell space can be derived, it is not explicitly represented anywhere in this
-//! library.
+//! [`CellLocation`][cell::CellLocation] trait. The set of all legal cell locations in the context
+//! of a maze is known as the maze's *cell space*. The cell space is every position in a maze where
+//! it is possible to physically exist. In a way, it is the fabric of reality. The cell space of a
+//! maze (and the type of cell location used) is derived from the maze's coordinate space (loosely,
+//! how big the maze is) and its cell class (how the cells connect). Because all the information
+//! about a cell space can be derived, it is not explicitly represented anywhere in this library.
 //!
 //! Every cell in a maze is assigned an arbitrary ordinal integer (0, 1, 2, ...) called its
-//! *cell id*. It is represented by the [`CellID`][crate::interface::cell::CellID] struct. How
-//! locations are mapped to IDs is up to the [maze's coordinator (discussed later)](#coordinator).
-//! However, if the cell space has an origin, that origin is always mapped to ID 0.
+//! *cell id*. It is represented by the [`CellID`][cell::CellID] struct. How locations are mapped
+//! to IDs is up to the [maze's coordinator (discussed later)](#coordinator). However, if the cell
+//! space has an origin, that origin is always mapped to ID 0.
 //!
 //! Here's an example of how locations *could* be mapped to IDs:
 //!
@@ -72,18 +71,18 @@
 //!
 //! ### Cell Values
 //!
-//! A cell's value determines the [movement rules][self::cell::ConnectionType] between itself and
-//! its neighbours. This may be as blunt as "this cell can be moved through" and "this cell can't",
-//! or it may be more granular. The information carried by a cell (and thus the! set of possible
+//! A cell's value determines the [movement rules][cell::ConnectionType] between itself and its
+//! neighbours. This may be as blunt as "this cell can be moved through" and "this cell can't", or
+//! it may be more granular. The information carried by a cell (and thus the! set of possible
 //! values) can differ between cell classes. Cell values are represented by the
-//! [`CellValue`][self::cell::CellValue] trait.
+//! [`CellValue`][cell::CellValue] trait.
 //!
 //! ## Point
 //!
 //! A [point][self::point::Point] is a *potential junction* of a maze. This includes features
 //! such as intersections, junctions, and straight hallways. Passageways are simply two connected
 //! points with passage cells between them. More generally, a point is a logical location in a maze.
-//! They are represented by the [`Point`][self::point::Point] trait.
+//! They are represented by the [`Point`][point::Point] trait.
 //!
 //! Here are all the points annotated on the maze from before:
 //!
@@ -115,9 +114,9 @@
 //!
 //! ## Coordinate Space
 //!
-//! The [coordinate space][self::point::CoordinateSpace] is the topology the maze. It defines the
-//! set of points (potential junctions) that exist in a maze, and how they connect. This dictates
-//! the size and shape of the maze.
+//! The [coordinate space][point::CoordinateSpace] is the topology the maze. It defines the set of
+//! points (potential junctions) that exist in a maze, and how they connect. This dictates the size
+//! and shape of the maze.
 //!
 //! Like how a maze's cell space is the set of all positions where it is possible to physically
 //! exist, a maze's coordinate space is the set of all positions we care about (have semantic
@@ -129,7 +128,7 @@
 //! [graphs](https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)), with points as its
 //! vertices, potential passages between those points as its edges, and a few other bits of
 //! information (e.g. the origin). They are represented by the
-//! [`CoordinateSpace`][self::point::CoordinateSpace] trait.
+//! [`CoordinateSpace`][point::CoordinateSpace] trait.
 //!
 //! Here, the turquoise lines between points represent the potential ways one could move between
 //! points. Only some of these connections are passages and can be moved through. The others are
@@ -150,7 +149,7 @@
 //! They only store the mazes cells, indexed by their unique consecutive IDs. They have no knowledge
 //! of the higher-order structure of the maze. Typically buffers will just be something akin to a
 //! [`Vec`][crate::implm::buffer::VecBuffer] wrapper but other more exotic buffers are possible.
-//! Buffers are represented by the [`MazeBuffer`][self::buffer::MazeBuffer] trait.
+//! Buffers are represented by the [`MazeBuffer`][buffer::MazeBuffer] trait.
 //!
 //! Buffers do not handle exporting mazes into more permanent forms. That is handled by
 //! [exporters](#exporter).
@@ -168,13 +167,21 @@
 //! with a maze directly, you will almost always do it through the coordinator.
 //!
 //! In practical terms, the coordinator is the most important concept for using this library. It is
-//! represented by the [`MazeCoordinator`][crate::interface::coordinator::MazeCoordinator] trait.
+//! represented by the [`MazeCoordinator`][coordinator::MazeCoordinator] trait.
 //!
 //! # External Concepts
 //!
 //! ## Generator
 //!
-//! TODO
+//! Generators are responsible for creating the actual layouts of mazes. They turn blank canvases
+//! into real challenges. Generators may operate on clean slates, or mazes that already have
+//! some parts created. A human could draw the main structural features of the maze and let a
+//! generator fill in the gaps. Or the generator could create the whole maze from start to finish.
+//! 
+//! No two generators are alike. Every generator has its own quirks and identity in the output it
+//! produces. They also use a random-number source to ensure that every maze generated is unique.
+//! 
+//! Generators are represented by the [`MazeGenerator`][generate::MazeGenerator] trait.
 //!
 //! ## Solver
 //!
@@ -188,8 +195,7 @@
 //! from an ASCII diagram or image to a super-niche binary format for a particular game. Most
 //! exporters though are only capable with dealing with with a small number of maze coordinators
 //! due to restrictions inherent in the format. You're not exporting a 3D maze to a 2D image after
-//! all. Exporters are represented by the [`MazeExporter`][crate::interface::export::MazeExporter]
-//! trait.
+//! all. Exporters are represented by the [`MazeExporter`][export::MazeExporter] trait.
 #![doc = embed_doc_image::embed_image!("example-maze-unannotated", "src/doc/img/maze-model/example-maze-unannotated.png")]
 #![doc = embed_doc_image::embed_image!("example-maze-cell-outlines", "src/doc/img/maze-model/example-maze-cell-outlines.png")]
 #![doc = embed_doc_image::embed_image!("example-maze-cell-outlines-with-annotated-ids", "src/doc/img/maze-model/example-maze-cell-outlines-with-annotated-ids.png")]

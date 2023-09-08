@@ -71,6 +71,14 @@ impl <M: MazeCoordinator<CoordSpace=BoxCoordinateSpace<DIMENSION>>, const DIMENS
 }
 
 impl NAryTreeGenerator {
+    /// Construct a new generator instance.
+    ///
+    /// This doesn't take any parameters, so if you're just immediately going to call
+    /// [`generate()`][crate::interface::generate::MazeGenerator::generate], you may wish to use
+    /// [`DefaultMazeGenerator::generate()`][crate::interface::generate::DefaultMazeGenerator::generate]
+    /// instead.
+    ///
+    /// Equivalent to [`Self::default()`].
     #[must_use]
     pub fn new() -> Self {
         Self { _private: () }
