@@ -136,6 +136,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<2>>, Output: Write> MazeExporter<BoxSpa
 
 impl BoxSpaceTextMazeExporter {
     // not recommended reading
+    #[must_use]
     fn get_box_char(left_wall: EdgeType, top_wall: EdgeType, right_wall: EdgeType, bottom_wall: EdgeType) -> char {
         match (left_wall, top_wall, right_wall, bottom_wall) {
             (EdgeType::WALL | EdgeType::UNVISITED,  EdgeType::WALL | EdgeType::UNVISITED,  EdgeType::WALL | EdgeType::UNVISITED,  EdgeType::WALL | EdgeType::UNVISITED) => '┼',

@@ -23,6 +23,7 @@ impl BoxSpaceTextMazeExporter {
     /// Construct a new instance.
     ///
     /// Optional, see [`DefaultMazeExporter`][crate::interface::export::DefaultMazeExporter].
+    #[must_use]
     pub fn new() -> Self {
         Self { _private: () }
     }

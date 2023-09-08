@@ -38,6 +38,7 @@ impl <const DIMENSION: usize> CoordinateTuplet<DIMENSION> {
     /// assert_eq!(CoordinateTuplet([2, 5, 2]), pt.offset(1, 3));
     /// assert_eq!(CoordinateTuplet([1, 2, 2]), pt.offset(0, -1));
     /// ```
+    #[must_use]
     pub fn offset(&self, axis: usize, offset: isize) -> Self {
         let mut new = *self;
 
@@ -63,6 +64,7 @@ impl <const DIMENSION: usize> CoordinateTuplet<DIMENSION> {
     /// ```
     ///
     /// [axis]: self::super::BoxCoordinateSpace#coordinate-axes
+    #[must_use]
     pub fn at(&self, axis: usize, position: usize) -> Self {
         let mut new = *self;
 
@@ -84,6 +86,7 @@ impl <const DIMENSION: usize> CoordinateTuplet<DIMENSION> {
     /// assert_eq!(false, CoordinateTuplet([7, 8, 9]).any_coordinate_is(1));
     /// assert_eq!(false, CoordinateTuplet([0, 0, 1]).any_coordinate_is(2));
     /// ```
+    #[must_use]
     pub fn any_coordinate_is(&self, value: usize) -> bool {
         self.0.contains(&value)
     }
@@ -103,6 +106,7 @@ impl <const DIMENSION: usize> CoordinateTuplet<DIMENSION> {
     ///
     /// [axis]: self::super::BoxCoordinateSpace#coordinate-axes
     /// [directly adjacent]: self::super::BoxCoordinateSpace#direct-adjacency
+    #[must_use]
     pub fn axis_of_adjacency_with(&self, other_pt: CoordinateTuplet<DIMENSION>) -> Option<usize> {
         let mut found_dimension: Option<usize> = None;
 

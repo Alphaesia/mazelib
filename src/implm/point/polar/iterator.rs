@@ -31,6 +31,7 @@ pub struct PolarCoordinateSpaceIterator {
 
 // Constructor
 impl PolarCoordinateSpaceIterator {
+    #[must_use]
     pub(crate) fn new(space: PolarCoordinateSpace, starting_pos: Option<PolarCoordinate>) -> Self {
         Self { space, pos: starting_pos }
     }

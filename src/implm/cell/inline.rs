@@ -14,6 +14,7 @@ impl <const DIMENSION: usize> CellLocation for InlineCellLocation<DIMENSION> {}
 impl <const DIMENSION: usize> InlineCellLocation<DIMENSION> {
     /// Get the point at a given offset from this point
     /// (dimension refers to the direction of the offset - e.g. x-direction is dimension 0).
+    #[must_use]
     pub fn offset(&self, axis: usize, offset: isize) -> Self {
         Self(self.0.offset(axis, offset))
     }
@@ -21,6 +22,7 @@ impl <const DIMENSION: usize> InlineCellLocation<DIMENSION> {
     /// Replace the position along the given axis with a new value.
     /// Useful when iterating along an axis.
     /// Suggestions for better names are welcome.
+    #[must_use]
     pub fn at(&self, axis: usize, position: usize) -> Self {
         Self(self.0.at(axis, position))
     }

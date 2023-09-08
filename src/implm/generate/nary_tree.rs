@@ -71,6 +71,7 @@ impl <M: MazeCoordinator<CoordSpace=BoxCoordinateSpace<DIMENSION>>, const DIMENS
 }
 
 impl NAryTreeGenerator {
+    #[must_use]
     pub fn new() -> Self {
         Self { _private: () }
     }

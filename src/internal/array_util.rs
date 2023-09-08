@@ -5,6 +5,7 @@ use crate::internal::util::NONZERO_USIZE_ONE;
 pub trait Sum {
     type Output;
 
+    #[must_use]
     fn sum(&self) -> Self::Output;
 }
 
@@ -41,6 +42,7 @@ impl <const LENGTH: usize> Sum for [NonZeroUsize; LENGTH] {
 pub trait CheckedSum {
     type Output;
 
+    #[must_use]
     fn checked_sum(&self) -> Option<Self::Output>;
 }
 
@@ -77,6 +79,7 @@ impl <const LENGTH: usize> CheckedSum for [NonZeroUsize; LENGTH] {
 pub trait Product {
     type Output;
 
+    #[must_use]
     fn product(&self) -> Self::Output;
 }
 
@@ -101,6 +104,7 @@ impl <const LENGTH: usize> Product for [NonZeroUsize; LENGTH] {
 
     /// Return the product of all elements in an array.
     /// Returns 1 when LENGTH == 0.
+    #[must_use]
     fn product(&self) -> Self::Output {
         let mut product = NONZERO_USIZE_ONE;
 
@@ -116,6 +120,7 @@ pub trait CheckedProduct {
     type Output;
 
     /// Return None if overflow occurs.
+    #[must_use]
     fn checked_product(&self) -> Option<Self::Output>;
 }
 
@@ -152,6 +157,7 @@ impl <const LENGTH: usize> CheckedProduct for [NonZeroUsize; LENGTH] {
 }
 
 pub trait And<T> {
+    #[must_use]
     fn and(&self, other: &T) -> T;
 }
 
@@ -163,6 +169,7 @@ impl <const LENGTH: usize> And<[bool; LENGTH]> for [bool; LENGTH] {
 }
 
 pub trait ArrayZipMap<T, const LENGTH: usize> {
+    #[must_use]
     fn zip_map<U, R>(&self, other: &[U; LENGTH], map: fn(&T, &U) -> R) -> [R; LENGTH];
 }
 

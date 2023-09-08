@@ -219,6 +219,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Ma
     }
 }
 
+#[must_use]
 pub struct BoxSpaceInlineCellMazeCoordinatorBuilder<Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> {
     _buffer: PhantomData<Buffer>,
     space: BoxCoordinateSpace<DIMENSION>,
@@ -232,6 +233,7 @@ impl<Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Box
         }
     }
 
+    #[must_use]
     pub fn build(&self) -> BoxSpaceInlineCellMazeCoordinator<Buffer, DIMENSION> {
         BoxSpaceInlineCellMazeCoordinator::new(self.space)
     }

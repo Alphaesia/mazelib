@@ -398,6 +398,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> MazeCoordinato
     }
 }
 
+#[must_use]
 pub struct BoxSpaceBlockCellMazeCoordinatorBuilder<Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> {
     _buffer: PhantomData<Buffer>,  // We're not actually interested in constructing a buffer yet
     space: BoxCoordinateSpace<DIMENSION>,
@@ -431,6 +432,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
         return self
     }
 
+    #[must_use]
     pub fn build(&self) -> BoxSpaceBlockCellMazeCoordinator<Buffer, DIMENSION> {
         BoxSpaceBlockCellMazeCoordinator::new(self.space, self.scale_factor, self.padding)
     }

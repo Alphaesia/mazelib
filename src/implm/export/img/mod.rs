@@ -30,6 +30,7 @@ impl BoxSpaceImageMazeExporter {
     ///
     /// `format` --- the image format that mazes will be exported as. [`image`] must support
     ///              encoding in it ([`ImageFormat::can_write`] must return true).
+    #[must_use]
     pub fn new(format: ImageFormat) -> Self {
         Self { format }
     }

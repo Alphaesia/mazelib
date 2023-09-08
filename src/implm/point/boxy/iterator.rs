@@ -53,6 +53,7 @@ pub struct BoxCoordinateSpaceIterator<const DIMENSION: usize> {
 
 // Constructor
 impl <const DIMENSION: usize> BoxCoordinateSpaceIterator<DIMENSION> {
+    #[must_use]
     pub(crate) fn new(space: BoxCoordinateSpace<DIMENSION>, starting_pos: Option<CoordinateTuplet<DIMENSION>>) -> Self {
         Self { space, pos: starting_pos }
     }

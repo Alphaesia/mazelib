@@ -70,6 +70,7 @@ impl <M: MazeCoordinator> MazeGenerator<M> for HuntAndKillGenerator {
 }
 
 impl HuntAndKillGenerator {
+    #[must_use]
     pub fn new() -> Self {
         Self { _private: () }
     }
