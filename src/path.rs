@@ -1,3 +1,9 @@
+//! Paths through mazes.
+//! 
+//! # Recommended Reading
+//! 
+//! * [`Path`] --- the main path struct.
+
 use std::collections::hash_map::Entry::{Occupied, Vacant};
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
@@ -7,43 +13,169 @@ use std::slice::SliceIndex;
 use crate::interface::cell::CellValue;
 use crate::interface::point::CoordinateSpace;
 
+/// A series of movements from location to location.
+/// 
+/// It is a *directed path*, so locations can only be traversed in order.
+/// 
+/// # Examples
+/// 
+/// ```
+/// # use mazelib::path::Path;
+/// #
+/// // Create a path starting at the "origin"
+/// let mut path = Path::starting_at(0);
+/// 
+/// // Wander about
+/// path.push(2);
+/// path.push(3);
+/// path.push(4);
+/// path.push(2);
+/// path.push(4);
+/// path.push(3);
+/// 
+/// // Remove loops
+/// path.make_simple();
+/// 
+/// // Retread the path
+/// for loc in path {
+///     // ...
+/// }
+/// ```
 #[derive(Debug)]
 pub struct Path<T: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Debug> {
-    vec: Vec<T>,
+    locs: Vec<T>,
 }
 
 // TODO make these type aliases once again once lazy_type_alias is stabilised
-pub struct PointPath<CoordSpace: CoordinateSpace>(Path<CoordSpace::PtType>);
-pub struct CellPath<CellType: CellValue>(Path<CellType>);
+
+/// A path of points.
+///
+/// See [`Path`].
+pub struct PointPath<CoordSpace: CoordinateSpace>(pub Path<CoordSpace::PtType>);
+
+/// A path of cell locations.
+///
+/// See [`Path`].
+pub struct CellPath<CellType: CellValue>(pub Path<CellType>);
 
 impl <T: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Debug> Path<T> {
-    pub fn new() -> Self {
-        Self { vec: Vec::new() }
+    /// Create a path from the given locations.
+    /// 
+    /// # Parameters
+    /// `locs` --- The locations to create the path from. The resulting path will have the same
+    ///            locations in the same order as in `locs`. It must contain at least one location.
+    /// 
+    /// # Panics
+    /// 
+    /// If `locs` is empty.
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// # use mazelib::path::Path;
+    /// #
+    /// let path = Path::from_vec(vec![3, 2, 1]);
+    /// 
+    /// let mut iter = path.into_iter();
+    /// assert_eq!(Some(3), iter.next());
+    /// assert_eq!(Some(2), iter.next());
+    /// assert_eq!(Some(1), iter.next());
+    /// assert_eq!(None, iter.next());
+    /// assert_eq!(None, iter.next());
+    /// ```
+    pub fn from_vec(locs: Vec<T>) -> Self {
+        if locs.is_empty() { panic!("locs must be non-empty") }
+        
+        Self { locs }
     }
 
-    pub fn from_vec(vec: Vec<T>) -> Self {
-        Self { vec }
+    /// Create a path where the first location is `loc`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use mazelib::path::Path;
+    /// #
+    /// let path = Path::starting_at(8);
+    ///
+    /// let mut iter = path.into_iter();
+    /// assert_eq!(Some(8), iter.next());
+    /// assert_eq!(None, iter.next());
+    /// assert_eq!(None, iter.next());
+    /// ```
+    pub fn starting_at(loc: T) -> Self {
+        Self { locs: vec![loc] }
     }
 
-    pub fn starting_at(pt: T) -> Self {
-        Self { vec: vec![pt] }
-    }
-
+    /// Return the number of movements in this path.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use mazelib::path::Path;
+    /// #
+    /// let path = Path::from_vec(vec![3, 2, 1]);
+    ///
+    /// assert_eq!(2, path.len());
+    /// ```
+    /// 
+    /// Cycles don't shorten the length:
+    /// 
+    /// ```
+    /// # use mazelib::path::Path;
+    /// #
+    /// let path = Path::from_vec(vec![3, 2, 1, 2, 3]);
+    ///
+    /// assert_eq!(4, path.len());
+    /// ```
     pub fn len(&self) -> usize {
-        self.vec.len()
+        self.locs.len() - 1
     }
 
-    pub fn contains(&self, pt: T) -> bool {
-        self.vec.contains(&pt)
+    /// Test whether this path contains a given location.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use mazelib::path::Path;
+    /// #
+    /// let path = Path::from_vec(vec![3, 2, 1]);
+    ///
+    /// assert!(path.contains(1));
+    /// assert!(path.contains(2));
+    /// assert!(path.contains(3));
+    /// assert!(path.contains(4) == false);
+    /// ```
+    pub fn contains(&self, loc: T) -> bool {
+        self.locs.contains(&loc)
     }
 
-    /// Contains a movement from one position to another.
+    /// Contains a movement from one location to another.
     ///
     /// Basically checks if `from` exists in the path and
     /// is immediately followed by `to`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use mazelib::path::Path;
+    /// #
+    /// let path = Path::from_vec(vec![3, 2, 1]);
+    ///
+    /// assert!(path.contains_movement(3, 2));
+    /// assert!(path.contains_movement(2, 1));
+    /// 
+    /// // Can't go backwards
+    /// assert!(path.contains_movement(1, 2) == false);
+    /// assert!(path.contains_movement(2, 3) == false);
+    ///
+    /// // Checks for non-existent points just return false
+    /// assert!(path.contains_movement(1, 4) == false);
+    /// assert!(path.contains_movement(8, 9) == false);
+    /// ```
     pub fn contains_movement(&self, from: T, to: T) -> bool {
-        for i in 0..(self.len() - 1) {
-            if &self.vec[i] == &from && &self.vec[i + 1] == &to {
+        for i in 0..self.len() {
+            if &self.locs[i] == &from && &self.locs[i + 1] == &to {
                 return true;
             }
         }
@@ -51,17 +183,42 @@ impl <T: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Debug> Pat
         return false;
     }
 
-    pub fn push(&mut self, pt: T) {
-        self.vec.push(pt)
+    /// Append a new location to the path.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use mazelib::path::Path;
+    /// #
+    /// let mut path = Path::from_vec(vec![3, 2, 1]);
+    /// 
+    /// path.push(6);
+    ///
+    /// assert_eq!(3, path[0]);
+    /// assert_eq!(2, path[1]);
+    /// assert_eq!(1, path[2]);
+    /// assert_eq!(6, path[3]);
+    /// ```
+    pub fn push(&mut self, loc: T) {
+        self.locs.push(loc)
     }
 
     /// Return whether this path is simple.
     ///
-    /// A simple path has no loops (no repeated points).
+    /// A simple path has no loops (no location appears multiple times).
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use mazelib::path::Path;
+    /// #
+    /// assert!(Path::from_vec(vec![3, 2, 1]).is_simple());
+    /// assert!(Path::from_vec(vec![3, 2, 1, 2]).is_simple() == false);
+    /// ```
     pub fn is_simple(&self) -> bool {
         let mut seen_pts = HashSet::new();
 
-        for pt in &self.vec {
+        for pt in &self.locs {
             // Minor abuse of ::replace as a replacement for insert_if_missing
             // If already in the set, then this path must not be simple
             match seen_pts.replace(pt) {
@@ -75,18 +232,33 @@ impl <T: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Debug> Pat
 
     /// Make this path into a simple path.
     ///
-    /// A simple path is a path that has no loops (no repeated points).
+    /// A simple path is a path that has no loops (no repeated locations). This method removes
+    /// loops by removing all locations between two repeated locations (and then de-duplicating
+    /// those locations). For example, `[4, 1, 5, 1]` becomes `[4, 1`].
     ///
     /// If this path is already simple, this method has no effect.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use mazelib::path::Path;
+    /// #
+    /// let mut path = Path::from_vec(vec![3, 2, 1, 2, 3]);
+    /// 
+    /// let mut simplified_path = path.make_simple();
+    /// 
+    /// assert_eq!(Path::from_vec(vec![3]), simplified_path);
+    /// assert_eq!(Path::from_vec(vec![3]), simplified_path.make_simple());
+    /// ```
     pub fn make_simple(&mut self) {
-        // Track the first time we've seen each point (not in a removed range),
+        // Track the first time we've seen each location (not in a removed range),
         // so we know where the start indices for ranges are
-        let mut first_seen_indices_of_pts = HashMap::<T, usize>::new();
+        let mut first_seen_indices_of_locs = HashMap::<T, usize>::new();
 
         let mut ranges_to_remove: Vec<RangeInclusive<usize>> = Vec::new();
 
-        for (i, pt) in self.vec.iter().enumerate() {
-            match first_seen_indices_of_pts.entry(*pt) {
+        for (i, loc) in self.locs.iter().enumerate() {
+            match first_seen_indices_of_locs.entry(*loc) {
                 Occupied(entry) => {
                     // Indices are inclusive
 
@@ -108,7 +280,7 @@ impl <T: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Debug> Pat
                         let other_range = &ranges_to_remove[ranges_to_condense_start];
 
                         // If another range has a start >= ours, since our end always exceeds their end, we know that our range will fully encompass it
-                        // Note that we can never have a partial overlap, because creating a range deregisters all points that were inside it
+                        // Note that we can never have a partial overlap, because creating a range deregisters all locations that were inside it
                         if other_range.start() >= new_removal_range.start() {
                             break;
                         } else {
@@ -120,9 +292,9 @@ impl <T: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Debug> Pat
 
                     /* Now we have our correct range (and which previous ranges to remove), we put this information to use */
 
-                    // Any point that is removed shouldn't be eligible for a new removal range (as we've already
+                    // Any location that is removed shouldn't be eligible for a new removal range (as we've already
                     // removed it, and any new range would start later than the existing range)
-                    first_seen_indices_of_pts.retain(|_pt, first_seen_index| new_removal_range.contains(first_seen_index) == false);
+                    first_seen_indices_of_locs.retain(|_pt, first_seen_index| new_removal_range.contains(first_seen_index) == false);
 
                     // Remove all the ranges that we're condensing...
                     ranges_to_remove.drain(ranges_to_condense_start..ranges_to_remove.len());
@@ -131,15 +303,15 @@ impl <T: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Debug> Pat
                     ranges_to_remove.insert(ranges_to_condense_start, new_removal_range);
                 },
                 Vacant(entry) => {
-                    // First time we've seen this point so we register ti
+                    // First time we've seen this location so we register ti
                     entry.insert(i);
                 },
             }
         }
 
-        // Actually apply the removal ranges (i.e. remove the points that we've determined need to be removed
+        // Actually apply the removal ranges (i.e. remove the locations that we've determined need to be removed
         for range_to_remove in ranges_to_remove.into_iter().rev() {
-            self.vec.drain(range_to_remove);
+            self.locs.drain(range_to_remove);
         }
 
         debug_assert!(self.is_simple());  // Sanity check
@@ -147,15 +319,39 @@ impl <T: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Debug> Pat
 
     /// Return where this path is a cycle.
     ///
-    /// A cycle is a path that starts and ends at the same point.
+    /// A cycle is a path that starts and ends at the same location.
     /// A zero-length path is not considered a cycle.
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// # use mazelib::path::Path;
+    /// #
+    /// assert!(Path::from_vec(vec![1, 2, 1   ]).is_cycle());
+    /// assert!(Path::from_vec(vec![1, 2, 2, 1]).is_cycle());
+    /// 
+    /// assert!(Path::from_vec(vec![1, 2      ]).is_cycle() == false);
+    /// assert!(Path::from_vec(vec![1, 2, 2   ]).is_cycle() == false);
+    /// assert!(Path::from_vec(vec![1, 2, 1, 2]).is_cycle() == false);
+    /// assert!(Path::from_vec(vec![1         ]).is_cycle() == false);
+    /// ```
     pub fn is_cycle(&self) -> bool {
-        self.vec.len() >= 1 && self.vec[0] == self.vec[self.vec.len() - 1]
+        self.locs.len() >= 1 && self.locs[0] == self.locs[self.locs.len() - 1]
     }
 
     /// Return whether this path is a simple cycle.
     ///
     /// A simple cycle is a simple path that is also a cycle.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use mazelib::path::Path;
+    /// #
+    /// assert!(Path::from_vec(vec![1, 2, 1   ]).is_simple_cycle());
+    /// 
+    /// assert!(Path::from_vec(vec![1, 2, 2, 1]).is_simple_cycle() == false);
+    /// ```
     ///
     /// # See Also
     /// * [`Self::is_simple`]
@@ -170,13 +366,13 @@ impl <T: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Debug, I: 
     type Output = I::Output;
 
     fn index(&self, index: I) -> &Self::Output {
-        self.vec.index(index)
+        self.locs.index(index)
     }
 }
 
 impl <T: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Debug, I: SliceIndex<[T]>> IndexMut<I> for Path<T> {
     fn index_mut(&mut self, index: I) -> &mut Self::Output {
-        self.vec.index_mut(index)
+        self.locs.index_mut(index)
     }
 }
 
@@ -185,6 +381,6 @@ impl <T: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Debug> Int
     type IntoIter = <Vec<T> as IntoIterator>::IntoIter;
 
     fn into_iter(self) -> Self::IntoIter {
-        self.vec.into_iter()
+        self.locs.into_iter()
     }
 }

@@ -184,7 +184,7 @@
 
 pub mod interface;
 pub mod implm;
-mod path; pub use self::path::{PointPath, CellPath};
+pub mod path;
 pub mod util;
 pub(crate) mod internal;
 #[cfg(test)] mod test;
