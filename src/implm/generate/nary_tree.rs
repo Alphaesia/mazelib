@@ -34,7 +34,7 @@ use crate::interface::coordinator::MazeCoordinator;
 /// head towards that bottom-right corner. Passages will never curl in on themselves. Once
 /// a passage goes right, it will never go left again (ignoring intersections). Likewise
 /// for down/up.
-#[embed_doc_image("example", "src/doc/img/generator/nary-tree/example.png")]
+#[embed_doc_image("example", "src/doc/img/generate/nary-tree/example.png")]
 pub struct NAryTreeGenerator {
     _private: ()
 }

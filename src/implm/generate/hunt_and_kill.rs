@@ -25,7 +25,7 @@ use crate::interface::point::CoordinateSpace;
 /// As you can see, Hunt-and-Kill typically produces mazes with passages that run for a long way
 /// before dead-ending. They also tend to be quite twisty. It still features a number of cul-de-sacs
 /// though.
-#[embed_doc_image("example", "src/doc/img/generator/hunt-and-kill/example.png")]
+#[embed_doc_image("example", "src/doc/img/generate/hunt-and-kill/example.png")]
 pub struct HuntAndKillGenerator {
     _private: ()
 }

@@ -34,7 +34,7 @@ use crate::interface::point::CoordinateSpace;
 /// [^name]: While the name implies a recursive implementation, it is much more efficient to
 ///          implement it imperatively. A recursive implementation will likely overflow the
 ///          callstack on even medium-sized mazes (ignoring tail-call optimisation).
-#[embed_doc_image("example", "src/doc/img/generator/recursive-backtracker/example.png")]
+#[embed_doc_image("example", "src/doc/img/generate/recursive-backtracker/example.png")]
 pub struct RecursiveBacktrackerGenerator {
     _private: ()
 }
