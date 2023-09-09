@@ -42,10 +42,6 @@ mod iterator;
 ///
 /// While it is optimised for square mazes, you can use whatever maze outline you want.
 /// (You can create custom outlines by mutating the maze before passing it into a generator).
-///
-/// *This is a specialisation of [BoxCoordinateSpace] for two dimensions. See
-/// [CoordinateSpace][crate::interface::point::CoordinateSpace] and [BoxCoordinateSpace] for
-/// information on available methods and such.*
 pub type TwoDimensionalBoxCoordinateSpace = BoxCoordinateSpace<2>;
 
 /// An (x, y) pair for referencing points in a [TwoDimensionalBoxCoordinateSpace].
@@ -59,10 +55,6 @@ pub type CoordinatePair = CoordinateTuplet<2>;
 ///
 /// While this is optimised for cuboid mazes, you can use whatever maze outline you want.
 /// (You can create custom outlines by mutating the maze before passing it into a generator).
-///
-/// *This is a specialisation of [BoxCoordinateSpace] for three dimensions. See
-/// [CoordinateSpace][crate::interface::point::CoordinateSpace] and [BoxCoordinateSpace] for
-/// information on available methods and such.*
 pub type ThreeDimensionalBoxCoordinateSpace = BoxCoordinateSpace<3>;
 
 /// An (x, y, z) triplet for referencing points in a [ThreeDimensionalBoxCoordinateSpace].
