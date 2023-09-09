@@ -1,5 +1,6 @@
 use std::mem::MaybeUninit;
 use std::num::NonZeroUsize;
+
 use crate::internal::util::NONZERO_USIZE_ONE;
 
 pub trait Sum {

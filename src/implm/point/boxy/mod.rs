@@ -28,13 +28,13 @@
 //! You could also use [ThreeDimensionalBoxCoordinateSpace] in this example instead of
 //! [BoxCoordinateSpace] — they would be equivalent.
 
+pub use self::iterator::BoxCoordinateSpaceIterator;
+pub use self::point::CoordinateTuplet;
+pub use self::space::BoxCoordinateSpace;
+
 mod space;
 mod point;
 mod iterator;
-
-pub use self::space::BoxCoordinateSpace;
-pub use self::point::CoordinateTuplet;
-pub use self::iterator::BoxCoordinateSpaceIterator;
 
 /// A flat rectangular coordinate space. The most common type of coordinate space for mazes.
 ///

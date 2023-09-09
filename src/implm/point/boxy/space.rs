@@ -4,8 +4,8 @@ use std::ops::Index;
 
 use rand::Rng;
 
-use crate::implm::point::boxy::CoordinateTuplet;
 use crate::implm::point::boxy::BoxCoordinateSpaceIterator;
+use crate::implm::point::boxy::CoordinateTuplet;
 use crate::interface::point::CoordinateSpace;
 use crate::internal::array_util::CheckedProduct;
 use crate::internal::util::try_usize_array_to_nonzero_usize_array;

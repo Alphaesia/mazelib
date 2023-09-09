@@ -2,6 +2,7 @@
 #![cfg(any(feature = "img", doc))]
 
 use std::io::Write;
+
 use image;
 use image::ImageFormat;
 

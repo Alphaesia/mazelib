@@ -1,5 +1,7 @@
 use std::fmt::{Debug, Display, Formatter};
+
 use embed_doc_image::embed_doc_image;
+
 use crate::interface::point::Point;
 use crate::internal::util::offset_usize;
 

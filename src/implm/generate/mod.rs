@@ -34,11 +34,12 @@
 #![doc = ::embed_doc_image::embed_image!("example-recursive-backtracker", "src/doc/img/generate/recursive-backtracker/example.png")]
 #![doc = ::embed_doc_image::embed_image!("example-nary-tree", "src/doc/img/generate/nary-tree/example.png")]
 
+pub use self::hunt_and_kill::HuntAndKillGenerator;
+pub use self::nary_tree::NAryTreeGenerator;
+pub use self::recursive_backtracker::RecursiveBacktrackerGenerator;
+
 mod nary_tree;
 mod hunt_and_kill;
 mod recursive_backtracker;
 mod util;
 
-pub use self::nary_tree::NAryTreeGenerator;
-pub use self::hunt_and_kill::HuntAndKillGenerator;
-pub use self::recursive_backtracker::RecursiveBacktrackerGenerator;

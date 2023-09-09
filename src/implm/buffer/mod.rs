@@ -6,8 +6,9 @@
 //!
 //! * [`MazeBuffer`][crate::interface::buffer::MazeBuffer] --- the interface trait
 
+pub use self::array::ArrayBuffer;
+pub use self::vec::VecBuffer;
+
 mod vec;
 mod array;
 
-pub use self::vec::VecBuffer;
-pub use self::array::ArrayBuffer;

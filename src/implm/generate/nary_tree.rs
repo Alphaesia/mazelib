@@ -3,8 +3,8 @@ use rand::Rng;
 use rand::seq::IteratorRandom;
 
 use crate::implm::point::boxy::{BoxCoordinateSpace, CoordinateTuplet};
-use crate::interface::generate::MazeGenerator;
 use crate::interface::coordinator::MazeCoordinator;
+use crate::interface::generate::MazeGenerator;
 
 /// The ***n*-ary Tree** algorithm is a generalisation of the *Binary Tree* algorithm
 /// to higher dimensions.

@@ -1,5 +1,6 @@
 use std::fmt::{Debug, Formatter};
 use std::ops::{Index, IndexMut};
+
 use crate::implm::point::boxy::CoordinateTuplet;
 use crate::interface::cell::{CellLocation, CellValue};
 

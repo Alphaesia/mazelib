@@ -1,4 +1,5 @@
 use std::iter::FusedIterator;
+
 use crate::implm::point::polar::{PolarCoordinate, PolarCoordinateSpace};
 
 /// An iterator for iterating over all of the points in a boxy coordinate space.

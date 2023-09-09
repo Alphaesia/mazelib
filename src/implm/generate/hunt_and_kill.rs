@@ -4,8 +4,8 @@ use rand::seq::SliceRandom;
 
 use crate::implm::generate::util::carve_to_unvisited_neighbour;
 use crate::interface::cell::CellValue;
-use crate::interface::generate::MazeGenerator;
 use crate::interface::coordinator::MazeCoordinator;
+use crate::interface::generate::MazeGenerator;
 use crate::interface::point::CoordinateSpace;
 
 /// The **Hunt-and-Kill** algorithm links random walks together to generate a maze.

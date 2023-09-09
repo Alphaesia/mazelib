@@ -10,6 +10,7 @@
 //!                            components.
 
 use std::fmt::Debug;
+
 use crate::interface::cell::{CellLocation, CellValue, ConnectionType};
 use crate::interface::point::CoordinateSpace;
 use crate::pt;

@@ -1,6 +1,8 @@
 use std::num::NonZeroUsize;
+
 use embed_doc_image::embed_doc_image;
 use rand::Rng;
+
 use crate::implm::point::polar::point::PolarCoordinate;
 use crate::implm::point::polar::PolarCoordinateSpaceIterator;
 use crate::interface::point::CoordinateSpace;

@@ -1,4 +1,5 @@
 use fluent_asserter::prelude::*;
+
 use crate::implm::point::boxy::BoxCoordinateSpace;
 use crate::interface::point::CoordinateSpace;
 

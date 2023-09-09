@@ -1,5 +1,7 @@
 use std::num::NonZeroUsize;
+
 use fluent_asserter::prelude::*;
+
 use crate::implm::buffer::ArrayBuffer;
 use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
 use crate::interface::buffer::MazeBuffer;

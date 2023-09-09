@@ -2,6 +2,7 @@
 #![cfg(any(feature = "minecraft", doc))]
 
 use std::io::Write;
+
 use crate::interface::coordinator::MazeCoordinator;
 use crate::interface::export::MazeExporter;
 

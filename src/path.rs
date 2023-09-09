@@ -4,12 +4,13 @@
 //! 
 //! * [`Path`] --- the main path struct.
 
-use std::collections::hash_map::Entry::{Occupied, Vacant};
 use std::collections::{HashMap, HashSet};
+use std::collections::hash_map::Entry::{Occupied, Vacant};
 use std::fmt::Debug;
 use std::hash::Hash;
 use std::ops::{Index, IndexMut, RangeInclusive};
 use std::slice::SliceIndex;
+
 use crate::interface::cell::CellValue;
 use crate::interface::point::CoordinateSpace;
 

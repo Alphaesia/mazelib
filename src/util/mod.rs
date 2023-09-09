@@ -1,12 +1,12 @@
 //! A variety of basic helper functions provided for your convenience.
 
-mod solid_border;
-
-pub use self::solid_border::apply_solid_border;
-
 use crate::interface::cell::CellValue;
 use crate::interface::coordinator::MazeCoordinator;
 use crate::interface::point::CoordinateSpace;
+
+pub use self::solid_border::apply_solid_border;
+
+mod solid_border;
 
 /// Convert all unvisited *points* (not cells) in a maze into wall cells.
 ///
