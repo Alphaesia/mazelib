@@ -1,18 +1,18 @@
 use std::fmt::{Debug, Formatter};
 use std::marker::PhantomData;
 
+use crate::implm::cell::block::BlockCellLocation;
 use crate::implm::cell::inline::InlineCellValue;
 use crate::implm::cell::inline::InlineCellValueEdgeType;
+use crate::implm::export::text::BoxSpaceInlineCellTextMazeExporter;
 use crate::implm::point::boxy::BoxCoordinateSpace;
-use crate::implm::export::text::BoxSpaceTextMazeExporter;
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::{CellID, ConnectionType};
-use crate::interface::point::CoordinateSpace;
+use crate::interface::coordinator::MazeCoordinator;
 use crate::interface::export::MazeExporter;
+use crate::interface::point::CoordinateSpace;
 use crate::internal::array_util::Product;
 use crate::pt;
-use crate::implm::cell::block::BlockCellLocation;
-use crate::interface::coordinator::MazeCoordinator;
 
 /// As this coordinator implements a one-to-one mapping between points and cells, there is
 /// no separate [`CellLocation`][crate::interface::cell::CellLocation] struct.
@@ -276,7 +276,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<2>>> Debug for BoxSpaceInlineCellMazeCo
 
         let mut text_export = Vec::<u8>::new();
 
-        if let Err(err) = BoxSpaceTextMazeExporter::new().export(self, &mut text_export) {
+        if let Err(err) = BoxSpaceInlineCellTextMazeExporter::default().export(self, &mut text_export) {
             panic!("{}", err)
         }
 

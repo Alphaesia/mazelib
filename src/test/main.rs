@@ -1,6 +1,6 @@
-#![allow(unused_imports)]
+#![allow(unused_imports, dead_code)]
 
-use std::io::BufWriter;
+use std::io::{BufWriter, Result, Write};
 
 #[cfg(feature = "img")] use image::ImageFormat;
 use rand::thread_rng;
@@ -8,38 +8,49 @@ use rand::thread_rng;
 use mazelib::implm::buffer::VecBuffer;
 use mazelib::implm::cell::block::BlockCellValue;
 use mazelib::implm::cell::inline::InlineCellValue;
-use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinatorBuilder;
+use mazelib::implm::coordinator::block::{BoxSpaceBlockCellMazeCoordinator, BoxSpaceBlockCellMazeCoordinatorBuilder};
 use mazelib::implm::coordinator::inline::BoxSpaceInlineCellMazeCoordinatorBuilder;
-use mazelib::implm::generate::{HuntAndKillGenerator, NAryTreeGenerator, RecursiveBacktrackerGenerator};
-use mazelib::implm::point::boxy::BoxCoordinateSpace;
 #[cfg(feature = "img")] use mazelib::implm::export::img::BoxSpaceImageMazeExporter;
 #[cfg(feature = "minecraft")] use mazelib::implm::export::minecraft::BoxSpaceSchematicMazeExporter;
-use mazelib::implm::export::text::BoxSpaceTextMazeExporter;
+use mazelib::implm::export::text::{BoxSpaceBlockCellTextMazeExporter, BoxSpaceBlockCellTextMazeExporterBuilder, BoxSpaceInlineCellTextMazeExporter, BoxSpaceTextMazeExporter};
+use mazelib::implm::generate::{HuntAndKillGenerator, NAryTreeGenerator, RecursiveBacktrackerGenerator};
+use mazelib::implm::point::boxy::BoxCoordinateSpace;
+use mazelib::interface::export::{DefaultMazeExporter, MazeExporter};
 use mazelib::interface::generate::DefaultMazeGenerator;
-use mazelib::interface::export::DefaultMazeExporter;
 use mazelib::util::apply_solid_border;
 
-fn main() {
-    const DIMENSION: usize = 2;
+fn main() -> Result<()> {
+    generate_maze_box_text()
+}
 
-    type Space = BoxCoordinateSpace<DIMENSION>;
-    type CellType = InlineCellValue<DIMENSION>;
-    type BufferType = VecBuffer<CellType>;
-    type Maze = BoxSpaceInlineCellMazeCoordinatorBuilder<BufferType, DIMENSION>;
-    type Generator = HuntAndKillGenerator;
-    type Exporter = BoxSpaceTextMazeExporter;
+fn generate_maze_box_text() -> Result<()> {
+    let space = BoxCoordinateSpace::<2>::new_checked([9, 9]);
 
-    let mut rng = thread_rng();
-
-    let space = Space::new_checked([9, 9]);
-
-    let mut maze = Maze::new(space).build();
+    let mut maze = BoxSpaceBlockCellMazeCoordinatorBuilder::<VecBuffer<BlockCellValue>, 2>::new(space).build();
 
     apply_solid_border(&mut maze);
 
-    Generator::generate_with_rng(&mut maze, &mut rng);
+    HuntAndKillGenerator::generate(&mut maze);
 
-    let output = std::io::stdout();
+    let mut output = BufWriter::new(std::io::stdout());
 
-    Exporter::export(&maze, &mut BufWriter::new(output)).unwrap();
+    BoxSpaceBlockCellTextMazeExporter::builder().build().export(&maze, &mut output)?;
+    
+    output.flush()
+}
+
+fn generate_maze_inline_text() -> Result<()> {
+    let space = BoxCoordinateSpace::<2>::new_checked([9, 9]);
+
+    let mut maze = BoxSpaceInlineCellMazeCoordinatorBuilder::<VecBuffer<InlineCellValue<2>>, 2>::new(space).build();
+
+    apply_solid_border(&mut maze);
+
+    HuntAndKillGenerator::generate(&mut maze);
+
+    let mut output = BufWriter::new(std::io::stdout());
+
+    BoxSpaceInlineCellTextMazeExporter::builder().build().export(&maze, &mut output)?;
+
+    output.flush()
 }

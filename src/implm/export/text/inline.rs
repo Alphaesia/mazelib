@@ -1,16 +1,109 @@
 use std::io::{Result, Write};
+use std::num::NonZeroUsize;
 
 use crate::implm::cell::inline::{InlineCellValue, InlineCellValueEdgeType as EdgeType};
 use crate::implm::coordinator::inline::BoxSpaceInlineCellMazeCoordinator;
-use crate::implm::export::text::{BoxSpaceTextMazeExporter, TextMazeExporter};
-use crate::implm::export::text::line_break::WriteLineBreak;
+use crate::implm::export::text::TextMazeExporter;
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::CellID;
 use crate::interface::coordinator::MazeCoordinator;
 use crate::interface::export::MazeExporter;
-use crate::internal::util::nonzero_usize_array_to_usize_array;
+use crate::internal::line_break::WriteLineBreak;
+use crate::internal::util::{nonzero_usize_array_to_usize_array, NONZERO_USIZE_ONE, NONZERO_USIZE_THREE};
 
-impl <Buffer: MazeBuffer<InlineCellValue<2>>, Output: Write> MazeExporter<BoxSpaceInlineCellMazeCoordinator<Buffer, 2>, Output> for BoxSpaceTextMazeExporter {
+/// An exporter that renders [`BoxSpaceInlineCellMazeCoordinator`]s to text.
+pub struct BoxSpaceInlineCellTextMazeExporter {
+    /// The number of the characters to emit horizontally per cell, excluding walls.
+    chars_per_cell_horizontally: NonZeroUsize,
+    /// The number of the characters to emit vertically per cell, excluding walls.
+    chars_per_cell_vertically:   NonZeroUsize,
+}
+
+impl BoxSpaceInlineCellTextMazeExporter {
+    /// Construct a new builder for a `BoxSpaceInlineCellTextMazeExporter`.
+    ///
+    /// Optional, see [`DefaultMazeExporter`][crate::interface::export::DefaultMazeExporter].
+    pub fn builder() -> BoxSpaceInlineCellTextMazeExporterBuilder {
+        BoxSpaceInlineCellTextMazeExporterBuilder::new()
+    }
+
+    /// Return the number of the characters that is emitted horizontally per cell, excluding walls.
+    #[must_use]
+    pub fn chars_per_cell_horizontally(&self) -> NonZeroUsize {
+        self.chars_per_cell_horizontally
+    }
+
+    /// Return the number of the characters that is emitted vertically per cell, excluding walls.
+    #[must_use]
+    pub fn chars_per_cell_vertically(&self) -> NonZeroUsize {
+        self.chars_per_cell_vertically
+    }
+}
+
+impl Default for BoxSpaceInlineCellTextMazeExporter {
+    fn default() -> Self {
+        Self::builder().build()
+    }
+}
+
+/// A builder for a [`BoxSpaceInlineCellTextMazeExporter`].
+#[must_use]
+pub struct BoxSpaceInlineCellTextMazeExporterBuilder {
+    /// The number of the characters to emit horizontally per cell.
+    chars_per_cell_horizontally: NonZeroUsize,
+    /// The number of the characters to emit vertically per cell.
+    chars_per_cell_vertically:   NonZeroUsize,
+}
+
+impl BoxSpaceInlineCellTextMazeExporterBuilder {
+    /// Create a new builder for a [`BoxSpaceInlineCellTextMazeExporter`].
+    fn new() -> Self {
+        Self {
+            chars_per_cell_horizontally: NONZERO_USIZE_THREE,
+            chars_per_cell_vertically:   NONZERO_USIZE_ONE,
+        }
+    }
+
+    /// Set the number of the characters to emit horizontally per cell, excluding walls.
+    pub fn chars_per_cell_horizontally(mut self, count: NonZeroUsize) -> Self {
+        self.chars_per_cell_horizontally = count;
+
+        return self
+    }
+
+    /// Set the number of the characters to emit horizontally per cell, excluding walls.
+    ///
+    /// `count` must be non-zero.
+    pub fn chars_per_cell_horizontally_checked(self, count: usize) -> Self {
+        self.chars_per_cell_horizontally(NonZeroUsize::new(count).expect("count was zero"))
+    }
+
+    /// Set the number of the characters to emit vertically per cell, excluding walls.
+    pub fn chars_per_cell_vertically(mut self, count: NonZeroUsize) -> Self {
+        self.chars_per_cell_vertically = count;
+
+        return self
+    }
+
+    /// Set the number of the characters to emit vertically per cell, excluding walls.
+    ///
+    /// `count` must be non-zero.
+    pub fn chars_per_cell_vertically_checked(self, count: usize) -> Self {
+        self.chars_per_cell_vertically(NonZeroUsize::new(count).expect("count was zero"))
+    }
+
+
+    /// Finalise the [`BoxSpaceInlineCellTextMazeExporter`].
+    #[must_use]
+    pub fn build(self) -> BoxSpaceInlineCellTextMazeExporter {
+        BoxSpaceInlineCellTextMazeExporter {
+            chars_per_cell_horizontally: self.chars_per_cell_horizontally,
+            chars_per_cell_vertically:   self.chars_per_cell_vertically,
+        }
+    }
+}
+
+impl <Buffer: MazeBuffer<InlineCellValue<2>>, Output: Write> MazeExporter<BoxSpaceInlineCellMazeCoordinator<Buffer, 2>, Output> for BoxSpaceInlineCellTextMazeExporter {
     fn export(&self, maze: &BoxSpaceInlineCellMazeCoordinator<Buffer, 2>, output: &mut Output) -> Result<()> {
         let [width, height] = nonzero_usize_array_to_usize_array(maze.coord_space().dimensions());
 
@@ -56,12 +149,12 @@ impl <Buffer: MazeBuffer<InlineCellValue<2>>, Output: Write> MazeExporter<BoxSpa
 
                 line_top_walls.push(Self::get_box_char(wall_connections[x][0], wall_connections[x][1], top_wall_actual, left_wall_actual));
 
-                line_top_walls.push_str(match top_wall_actual {
-                    EdgeType::WALL => "──",
-                    EdgeType::BOUNDARY => "━━",
-                    EdgeType::PASSAGE => "  ",
-                    EdgeType::UNVISITED => "┄┄",
-                });
+                line_top_walls.push_str(&(match top_wall_actual {
+                    EdgeType::WALL => "─",
+                    EdgeType::BOUNDARY => "━",
+                    EdgeType::PASSAGE => " ",
+                    EdgeType::UNVISITED => "┄",
+                }).repeat(self.chars_per_cell_horizontally.into()));
 
                 line_side_walls.push(match left_wall_actual {
                     EdgeType::WALL => '│',
@@ -70,7 +163,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<2>>, Output: Write> MazeExporter<BoxSpa
                     EdgeType::UNVISITED => '┆',
                 });
 
-                line_side_walls.push_str("  ");  // Cells are 2-chars wide
+                line_side_walls.push_str(&" ".repeat(self.chars_per_cell_horizontally.into()));
 
                 wall_previously = walls[0][1];
                 top_walls[x] = walls[1][1];
@@ -96,8 +189,11 @@ impl <Buffer: MazeBuffer<InlineCellValue<2>>, Output: Write> MazeExporter<BoxSpa
 
             output.write_all(line_top_walls.as_bytes())?;
             output.write_line_break()?;
-            output.write_all(line_side_walls.as_bytes())?;
-            output.write_line_break()?;
+            
+            for _ in 0..(self.chars_per_cell_vertically.into()) {
+                output.write_all(line_side_walls.as_bytes())?;
+                output.write_line_break()?;
+            }
         }
 
         // Draw the bottom side
@@ -113,12 +209,12 @@ impl <Buffer: MazeBuffer<InlineCellValue<2>>, Output: Write> MazeExporter<BoxSpa
 
                 line.push(Self::get_box_char(wall_connections[x][0], walls[0][0], walls[1][1], EdgeType::PASSAGE));
 
-                line.push_str(match walls[1][1] {
-                    EdgeType::WALL => "──",
-                    EdgeType::BOUNDARY => "━━",
-                    EdgeType::PASSAGE => "  ",
-                    EdgeType::UNVISITED => "┄┄",
-                });
+                line.push_str(&(match walls[1][1] {
+                    EdgeType::WALL => "─",
+                    EdgeType::BOUNDARY => "━",
+                    EdgeType::PASSAGE => " ",
+                    EdgeType::UNVISITED => "┄",
+                }).repeat(self.chars_per_cell_horizontally.into()));
 
                 wall_connections[x + 1][0] = walls[1][1];
             }
@@ -134,7 +230,7 @@ impl <Buffer: MazeBuffer<InlineCellValue<2>>, Output: Write> MazeExporter<BoxSpa
     }
 }
 
-impl BoxSpaceTextMazeExporter {
+impl BoxSpaceInlineCellTextMazeExporter {
     // not recommended reading
     #[must_use]
     fn get_box_char(left_wall: EdgeType, top_wall: EdgeType, right_wall: EdgeType, bottom_wall: EdgeType) -> char {
@@ -239,4 +335,4 @@ impl BoxSpaceTextMazeExporter {
     }
 }
 
-impl <Buffer: MazeBuffer<InlineCellValue<2>>, Output: Write> TextMazeExporter<BoxSpaceInlineCellMazeCoordinator<Buffer, 2>, Output> for BoxSpaceTextMazeExporter {}
+impl <Buffer: MazeBuffer<InlineCellValue<2>>, Output: Write> TextMazeExporter<BoxSpaceInlineCellMazeCoordinator<Buffer, 2>, Output> for BoxSpaceInlineCellTextMazeExporter {}

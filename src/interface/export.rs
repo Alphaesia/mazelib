@@ -10,7 +10,7 @@ use crate::interface::coordinator::MazeCoordinator;
 
 /// Export a maze into another, usually persistent, format.
 ///
-/// [Maze coordinator][crate::interface::coordinator::MazeCoordinator]s are only useful within the
+/// [Maze coordinators][crate::interface::coordinator::MazeCoordinator] are only useful within the
 /// confines of this library. If you want to visualise your handiwork you'll want to export it to
 /// something you can [see][crate::implm::export::img::ImageMazeExporter]. If you want to use
 /// the maze in another program, you'll want to write your own exporter that exports the maze to
@@ -48,7 +48,7 @@ use crate::interface::coordinator::MazeCoordinator;
 /// # use mazelib::implm::cell::inline::InlineCellValue;
 /// # use mazelib::implm::coordinator::inline::BoxSpaceInlineCellMazeCoordinatorBuilder;
 /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
-/// use mazelib::implm::export::text::BoxSpaceTextMazeExporter;
+/// use mazelib::implm::export::text::BoxSpaceInlineCellTextMazeExporter;
 /// use mazelib::interface::export::MazeExporter;
 /// #
 /// # fn test() -> Result<()> {
@@ -58,7 +58,7 @@ use crate::interface::coordinator::MazeCoordinator;
 /// // Buffer writes for performance
 /// let mut output = BufWriter::new(std::io::stdout());
 ///
-/// BoxSpaceTextMazeExporter::new().export(&maze, &mut output)
+/// BoxSpaceInlineCellTextMazeExporter::builder().build().export(&maze, &mut output)
 /// # }
 /// ```
 ///
@@ -70,7 +70,7 @@ use crate::interface::coordinator::MazeCoordinator;
 /// # use mazelib::implm::cell::inline::InlineCellValue;
 /// # use mazelib::implm::coordinator::inline::BoxSpaceInlineCellMazeCoordinatorBuilder;
 /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
-/// use mazelib::implm::export::text::BoxSpaceTextMazeExporter;
+/// use mazelib::implm::export::text::BoxSpaceInlineCellTextMazeExporter;
 /// use mazelib::interface::export::MazeExporter;
 /// #
 /// # fn example() -> std::io::Result<()> {
@@ -80,7 +80,7 @@ use crate::interface::coordinator::MazeCoordinator;
 /// // Buffer writes for performance
 /// let mut output = BufWriter::new(File::create("maze.txt")?);
 ///
-/// BoxSpaceTextMazeExporter::new().export(&maze, &mut output)?;
+/// BoxSpaceInlineCellTextMazeExporter::builder().build().export(&maze, &mut output)?;
 /// #
 /// # return Ok(());
 /// # }
@@ -96,8 +96,8 @@ pub trait MazeExporter<M: MazeCoordinator, O: Write> {
     ///
     /// # Usage Notes
     ///
-    /// It is recommended to wrap `output` in a [`BufWriter`][std::io::BufWriter]
-    /// if it not already buffered.
+    /// You may wish to wrap `output` in a [`BufWriter`][std::io::BufWriter] if it not already
+    /// buffered.
     fn export(&self, maze: &M, output: &mut O) -> io::Result<()>;
 }
 
@@ -114,7 +114,7 @@ pub trait MazeExporter<M: MazeCoordinator, O: Write> {
 /// # use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinatorBuilder;
 /// # use mazelib::implm::generate::HuntAndKillGenerator;
 /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
-/// # use mazelib::implm::export::text::BoxSpaceTextMazeExporter;
+/// # use mazelib::implm::export::text::BoxSpaceBlockCellTextMazeExporter;
 /// # use mazelib::interface::export::MazeExporter;
 /// #
 /// # fn test() -> std::io::Result<()> {
@@ -122,7 +122,7 @@ pub trait MazeExporter<M: MazeCoordinator, O: Write> {
 /// # let mut maze = BoxSpaceBlockCellMazeCoordinatorBuilder::<VecBuffer<BlockCellValue>, 2>::new(BoxCoordinateSpace::new_checked([1, 1])).build();
 /// # let mut output = File::create(Path::new("")).unwrap();
 /// #
-/// BoxSpaceTextMazeExporter::new().export(&mut maze, &mut output)
+/// BoxSpaceBlockCellTextMazeExporter::builder().build().export(&mut maze, &mut output)
 /// # }
 /// ```
 /// becomes
@@ -135,7 +135,7 @@ pub trait MazeExporter<M: MazeCoordinator, O: Write> {
 /// # use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinatorBuilder;
 /// # use mazelib::implm::generate::HuntAndKillGenerator;
 /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
-/// # use mazelib::implm::export::text::BoxSpaceTextMazeExporter;
+/// # use mazelib::implm::export::text::BoxSpaceBlockCellTextMazeExporter;
 /// # use mazelib::interface::export::DefaultMazeExporter;
 /// #
 /// # fn test() -> std::io::Result<()> {
@@ -143,7 +143,7 @@ pub trait MazeExporter<M: MazeCoordinator, O: Write> {
 /// # let mut maze = BoxSpaceBlockCellMazeCoordinatorBuilder::<VecBuffer<BlockCellValue>, 2>::new(BoxCoordinateSpace::new_checked([1, 1])).build();
 /// # let mut output = File::create(Path::new("")).unwrap();
 /// #
-/// BoxSpaceTextMazeExporter::export(&mut maze, &mut output)
+/// BoxSpaceBlockCellTextMazeExporter::export(&mut maze, &mut output)
 /// # }
 /// ```
 pub trait DefaultMazeExporter<M: MazeCoordinator, O: Write>: MazeExporter<M, O> {

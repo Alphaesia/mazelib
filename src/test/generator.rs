@@ -6,11 +6,11 @@ use crate::implm::cell::block::BlockCellValue;
 use crate::implm::cell::inline::InlineCellValue;
 use crate::implm::coordinator::block::{BoxSpaceBlockCellMazeCoordinator, BoxSpaceBlockCellMazeCoordinatorBuilder};
 use crate::implm::coordinator::inline::{BoxSpaceInlineCellMazeCoordinator, BoxSpaceInlineCellMazeCoordinatorBuilder};
+use crate::implm::export::text::{BoxSpaceBlockCellTextMazeExporter, BoxSpaceInlineCellTextMazeExporter};
 use crate::implm::generate::{HuntAndKillGenerator, NAryTreeGenerator, RecursiveBacktrackerGenerator};
 use crate::implm::point::boxy::BoxCoordinateSpace;
-use crate::implm::export::text::BoxSpaceTextMazeExporter;
-use crate::interface::generate::MazeGenerator;
 use crate::interface::export::MazeExporter;
+use crate::interface::generate::MazeGenerator;
 use crate::internal::util::get_line_sep;
 
 #[test]
@@ -244,7 +244,11 @@ fn get_new_inline_cell_maze() -> BoxSpaceInlineCellMazeCoordinator::<VecBuffer<I
 fn export_block_cell_maze(maze: &BoxSpaceBlockCellMazeCoordinator<VecBuffer<BlockCellValue>, 2>) -> String {
     let mut str_buffer = Vec::<u8>::new();
 
-    BoxSpaceTextMazeExporter::new().export(maze, &mut str_buffer).unwrap();
+    BoxSpaceBlockCellTextMazeExporter::builder()
+        .chars_per_cell_horizontally_checked(1)
+        .chars_per_cell_vertically_checked(1)
+        .build()
+        .export(maze, &mut str_buffer).unwrap();
 
     let as_string = String::from_utf8(str_buffer).unwrap();
 
@@ -254,7 +258,11 @@ fn export_block_cell_maze(maze: &BoxSpaceBlockCellMazeCoordinator<VecBuffer<Bloc
 fn export_inline_cell_maze(maze: &BoxSpaceInlineCellMazeCoordinator::<VecBuffer<InlineCellValue<2>>, 2>) -> String {
     let mut str_buffer = Vec::<u8>::new();
 
-    BoxSpaceTextMazeExporter::new().export(maze, &mut str_buffer).unwrap();
+    BoxSpaceInlineCellTextMazeExporter::builder()
+        .chars_per_cell_horizontally_checked(2)
+        .chars_per_cell_vertically_checked(1)
+        .build()
+        .export(maze, &mut str_buffer).unwrap();
 
     let as_string = String::from_utf8(str_buffer).unwrap();
 

@@ -14,7 +14,7 @@
 //! use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinatorBuilder;
 //! use mazelib::implm::generate::HuntAndKillGenerator;
 //! use mazelib::implm::point::boxy::BoxCoordinateSpace;
-//! use mazelib::implm::export::text::BoxSpaceTextMazeExporter;
+//! use mazelib::implm::export::text::BoxSpaceBlockCellTextMazeExporter;
 //! use mazelib::interface::generate::DefaultMazeGenerator;
 //! use mazelib::interface::export::DefaultMazeExporter;
 //! use mazelib::util::apply_solid_border;
@@ -41,25 +41,25 @@
 //!
 //! // Print the maze as text
 //! # #[allow(unused_must_use)]
-//! BoxSpaceTextMazeExporter::export(&maze, &mut std::io::stdout());
+//! BoxSpaceBlockCellTextMazeExporter::export(&maze, &mut std::io::stdout());
 //! ```
 //! produces
 //! ```text
-//! ███████████████
-//! █ █   █       █
-//! █ █ █ █ █████ █
-//! █   █ █   █   █
-//! █████ █████ █ █
-//! █   █   █   █ █
-//! █ █ ███ █ ███ █
-//! █ █ █   █   █ █
-//! █ █ █ █████ █ █
-//! █ █ █       █ █
-//! █ █ █████████ █
-//! █ █       █   █
-//! █ ███████ █ ███
-//! █       █     █
-//! ███████████████
+//! ██████████████████████████████
+//! ██  ██      ██              ██
+//! ██  ██  ██  ██  ██████████  ██
+//! ██      ██  ██      ██      ██
+//! ██████████  ██████████  ██  ██
+//! ██      ██      ██      ██  ██
+//! ██  ██  ██████  ██  ██████  ██
+//! ██  ██  ██      ██      ██  ██
+//! ██  ██  ██  ██████████  ██  ██
+//! ██  ██  ██              ██  ██
+//! ██  ██  ██████████████████  ██
+//! ██  ██              ██      ██
+//! ██  ██████████████  ██  ██████
+//! ██              ██          ██
+//! ██████████████████████████████
 //! ```
 //!
 //! All of the implementations in this example (`BoxCoordinateSpace`, `BlockCellValue`, etc.)
@@ -67,39 +67,49 @@
 //! of the generated maze in different ways.
 //!
 //! For example, changing `BlockCellValue` to `InlineCellValue<2>` will change how the cells look.
-//! (Note you wll have to replace `BoxSpaceBlockCellMazeBuilder` with `BoxSpaceInlineCellMazeBuilder`).
+//! (Note you wll have to replace `BlockCell` with `InlineCell` for the maze coordinator and maze
+//! exporter types too).
 //!
 //! ```
 //! # use mazelib::implm::buffer::VecBuffer;
 //! # use mazelib::implm::cell::inline::InlineCellValue;
 //! # use mazelib::implm::coordinator::inline::BoxSpaceInlineCellMazeCoordinatorBuilder;
+//! use mazelib::implm::export::text::BoxSpaceInlineCellTextMazeExporter;
 //! # use mazelib::implm::point::boxy::BoxCoordinateSpace;
+//! # use mazelib::interface::export::DefaultMazeExporter;
 //! #
 //! # const DIMENSION: usize = 2;
 //! # let coord_space = BoxCoordinateSpace::new_checked([1, 1]);
-//! #
+//! 
+//! // ...
+//!
 //! // 2 for a 2D maze
 //! type Buffer = VecBuffer<InlineCellValue<2>>;
 //!
 //! let mut maze = BoxSpaceInlineCellMazeCoordinatorBuilder::<Buffer, 2>::new(coord_space).build();
+//!
+//! // ...
+//!
+//! # #[allow(unused_must_use)]
+//! BoxSpaceInlineCellTextMazeExporter::export(&maze, &mut std::io::stdout());
 //! ```
 //! produces
 //! ```text
-//! ┏━━━━━┯━━━━━━━━━━━┯━━┓
-//! ┃     │           │  ┃
-//! ┠──┐  └─────╴  ╷  ╵  ┃
-//! ┃  │           │     ┃
-//! ┃  └───────────┼──╴  ┃
-//! ┃              │     ┃
-//! ┠──╴  ╷  ┌─────┤  ╶──┨
-//! ┃     │  │     │     ┃
-//! ┃  ╶──┤  │  ╷  └──┐  ┃
-//! ┃     │  │  │     │  ┃
-//! ┃  ╷  └──┘  │  ╷  │  ┃
-//! ┃  │        │  │  │  ┃
-//! ┃  └────────┤  └──┘  ┃
-//! ┃           │        ┃
-//! ┗━━━━━━━━━━━┷━━━━━━━━┛
+//! ┏━━━━━━━┯━━━━━━━━━━━━━━━┯━━━┓
+//! ┃       │               │   ┃
+//! ┠───┐   └───────╴   ╷   ╵   ┃
+//! ┃   │               │       ┃
+//! ┃   └───────────────┼───╴   ┃
+//! ┃                   │       ┃
+//! ┠───╴   ╷   ┌───────┤    ╶──┨
+//! ┃       │   │       │       ┃
+//! ┃   ╶───┤   │   ╷   └───┐   ┃
+//! ┃       │   │   │       │   ┃
+//! ┃   ╷   └───┘   │   ╷   │   ┃
+//! ┃   │           │   │   │   ┃
+//! ┃   └───────────┤   └───┘   ┃
+//! ┃               │           ┃
+//! ┗━━━━━━━━━━━━━━━┷━━━━━━━━━━━┛
 //! ```
 //!
 //! # Architecture

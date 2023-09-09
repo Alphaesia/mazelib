@@ -2,7 +2,7 @@ use std::io::{Result, Write};
 
 use crate::internal::util::get_line_sep;
 
-pub(super) trait WriteLineBreak: Write {
+pub trait WriteLineBreak: Write {
     fn write_line_break(&mut self) -> Result<()>;
 }
 
