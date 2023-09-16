@@ -9,6 +9,6 @@
 pub mod buffer;
 pub mod point;
 pub mod cell;
-pub mod coordinator;
+pub mod coordinate;
 pub mod export;
 pub mod generate;

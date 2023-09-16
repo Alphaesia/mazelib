@@ -3,7 +3,7 @@ use std::io::{Result, Seek, Write};
 use image::{ImageError, Rgba, RgbaImage};
 
 use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
-use crate::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinator;
+use crate::implm::coordinate::block::BoxSpaceBlockCellMazeCoordinator;
 use crate::implm::export::img::{BoxSpaceImageMazeExporter, ImageMazeExporter};
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::export::MazeExporter;

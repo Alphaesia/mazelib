@@ -6,11 +6,11 @@
 use std::io;
 use std::io::Write;
 
-use crate::interface::coordinator::MazeCoordinator;
+use crate::interface::coordinate::MazeCoordinator;
 
 /// Export a maze into another, usually persistent, format.
 ///
-/// [Maze coordinators][crate::interface::coordinator::MazeCoordinator] are only useful within the
+/// [Maze coordinators][crate::interface::coordinate::MazeCoordinator] are only useful within the
 /// confines of this library. If you want to visualise your handiwork you'll want to export it to
 /// something you can [see][crate::implm::export::img::ImageMazeExporter]. If you want to use
 /// the maze in another program, you'll want to write your own exporter that exports the maze to
@@ -35,7 +35,7 @@ use crate::interface::coordinator::MazeCoordinator;
 /// ```
 /// # use mazelib::implm::buffer::VecBuffer;
 /// # use mazelib::implm::cell::inline::InlineCellValue;
-/// # use mazelib::implm::coordinator::inline::BoxSpaceInlineCellMazeCoordinator;
+/// # use mazelib::implm::coordinate::inline::BoxSpaceInlineCellMazeCoordinator;
 /// #
 /// let maze: BoxSpaceInlineCellMazeCoordinator<VecBuffer<InlineCellValue<2>>, 2> /* = ... */;
 /// ```
@@ -46,7 +46,7 @@ use crate::interface::coordinator::MazeCoordinator;
 /// # use std::io::Result;
 /// # use mazelib::implm::buffer::VecBuffer;
 /// # use mazelib::implm::cell::inline::InlineCellValue;
-/// # use mazelib::implm::coordinator::inline::BoxSpaceInlineCellMazeCoordinatorBuilder;
+/// # use mazelib::implm::coordinate::inline::BoxSpaceInlineCellMazeCoordinatorBuilder;
 /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
 /// use mazelib::implm::export::text::BoxSpaceInlineCellTextMazeExporter;
 /// use mazelib::interface::export::MazeExporter;
@@ -68,7 +68,7 @@ use crate::interface::coordinator::MazeCoordinator;
 /// use std::io::BufWriter;
 /// # use mazelib::implm::buffer::VecBuffer;
 /// # use mazelib::implm::cell::inline::InlineCellValue;
-/// # use mazelib::implm::coordinator::inline::BoxSpaceInlineCellMazeCoordinatorBuilder;
+/// # use mazelib::implm::coordinate::inline::BoxSpaceInlineCellMazeCoordinatorBuilder;
 /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
 /// use mazelib::implm::export::text::BoxSpaceInlineCellTextMazeExporter;
 /// use mazelib::interface::export::MazeExporter;
@@ -111,7 +111,7 @@ pub trait MazeExporter<M: MazeCoordinator, O: Write> {
 /// # use mazelib::interface::generate::MazeGenerator;
 /// # use mazelib::implm::buffer::VecBuffer;
 /// # use mazelib::implm::cell::block::BlockCellValue;
-/// # use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinator;
+/// # use mazelib::implm::coordinate::block::BoxSpaceBlockCellMazeCoordinator;
 /// # use mazelib::implm::generate::HuntAndKillGenerator;
 /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
 /// # use mazelib::implm::export::text::BoxSpaceBlockCellTextMazeExporter;
@@ -132,7 +132,7 @@ pub trait MazeExporter<M: MazeCoordinator, O: Write> {
 /// # use mazelib::interface::generate::MazeGenerator;
 /// # use mazelib::implm::buffer::VecBuffer;
 /// # use mazelib::implm::cell::block::BlockCellValue;
-/// # use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinator;
+/// # use mazelib::implm::coordinate::block::BoxSpaceBlockCellMazeCoordinator;
 /// # use mazelib::implm::generate::HuntAndKillGenerator;
 /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
 /// # use mazelib::implm::export::text::BoxSpaceBlockCellTextMazeExporter;

@@ -34,7 +34,7 @@ use rand::Rng;
 ///
 /// # use mazelib::implm::buffer::VecBuffer;
 /// # use mazelib::implm::cell::block::BlockCellValue;
-/// # use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinator;
+/// # use mazelib::implm::coordinate::block::BoxSpaceBlockCellMazeCoordinator;
 /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
 /// #
 /// # type Buffer = VecBuffer<BlockCellValue>;

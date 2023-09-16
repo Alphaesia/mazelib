@@ -1,7 +1,7 @@
 //! A variety of basic helper functions provided for your convenience.
 
 use crate::interface::cell::CellValue;
-use crate::interface::coordinator::MazeCoordinator;
+use crate::interface::coordinate::MazeCoordinator;
 use crate::interface::point::CoordinateSpace;
 
 pub use self::solid_border::apply_solid_border;

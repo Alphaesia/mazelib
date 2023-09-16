@@ -3,7 +3,7 @@
 
 use std::io::Write;
 
-use crate::interface::coordinator::MazeCoordinator;
+use crate::interface::coordinate::MazeCoordinator;
 use crate::interface::export::MazeExporter;
 
 mod block;

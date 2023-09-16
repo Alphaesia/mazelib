@@ -17,7 +17,7 @@ use std::hash::Hash;
 ///
 /// They are physical positions in a maze. They also act as a cell's "address". For
 /// example, to query a cell's [value][CellValue], you give the cell's `CellLocation`
-/// to the [`MazeCoordinator`][crate::interface::coordinator::MazeCoordinator].
+/// to the [`MazeCoordinator`][crate::interface::coordinate::MazeCoordinator].
 pub trait CellLocation: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + Debug {}
 
 /// A unique identifier for a cell within a given maze.
@@ -28,7 +28,7 @@ pub trait CellLocation: Sized + Clone + Copy + PartialEq + Eq + Hash + Send + Sy
 /// for the purposes of storing mazes.
 ///
 /// The exact semantics of how cells are given their identifiers is
-/// unspecified and up to each [`MazeCoordinator`][crate::interface::coordinator::MazeCoordinator].
+/// unspecified and up to each [`MazeCoordinator`][crate::interface::coordinate::MazeCoordinator].
 /// Typically it will differ between implementations, and is not API.
 #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
 pub struct CellID(pub usize);

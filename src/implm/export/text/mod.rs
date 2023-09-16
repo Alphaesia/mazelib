@@ -3,7 +3,7 @@
 use std::io::Write;
 
 use crate::implm::point::boxy::BoxCoordinateSpace;
-use crate::interface::coordinator::MazeCoordinator;
+use crate::interface::coordinate::MazeCoordinator;
 use crate::interface::export::MazeExporter;
 
 pub use self::block::{BoxSpaceBlockCellTextMazeExporter, BoxSpaceBlockCellTextMazeExporterBuilder};

@@ -6,7 +6,7 @@ use std::io::Write;
 use image;
 use image::ImageFormat;
 
-use crate::interface::coordinator::MazeCoordinator;
+use crate::interface::coordinate::MazeCoordinator;
 use crate::interface::export::MazeExporter;
 
 mod block;

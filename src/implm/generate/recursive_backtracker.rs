@@ -2,7 +2,7 @@ use embed_doc_image::embed_doc_image;
 use rand::Rng;
 
 use crate::implm::generate::util::carve_to_unvisited_neighbour;
-use crate::interface::coordinator::MazeCoordinator;
+use crate::interface::coordinate::MazeCoordinator;
 use crate::interface::generate::MazeGenerator;
 use crate::interface::point::CoordinateSpace;
 

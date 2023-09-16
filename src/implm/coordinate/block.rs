@@ -21,7 +21,7 @@ use crate::implm::export::text::BoxSpaceBlockCellTextMazeExporter;
 use crate::implm::point::boxy::BoxCoordinateSpace;
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::{CellID, ConnectionType};
-use crate::interface::coordinator::MazeCoordinator;
+use crate::interface::coordinate::MazeCoordinator;
 use crate::interface::export::MazeExporter;
 use crate::interface::point::CoordinateSpace;
 use crate::internal::array_util::{ArrayZipMap, CheckedProduct, CheckedSum};
@@ -51,7 +51,7 @@ use crate::internal::util::{NONZERO_USIZE_TWO, try_usize_array_to_nonzero_usize_
 /// use mazelib::implm::point::boxy::TwoDimensionalBoxCoordinateSpace;
 /// use mazelib::implm::cell::block::BlockCellValue;
 /// use mazelib::implm::buffer::VecBuffer;
-/// use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinator;
+/// use mazelib::implm::coordinate::block::BoxSpaceBlockCellMazeCoordinator;
 ///
 /// let coord_space = TwoDimensionalBoxCoordinateSpace::new_checked([11, 11]); // Standard 2D coordinate space
 /// let scale_factors = [2, 2]; // A simple scale factor of 2 for a clean look
@@ -67,7 +67,7 @@ use crate::internal::util::{NONZERO_USIZE_TWO, try_usize_array_to_nonzero_usize_
 /// ```
 /// 
 /// TODO add image showing result
-#[embed_doc_image("box-space-block-cell-coordinator-example", "src/doc/img/coordinator/box-space-block-cell/example-large.png")]
+#[embed_doc_image("box-space-block-cell-coordinator-example", "src/doc/img/coordinate/box-space-block-cell/example-large.png")]
 pub struct BoxSpaceBlockCellMazeCoordinator<Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> {
     /// The maze buffer the maze is stored in.
     buffer: Buffer,
@@ -194,7 +194,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// # use mazelib::implm::buffer::VecBuffer;
     /// # use mazelib::implm::cell::block::{BlockCellValue, BlockCellValueType};
     /// # use mazelib::implm::cell::inline::InlineCellValue;
-    /// # use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinator;
+    /// # use mazelib::implm::coordinate::block::BoxSpaceBlockCellMazeCoordinator;
     /// # use mazelib::implm::point::boxy::{BoxCoordinateSpace, CoordinateTuplet};
     /// # let mut maze = BoxSpaceBlockCellMazeCoordinator::<VecBuffer<BlockCellValue>, 1>::builder(BoxCoordinateSpace::new_checked([1])).build();
     /// # let pt: CoordinateTuplet<1> = [0].into();
@@ -251,7 +251,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// # use mazelib::implm::buffer::VecBuffer;
     /// # use mazelib::implm::cell::block::{BlockCellLocation, BlockCellValue, BlockCellValueType};
     /// # use mazelib::implm::cell::inline::InlineCellValue;
-    /// # use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinator;
+    /// # use mazelib::implm::coordinate::block::BoxSpaceBlockCellMazeCoordinator;
     /// # use mazelib::implm::point::boxy::{BoxCoordinateSpace, CoordinateTuplet};
     /// # let mut maze = BoxSpaceBlockCellMazeCoordinator::<VecBuffer<BlockCellValue>, 1>::builder(BoxCoordinateSpace::new_checked([1])).build();
     /// # let loc: BlockCellLocation<1> = [0].into();

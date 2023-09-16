@@ -11,7 +11,7 @@
 //! ```
 //! use mazelib::implm::buffer::VecBuffer;
 //! use mazelib::implm::cell::block::BlockCellValue;
-//! use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinator;
+//! use mazelib::implm::coordinate::block::BoxSpaceBlockCellMazeCoordinator;
 //! use mazelib::implm::generate::HuntAndKillGenerator;
 //! use mazelib::implm::point::boxy::BoxCoordinateSpace;
 //! use mazelib::implm::export::text::BoxSpaceBlockCellTextMazeExporter;
@@ -73,7 +73,7 @@
 //! ```
 //! # use mazelib::implm::buffer::VecBuffer;
 //! # use mazelib::implm::cell::inline::InlineCellValue;
-//! # use mazelib::implm::coordinator::inline::BoxSpaceInlineCellMazeCoordinatorBuilder;
+//! # use mazelib::implm::coordinate::inline::BoxSpaceInlineCellMazeCoordinatorBuilder;
 //! use mazelib::implm::export::text::BoxSpaceInlineCellTextMazeExporter;
 //! # use mazelib::implm::point::boxy::BoxCoordinateSpace;
 //! # use mazelib::interface::export::DefaultMazeExporter;
@@ -131,7 +131,7 @@
 //! Then, you should read the module-level docs of [`interface`]. It explains all of the
 //! key interfaces and their role in our maze model.
 //!
-//! After that, you'll probably want to check out [`interface::coordinator::MazeCoordinator`].
+//! After that, you'll probably want to check out [`interface::coordinate::MazeCoordinator`].
 //! This is the central trait which all of the machinery interacts with, and is the main
 //! interface between you and the maze. The documentation for
 //! [`interface::generate::MazeGenerator`] will likely also be of use. The details of the

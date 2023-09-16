@@ -167,7 +167,7 @@
 //! with a maze directly, you will almost always do it through the coordinator.
 //!
 //! In practical terms, the coordinator is the most important concept for using this library. It is
-//! represented by the [`MazeCoordinator`][coordinator::MazeCoordinator] trait.
+//! represented by the [`MazeCoordinator`][coordinate::MazeCoordinator] trait.
 //!
 //! # External Concepts
 //!
@@ -205,6 +205,6 @@
 pub mod buffer;
 pub mod cell;
 pub mod point;
-pub mod coordinator;
+pub mod coordinate;
 pub mod export;
 pub mod generate;

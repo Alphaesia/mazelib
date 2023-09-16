@@ -2,11 +2,11 @@ use std::io::{Result, Write};
 use std::num::NonZeroUsize;
 
 use crate::implm::cell::inline::{InlineCellValue, InlineCellValueEdgeType as EdgeType};
-use crate::implm::coordinator::inline::BoxSpaceInlineCellMazeCoordinator;
+use crate::implm::coordinate::inline::BoxSpaceInlineCellMazeCoordinator;
 use crate::implm::export::text::TextMazeExporter;
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::CellID;
-use crate::interface::coordinator::MazeCoordinator;
+use crate::interface::coordinate::MazeCoordinator;
 use crate::interface::export::MazeExporter;
 use crate::internal::line_break::WriteLineBreak;
 use crate::internal::util::{nonzero_usize_array_to_usize_array, NONZERO_USIZE_ONE, NONZERO_USIZE_THREE};

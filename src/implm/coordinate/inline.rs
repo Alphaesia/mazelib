@@ -19,7 +19,7 @@ use crate::implm::export::text::BoxSpaceInlineCellTextMazeExporter;
 use crate::implm::point::boxy::BoxCoordinateSpace;
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::{CellID, ConnectionType};
-use crate::interface::coordinator::MazeCoordinator;
+use crate::interface::coordinate::MazeCoordinator;
 use crate::interface::export::MazeExporter;
 use crate::interface::point::CoordinateSpace;
 use crate::internal::array_util::Product;

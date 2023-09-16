@@ -3,7 +3,7 @@ use std::io::{Result, Write};
 use std::num::NonZeroUsize;
 
 use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
-use crate::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinator;
+use crate::implm::coordinate::block::BoxSpaceBlockCellMazeCoordinator;
 use crate::implm::export::text::TextMazeExporter;
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::CellID;

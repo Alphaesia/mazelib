@@ -1,7 +1,7 @@
 //! Generating mazes.
 //!
 //! As an abstraction, generating mazes is simple. You instantiate a generator then hand
-//! off your [maze][crate::interface::coordinator::MazeCoordinator] to it. Once the generator
+//! off your [maze][crate::interface::coordinate::MazeCoordinator] to it. Once the generator
 //! returns, you have your generated maze.
 //!
 //! # Recommended Reading
@@ -11,7 +11,7 @@
 
 use rand::Rng;
 
-use crate::interface::coordinator::MazeCoordinator;
+use crate::interface::coordinate::MazeCoordinator;
 
 /// A maze generator.
 ///
@@ -65,7 +65,7 @@ pub trait MazeGenerator<M: MazeCoordinator> {
 /// # use mazelib::interface::generate::MazeGenerator;
 /// # use mazelib::implm::buffer::VecBuffer;
 /// # use mazelib::implm::cell::block::BlockCellValue;
-/// # use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinator;
+/// # use mazelib::implm::coordinate::block::BoxSpaceBlockCellMazeCoordinator;
 /// # use mazelib::implm::generate::HuntAndKillGenerator;
 /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
 /// # let mut maze = BoxSpaceBlockCellMazeCoordinator::<VecBuffer<BlockCellValue>, 1>::builder(BoxCoordinateSpace::new_checked([1])).build();
@@ -77,7 +77,7 @@ pub trait MazeGenerator<M: MazeCoordinator> {
 /// # use mazelib::interface::generate::DefaultMazeGenerator;
 /// # use mazelib::implm::buffer::VecBuffer;
 /// # use mazelib::implm::cell::block::BlockCellValue;
-/// # use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinator;
+/// # use mazelib::implm::coordinate::block::BoxSpaceBlockCellMazeCoordinator;
 /// # use mazelib::implm::generate::HuntAndKillGenerator;
 /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
 /// # let mut maze = BoxSpaceBlockCellMazeCoordinator::<VecBuffer<BlockCellValue>, 1>::builder(BoxCoordinateSpace::new_checked([1])).build();

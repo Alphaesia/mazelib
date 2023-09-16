@@ -3,7 +3,7 @@ use std::io::{Result, Write};
 use std::time::SystemTime;
 
 use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
-use crate::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinator;
+use crate::implm::coordinate::block::BoxSpaceBlockCellMazeCoordinator;
 use crate::implm::export::minecraft::{BoxSpaceSchematicMazeExporter, SchematicMazeExporter};
 use crate::implm::export::minecraft::schem::{SpongeSchematicV3, SpongeSchematicV3BlockContainer, SpongeSchematicV3MetadataObject, SpongeSchematicV3SchematicObject};
 use crate::interface::buffer::MazeBuffer;

@@ -16,7 +16,7 @@ use crate::interface::cell::{CellID, CellValue};
 ///
 /// Maze buffers store the values of all cells in a maze. This is the meat of the maze. They
 /// are not responsible for other [core maze components](crate::interface#core-components).
-/// These are maintained by the [maze coordinator][crate::interface::coordinator::MazeCoordinator]
+/// These are maintained by the [maze coordinator][crate::interface::coordinate::MazeCoordinator]
 /// (which also holds a maze's buffer).
 ///
 /// A buffer's size is determined at construction and cannot be changed.

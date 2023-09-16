@@ -1,10 +1,10 @@
 use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
 use crate::implm::cell::inline::{InlineCellValue, InlineCellValueEdgeType};
-use crate::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinator;
-use crate::implm::coordinator::inline::BoxSpaceInlineCellMazeCoordinator;
+use crate::implm::coordinate::block::BoxSpaceBlockCellMazeCoordinator;
+use crate::implm::coordinate::inline::BoxSpaceInlineCellMazeCoordinator;
 use crate::implm::point::boxy::BoxCoordinateSpace;
 use crate::interface::buffer::MazeBuffer;
-use crate::interface::coordinator::MazeCoordinator;
+use crate::interface::coordinate::MazeCoordinator;
 use crate::interface::point::CoordinateSpace;
 
 /// Convert all *cells* (not points) adjacent to the edge of a box maze into border cells.

@@ -20,8 +20,8 @@
 //!
 //! # See Also
 //!
-//! * [`MazeCoordinator`][crate::interface::coordinator::MazeCoordinator] --- the interface trait
-#![doc = embed_doc_image::embed_image!("box-space-block-cell-coordinator-example", "src/doc/img/coordinator/box-space-block-cell/example-large.png")]
+//! * [`MazeCoordinator`][crate::interface::coordinate::MazeCoordinator] --- the interface trait
+#![doc = embed_doc_image::embed_image!("box-space-block-cell-coordinator-example", "src/doc/img/coordinate/box-space-block-cell/example-large.png")]
 
 pub mod block;
 pub mod inline;

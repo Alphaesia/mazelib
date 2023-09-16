@@ -2,11 +2,11 @@ use fluent_asserter::prelude::*;
 
 use crate::implm::buffer::VecBuffer;
 use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
-use crate::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinator;
+use crate::implm::coordinate::block::BoxSpaceBlockCellMazeCoordinator;
 use crate::implm::point::boxy::BoxCoordinateSpace;
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::CellID;
-use crate::interface::coordinator::MazeCoordinator;
+use crate::interface::coordinate::MazeCoordinator;
 
 // We test both at a coordinator level and a buffer level
 // (i.e. ignoring and taking into account the resolution)
