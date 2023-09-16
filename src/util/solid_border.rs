@@ -1,5 +1,5 @@
-use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
-use crate::implm::cell::inline::{InlineCellValue, InlineCellValueEdgeType};
+use crate::implm::cell::block::{BlockCellValue, BlockCellPrimaryValue};
+use crate::implm::cell::inline::{InlineCellValue, InlineCellValueEdge};
 use crate::implm::coordinate::block::BoxSpaceBlockCellMazeCoordinator;
 use crate::implm::coordinate::inline::BoxSpaceInlineCellMazeCoordinator;
 use crate::implm::point::boxy::BoxCoordinateSpace;
@@ -48,7 +48,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> SolidBorder<Bo
         'outer: loop {
             for (i, dim) in cell.iter().enumerate() {
                 if *dim == 0 || *dim == usize::from(maze.get_full_dimensions()[i]) - 1 {
-                    maze.set_cell_value_type(cell.into(), BlockCellValueType::BOUNDARY);
+                    maze.set_cell_value_type(cell.into(), BlockCellPrimaryValue::BOUNDARY);
                     break
                 }
             }
@@ -77,17 +77,17 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> So
         let mut cell = [0usize; DIMENSION];
 
         'outer: loop {
-            let mut walls = [[InlineCellValueEdgeType::UNVISITED; 2]; DIMENSION];
+            let mut walls = [[InlineCellValueEdge::UNVISITED; 2]; DIMENSION];
             let mut on_boundary = false;
 
             for (i, dim) in cell.iter().enumerate() {
                 if dim == &0 {
-                    walls[i][0] = InlineCellValueEdgeType::BOUNDARY;
+                    walls[i][0] = InlineCellValueEdge::BOUNDARY;
                     on_boundary = true;
                 }
 
                 if *dim == usize::from(maze.coord_space().dimensions()[i]) - 1 {
-                    walls[i][1] = InlineCellValueEdgeType::BOUNDARY;
+                    walls[i][1] = InlineCellValueEdge::BOUNDARY;
                     on_boundary = true;
                 }
             }

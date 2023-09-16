@@ -2,7 +2,7 @@ use std::io::{Result, Seek, Write};
 
 use image::{ImageError, Rgba, RgbaImage};
 
-use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
+use crate::implm::cell::block::{BlockCellValue, BlockCellPrimaryValue};
 use crate::implm::coordinate::block::BoxSpaceBlockCellMazeCoordinator;
 use crate::implm::export::img::{BoxSpaceImageMazeExporter, ImageMazeExporter};
 use crate::interface::buffer::MazeBuffer;
@@ -18,9 +18,9 @@ impl <Buffer: MazeBuffer<BlockCellValue>, Output: Write + Seek> MazeExporter<Box
         for y in 0..height {
             for x in 0..width {
                 let pixel = match maze.get_cell_value([x, y].into()).cell_type {
-                    BlockCellValueType::PASSAGE => Rgba::from([255, 255, 255, 255]),
-                    BlockCellValueType::WALL | BlockCellValueType::BOUNDARY => Rgba::from([0, 0, 0, 255]),
-                    BlockCellValueType::UNVISITED => Rgba::from([0, 0, 0, 0]),
+                    BlockCellPrimaryValue::PASSAGE => Rgba::from([255, 255, 255, 255]),
+                    BlockCellPrimaryValue::WALL | BlockCellPrimaryValue::BOUNDARY => Rgba::from([0, 0, 0, 255]),
+                    BlockCellPrimaryValue::UNVISITED => Rgba::from([0, 0, 0, 0]),
                 };
 
                 img.put_pixel(x as u32, y as u32, pixel);

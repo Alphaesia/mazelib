@@ -1,3 +1,14 @@
+//! Block cells are cells where each cell is exactly one of:
+//! [passage][BlockCellPrimaryValue::PASSAGE], [wall][BlockCellPrimaryValue::WALL],
+//! [boundary][BlockCellPrimaryValue::BOUNDARY], or [unvisited][BlockCellPrimaryValue::UNVISITED].
+//! 
+//! They are named block cells because they have a blocky or pixellated appearance.
+//!
+//! # Examples
+//!
+//! ![A pixellated-looking maze, where every cell is one pixel][box-space-block-cell-coordinator-example]
+#![doc = embed_doc_image::embed_image!("box-space-block-cell-coordinator-example", "src/doc/img/coordinate/box-space-block-cell/example-large.png")]
+
 use std::fmt::{Debug, Formatter};
 use std::ops::{Index, IndexMut};
 
@@ -109,26 +120,84 @@ impl <const DIMENSION: usize> From<BlockCellLocation<DIMENSION>> for [usize; DIM
 #[derive(Copy, Clone, Eq, PartialEq, Hash, Default, Debug)]
 pub struct BlockCellValue {
     /// The specific type or value of the cell. For more information
-    /// see [`BlockCellValueType`].
-    pub cell_type: BlockCellValueType,
+    /// see [`BlockCellPrimaryValue`].
+    pub cell_type: BlockCellPrimaryValue,
 
     /// Whether this cell has been marked or flagged. This is a
     /// general-use field, with no specific meaning.
     pub marked: bool,
 }
 
+/*
+ * If you were to represent a primary value as a 2-bit number, I'd do it like this:
+ * 
+ * 00 = UNVISITED
+ * 01 = PASSAGE
+ * 10 = WALL
+ * 11 = BOUNDARY
+ *
+ * UNVISITED is assigned to 00 so that zero-initialising a buffer is equivalent to initialising it
+ * to UNVISITED, which is what you want. Additionally, each bit individually represents something.
+ * If the upper bit is set, the cell cannot be moved through (wall or boundary). If the lower bit
+ * is set however, the cell can be carved through (to create a passage).
+ *
+ * Though alternatively, it could be nice to encode them in priority order.
+ */
+/// The possible values that a [block cell][super] can hold (ignoring flags and other data).
+/// 
+/// Each possibility directly maps to a [`ConnectionType`][crate::interface::cell::ConnectionType].
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Default, Debug)]
-pub enum BlockCellValueType {
+pub enum BlockCellPrimaryValue {
+    /// A cell that has not yet been generated.
+    /// 
+    /// An unvisited cell should never be accessible from within the maze itself after generation is
+    /// complete.
+    /// 
+    /// # See Also
+    /// 
+    /// [`ConnectionType::UNVISITED`][crate::interface::cell::ConnectionType], the connection type
+    /// this cell will yield (subject to
+    /// [priority][crate::interface::cell::ConnectionType#priority]).
     #[default]
     UNVISITED,
+
+    /// A cell that cannot be moved through.
+    /// 
+    /// A boundary cell should never be carved through.
+    ///
+    /// # See Also
+    ///
+    /// [`Self::WALL`], a cell that cannot be moved through initially but can be carved through to
+    /// create a [`Self::PASSAGE`] cell.
+    /// [`ConnectionType::BOUNDARY`][crate::interface::cell::ConnectionType], the connection type
+    /// this cell will yield.
     BOUNDARY,
+
+    /// A cell that cannot be moved through.
+    ///
+    /// A wall cell may be carved through, turning it into a [`Self::PASSAGE`] cell.
+    ///
+    /// # See Also
+    ///
+    /// [`Self::BOUNDARY`], a cell that cannot be moved and cannot be carved through.
+    /// [`ConnectionType::UNVISITED`][crate::interface::cell::ConnectionType], the connection type
+    /// this cell will yield (subject to
+    /// [priority][crate::interface::cell::ConnectionType#priority]).
     WALL,
+
+    /// A cell that can be moved through.
+    ///
+    /// # See Also
+    ///
+    /// [`ConnectionType::UNVISITED`][crate::interface::cell::ConnectionType], the connection type
+    /// this cell will yield (subject to
+    /// [priority][crate::interface::cell::ConnectionType#priority]).
     PASSAGE,
 }
 
 impl CellValue for BlockCellValue {
     fn is_fully_visited(&self) -> bool {
-        self.cell_type != BlockCellValueType::UNVISITED
+        self.cell_type != BlockCellPrimaryValue::UNVISITED
     }
 
     fn is_marked(&self) -> bool {

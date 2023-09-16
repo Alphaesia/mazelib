@@ -1,3 +1,14 @@
+//! Inline cells store whether they have a wall on each edge.
+//!
+//! They are named inline cells because the walls are inline with the passages (as opposed to being
+//! in separate cells, a la [block cells][super::block].
+//! 
+//! TODO annotated diagram of a single cell (or like 3x3)
+//!
+//! # Examples
+//! 
+//! TODO
+
 use std::fmt::{Debug, Formatter};
 use std::ops::{Index, IndexMut};
 
@@ -116,27 +127,56 @@ pub struct InlineCellValue<const DIMENSION: usize> {
     /// corresponding edge is set to be a boundary, the connection
     /// as a whole will be considered to be a boundary, even if
     /// this cell's edge is set to be a passage.
-    pub edges: [[InlineCellValueEdgeType; 2]; DIMENSION],
+    pub edges: [[InlineCellValueEdge; 2]; DIMENSION],
 
     /// Whether this cell has been marked or flagged. This is a
     /// general-use field, with no specific meaning.
     pub marked: bool,
 }
 
+/// The types of edges that an [inline cell][super] can have.
+/// 
+/// Each possibility directly maps to a [`ConnectionType`][crate::interface::cell::ConnectionType].
 #[derive(Copy, Clone, PartialEq, Eq, Hash, Debug)]
-pub enum InlineCellValueEdgeType {
+pub enum InlineCellValueEdge {
     /// An edge that permits passage. Note that the neighbouring cell in this direction
     /// may have a wall or boundary, preventing one from moving there.
+    ///
+    /// # See Also
+    ///
+    /// [`ConnectionType::PASSAGE`][crate::interface::cell::ConnectionType], the type of the
+    /// connection over this edge will be (subject to
+    /// [priority][crate::interface::cell::ConnectionType#priority]).
     PASSAGE,
+    
     /// An edge that denies passage. Walls may be converted into passages by
     /// passage-carving generation algorithms.
+    /// 
+    /// # See Also
+    ///
+    /// [`ConnectionType::WALL`][crate::interface::cell::ConnectionType], the type of the
+    /// connection over this edge will be (subject to
+    /// [priority][crate::interface::cell::ConnectionType#priority]).
     WALL,
-    /// Like a wall, but it will never be touched by a generator. Boundaries
+    
+    /// Like a wall, but it will never be carved through by a generator. Boundaries
     /// are ideal for the outlines of mazes and other important structural features.
+    /// 
+    /// # See Also
+    /// 
+    /// [`ConnectionType::BOUNDARY`][crate::interface::cell::ConnectionType], the type of the
+    /// connection over this edge will be.
     BOUNDARY,
+    
     /// An edge that has not been generated yet by a generator. An unvisited edge
     /// should never be accessible from a passage after generation is complete.
     /// A cell is considered
+    ///
+    /// # See Also
+    ///
+    /// [`ConnectionType::UNVISITED`][crate::interface::cell::ConnectionType], the type of the
+    /// connection over this edge will be (subject to
+    /// [priority][crate::interface::cell::ConnectionType#priority]).
     UNVISITED,
 }
 
@@ -157,7 +197,7 @@ pub enum InlineCellValueEdgeSide {
 
 impl <const DIMENSION: usize> InlineCellValue<DIMENSION> {
     #[must_use]
-    pub fn get_wall(&self, axis: usize, side: InlineCellValueEdgeSide) -> InlineCellValueEdgeType {
+    pub fn get_wall(&self, axis: usize, side: InlineCellValueEdgeSide) -> InlineCellValueEdge {
         let side_index = match side {
             InlineCellValueEdgeSide::POSITIVE => 1,
             InlineCellValueEdgeSide::NEGATIVE => 0,
@@ -169,7 +209,7 @@ impl <const DIMENSION: usize> InlineCellValue<DIMENSION> {
 
 impl <const DIMENSION: usize> CellValue for InlineCellValue<DIMENSION> {
     fn is_fully_visited(&self) -> bool {
-        self.edges.into_iter().flat_map(|dim| dim.into_iter()).all(|edge| edge != InlineCellValueEdgeType::UNVISITED)
+        self.edges.into_iter().flat_map(|dim| dim.into_iter()).all(|edge| edge != InlineCellValueEdge::UNVISITED)
     }
 
     fn is_marked(&self) -> bool {
@@ -184,6 +224,6 @@ impl <const DIMENSION: usize> CellValue for InlineCellValue<DIMENSION> {
 impl <const DIMENSION: usize> Default for InlineCellValue<DIMENSION> {
     #[must_use]
     fn default() -> Self {
-        Self { edges: [[InlineCellValueEdgeType::UNVISITED; 2]; DIMENSION], marked: false }
+        Self { edges: [[InlineCellValueEdge::UNVISITED; 2]; DIMENSION], marked: false }
     }
 }

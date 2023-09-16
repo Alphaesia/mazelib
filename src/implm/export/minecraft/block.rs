@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::io::{Result, Write};
 use std::time::SystemTime;
 
-use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
+use crate::implm::cell::block::{BlockCellValue, BlockCellPrimaryValue};
 use crate::implm::coordinate::block::BoxSpaceBlockCellMazeCoordinator;
 use crate::implm::export::minecraft::{BoxSpaceSchematicMazeExporter, SchematicMazeExporter};
 use crate::implm::export::minecraft::schem::{SpongeSchematicV3, SpongeSchematicV3BlockContainer, SpongeSchematicV3MetadataObject, SpongeSchematicV3SchematicObject};
@@ -38,16 +38,16 @@ impl <Buffer: MazeBuffer<BlockCellValue>, Output: Write> MazeExporter<BoxSpaceBl
         for z in 0..length_usize {
             for x in 0..width_usize {
                 match maze.get_cell_value([x, z].into()).cell_type {
-                    BlockCellValueType::PASSAGE => {
+                    BlockCellPrimaryValue::PASSAGE => {
                         // y = 0
                         data[x + z * width_usize] = FLOOR_BLOCK;
                     },
-                    BlockCellValueType::WALL | BlockCellValueType::BOUNDARY => {
+                    BlockCellPrimaryValue::WALL | BlockCellPrimaryValue::BOUNDARY => {
                         for y in 0..4 {
                             data[x + z * width_usize + y * width_usize * length_usize] = WALL_BLOCK;
                         }
                     },
-                    BlockCellValueType::UNVISITED => {},
+                    BlockCellPrimaryValue::UNVISITED => {},
                 }
             }
         }

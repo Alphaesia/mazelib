@@ -8,15 +8,16 @@
 //! [`BoxSpaceBlockCellMazeCoordinator`]:
 //!
 //! ![A pixellated-looking maze, where every cell is one pixel][box-space-block-cell-coordinator-example]
+#![doc = embed_doc_image::embed_image!("box-space-block-cell-coordinator-example", "src/doc/img/coordinate/box-space-block-cell/example-large.png")]
 
 use std::fmt::{Debug, Formatter};
 use std::marker::PhantomData;
 use std::num::NonZeroUsize;
 use embed_doc_image::embed_doc_image;
 
-use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
+use crate::implm::cell::block::{BlockCellValue, BlockCellPrimaryValue};
 use crate::implm::cell::block::BlockCellLocation;
-use crate::implm::cell::block::BlockCellValueType::{BOUNDARY, PASSAGE, UNVISITED, WALL};
+use crate::implm::cell::block::BlockCellPrimaryValue::{BOUNDARY, PASSAGE, UNVISITED, WALL};
 use crate::implm::export::text::BoxSpaceBlockCellTextMazeExporter;
 use crate::implm::point::boxy::BoxCoordinateSpace;
 use crate::interface::buffer::MazeBuffer;
@@ -192,13 +193,13 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// Sugar for
     /// ```
     /// # use mazelib::implm::buffer::VecBuffer;
-    /// # use mazelib::implm::cell::block::{BlockCellValue, BlockCellValueType};
+    /// # use mazelib::implm::cell::block::{BlockCellValue, BlockCellPrimaryValue};
     /// # use mazelib::implm::cell::inline::InlineCellValue;
     /// # use mazelib::implm::coordinate::block::BoxSpaceBlockCellMazeCoordinator;
     /// # use mazelib::implm::point::boxy::{BoxCoordinateSpace, CoordinateTuplet};
     /// # let mut maze = BoxSpaceBlockCellMazeCoordinator::<VecBuffer<BlockCellValue>, 1>::builder(BoxCoordinateSpace::new_checked([1])).build();
     /// # let pt: CoordinateTuplet<1> = [0].into();
-    /// # let cell_type = BlockCellValueType::PASSAGE;
+    /// # let cell_type = BlockCellPrimaryValue::PASSAGE;
     /// #
     /// maze.get_mut(pt).cell_type = cell_type;
     /// ```
@@ -206,7 +207,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// Modifies the cell's type but keeps its mark status intact.
     ///
     /// Please see [`get_mut()`][Self::get_mut] for details.
-    pub fn set_type(&mut self, pt: pt!(), cell_type: BlockCellValueType) {
+    pub fn set_type(&mut self, pt: pt!(), cell_type: BlockCellPrimaryValue) {
         self.get_mut(pt).cell_type = cell_type;
     }
 
@@ -249,19 +250,19 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// Sugar for
     /// ```
     /// # use mazelib::implm::buffer::VecBuffer;
-    /// # use mazelib::implm::cell::block::{BlockCellLocation, BlockCellValue, BlockCellValueType};
+    /// # use mazelib::implm::cell::block::{BlockCellLocation, BlockCellValue, BlockCellPrimaryValue};
     /// # use mazelib::implm::cell::inline::InlineCellValue;
     /// # use mazelib::implm::coordinate::block::BoxSpaceBlockCellMazeCoordinator;
     /// # use mazelib::implm::point::boxy::{BoxCoordinateSpace, CoordinateTuplet};
     /// # let mut maze = BoxSpaceBlockCellMazeCoordinator::<VecBuffer<BlockCellValue>, 1>::builder(BoxCoordinateSpace::new_checked([1])).build();
     /// # let loc: BlockCellLocation<1> = [0].into();
-    /// # let cell_type = BlockCellValueType::PASSAGE;
+    /// # let cell_type = BlockCellPrimaryValue::PASSAGE;
     /// #
     /// maze.get_cell_value_mut(loc).cell_type = cell_type;
     /// ```
     ///
     /// Please see [`Self::get_cell_value_mut()`] for details.
-    pub fn set_cell_value_type(&mut self, loc: <Self as MazeCoordinator>::CellLoc, cell_type: BlockCellValueType) {
+    pub fn set_cell_value_type(&mut self, loc: <Self as MazeCoordinator>::CellLoc, cell_type: BlockCellPrimaryValue) {
         self.get_cell_value_mut(loc).cell_type = cell_type;
     }
 }
@@ -344,7 +345,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> MazeCoordinato
     }
 
     //noinspection RsUnnecessaryQualifications
-    /// Set `pt` to [`BlockCellValueType::PASSAGE`].
+    /// Set `pt` to [`BlockCellPrimaryValue::PASSAGE`].
     fn make_passage(&mut self, pt: pt!()) {
         let cell_loc = self.map_pt_to_cell_loc(pt);
 
@@ -353,11 +354,11 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> MazeCoordinato
     }
 
     //noinspection RsUnnecessaryQualifications
-    /// Set `from` and `to` to [`BlockCellValueType::PASSAGE`]. If the scale factor along the axis
+    /// Set `from` and `to` to [`BlockCellPrimaryValue::PASSAGE`]. If the scale factor along the axis
     /// of adjacency is greater than 1, then all intermediate cells will be set to passages too.
     ///
     /// All cells that are adjacent to from, or any of the intermediate cells, and are unvisited,
-    /// will be set to [`BlockCellValueType::WALL`]. Note that this excludes `to`, so that
+    /// will be set to [`BlockCellPrimaryValue::WALL`]. Note that this excludes `to`, so that
     /// maze carvers will be able to progress. If you wish for `to` to also be surrounded by
     /// walls, simply call [`Self::make_passage()`] on `to` as well.
     fn make_passage_between(&mut self, from: pt!(), to: pt!()) {
@@ -391,13 +392,13 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> MazeCoordinato
     }
 
     //noinspection RsUnnecessaryQualifications
-    /// Set `pt` to [`BlockCellValueType::WALL`].
+    /// Set `pt` to [`BlockCellPrimaryValue::WALL`].
     fn make_wall(&mut self, pt: pt!()) {
         self.set_type(pt, WALL);
     }
 
     //noinspection RsUnnecessaryQualifications
-    /// Set `from` and `to` to [`BlockCellValueType::WALL`]. If the scale factor along the axis of
+    /// Set `from` and `to` to [`BlockCellPrimaryValue::WALL`]. If the scale factor along the axis of
     /// adjacency is greater than 1, then all intermediate cells will be set to walls too.
     fn make_wall_between(&mut self, from: pt!(), to: pt!()) {
         let axis_of_adjacency = Self::get_axis_of_adjacency(from, to).expect("from and to are not adjacent");
@@ -420,13 +421,13 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> MazeCoordinato
     }
 
     //noinspection RsUnnecessaryQualifications
-    /// Set `pt` to [`BlockCellValueType::BOUNDARY`].
+    /// Set `pt` to [`BlockCellPrimaryValue::BOUNDARY`].
     fn make_boundary(&mut self, pt: pt!()) {
         self.set_type(pt, BOUNDARY);
     }
 
     //noinspection RsUnnecessaryQualifications
-    /// Set `from` and `to` to [`BlockCellValueType::BOUNDARY`]. If the scale factor along the axis
+    /// Set `from` and `to` to [`BlockCellPrimaryValue::BOUNDARY`]. If the scale factor along the axis
     /// of adjacency is greater than 1, then all intermediate cells will be set to boundaries too.
     fn make_boundary_between(&mut self, from: pt!(), to: pt!()) {
         let axis_of_adjacency = Self::get_axis_of_adjacency(from, to).expect("from and to are not adjacent");

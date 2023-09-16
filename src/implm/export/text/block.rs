@@ -2,7 +2,7 @@ use std::cmp::max;
 use std::io::{Result, Write};
 use std::num::NonZeroUsize;
 
-use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
+use crate::implm::cell::block::{BlockCellValue, BlockCellPrimaryValue};
 use crate::implm::coordinate::block::BoxSpaceBlockCellMazeCoordinator;
 use crate::implm::export::text::TextMazeExporter;
 use crate::interface::buffer::MazeBuffer;
@@ -236,10 +236,10 @@ impl <Buffer: MazeBuffer<BlockCellValue>, Output: Write> MazeExporter<BoxSpaceBl
                     let pt = CellID(x + y * width);
 
                     let char = match maze.buffer().get(pt).cell_type {
-                        BlockCellValueType::PASSAGE   => passage_char,
-                        BlockCellValueType::WALL      => wall_char,
-                        BlockCellValueType::BOUNDARY  => boundary_char,
-                        BlockCellValueType::UNVISITED => unvisited_char
+                        BlockCellPrimaryValue::PASSAGE   => passage_char,
+                        BlockCellPrimaryValue::WALL      => wall_char,
+                        BlockCellPrimaryValue::BOUNDARY  => boundary_char,
+                        BlockCellPrimaryValue::UNVISITED => unvisited_char
                     };
 
                     for _ in 0..usize::from(self.chars_per_cell_horizontally) {
@@ -261,10 +261,10 @@ impl <Buffer: MazeBuffer<BlockCellValue>, Output: Write> MazeExporter<BoxSpaceBl
                     let pt = CellID(x + y * width);
 
                     let char = match maze.buffer().get(pt).cell_type {
-                        BlockCellValueType::PASSAGE   => passage_char,
-                        BlockCellValueType::WALL      => wall_char,
-                        BlockCellValueType::BOUNDARY  => boundary_char,
-                        BlockCellValueType::UNVISITED => unvisited_char
+                        BlockCellPrimaryValue::PASSAGE   => passage_char,
+                        BlockCellPrimaryValue::WALL      => wall_char,
+                        BlockCellPrimaryValue::BOUNDARY  => boundary_char,
+                        BlockCellPrimaryValue::UNVISITED => unvisited_char
                     };
 
                     for _ in 0..usize::from(self.chars_per_cell_horizontally) {

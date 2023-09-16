@@ -91,7 +91,7 @@ pub trait MazeBuffer<CellVal: CellValue> : Debug + Send {
     /// ```
     /// # use std::num::NonZeroUsize;
     /// # use mazelib::implm::buffer::VecBuffer;
-    /// # use mazelib::implm::cell::block::{BlockCellValue, BlockCellValueType};
+    /// # use mazelib::implm::cell::block::{BlockCellValue, BlockCellPrimaryValue};
     /// # use mazelib::interface::buffer::MazeBuffer;
     /// # use mazelib::interface::cell::CellID;
     /// #
@@ -99,7 +99,7 @@ pub trait MazeBuffer<CellVal: CellValue> : Debug + Send {
     /// let mut buffer = VecBuffer::<BlockCellValue>::new(NonZeroUsize::new(1).expect("If this fails the sky is falling"));
     ///
     /// let cell_id = CellID(0);
-    /// let cell = BlockCellValue { cell_type: BlockCellValueType::PASSAGE, marked: false };
+    /// let cell = BlockCellValue { cell_type: BlockCellPrimaryValue::PASSAGE, marked: false };
     ///
     /// buffer.set(cell_id, cell);
     ///
@@ -124,7 +124,7 @@ pub trait MazeBuffer<CellVal: CellValue> : Debug + Send {
     /// ```
     /// # use std::num::NonZeroUsize;
     /// # use mazelib::implm::buffer::VecBuffer;
-    /// # use mazelib::implm::cell::block::{BlockCellValue, BlockCellValueType};
+    /// # use mazelib::implm::cell::block::{BlockCellValue, BlockCellPrimaryValue};
     /// # use mazelib::interface::buffer::MazeBuffer;
     /// # use mazelib::interface::cell::CellID;
     /// #
@@ -132,7 +132,7 @@ pub trait MazeBuffer<CellVal: CellValue> : Debug + Send {
     /// let mut buffer = VecBuffer::<BlockCellValue>::new(NonZeroUsize::new(1).expect("If this fails the sky is falling"));
     ///
     /// let cell_id = CellID(0);
-    /// let cell = BlockCellValue { cell_type: BlockCellValueType::PASSAGE, marked: false };
+    /// let cell = BlockCellValue { cell_type: BlockCellPrimaryValue::PASSAGE, marked: false };
     ///
     /// buffer.set(cell_id, cell);
     ///

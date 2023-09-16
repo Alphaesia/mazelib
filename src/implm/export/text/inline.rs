@@ -1,7 +1,7 @@
 use std::io::{Result, Write};
 use std::num::NonZeroUsize;
 
-use crate::implm::cell::inline::{InlineCellValue, InlineCellValueEdgeType as EdgeType};
+use crate::implm::cell::inline::{InlineCellValue, InlineCellValueEdge as EdgeType};
 use crate::implm::coordinate::inline::BoxSpaceInlineCellMazeCoordinator;
 use crate::implm::export::text::TextMazeExporter;
 use crate::interface::buffer::MazeBuffer;

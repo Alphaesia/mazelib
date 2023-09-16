@@ -1,7 +1,7 @@
 use fluent_asserter::prelude::*;
 
 use crate::implm::buffer::VecBuffer;
-use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
+use crate::implm::cell::block::{BlockCellValue, BlockCellPrimaryValue};
 use crate::implm::coordinate::block::BoxSpaceBlockCellMazeCoordinator;
 use crate::implm::point::boxy::BoxCoordinateSpace;
 use crate::interface::buffer::MazeBuffer;
@@ -149,8 +149,8 @@ fn test_initialisation() {
 
         for y in 0usize..3 {
             for x in 0usize..3 {
-                assert_eq!(maze.get([x, y].into()).cell_type, BlockCellValueType::UNVISITED);
-                assert_eq!(maze.buffer().get(CellID(x + y * 3)).cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(maze.get([x, y].into()).cell_type, BlockCellPrimaryValue::UNVISITED);
+                assert_eq!(maze.buffer().get(CellID(x + y * 3)).cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -161,8 +161,8 @@ fn test_initialisation() {
 
         for y in 0usize..5 {
             for x in 0usize..5 {
-                assert_eq!(maze.get([x, y].into()).cell_type, BlockCellValueType::UNVISITED);
-                assert_eq!(maze.buffer().get(CellID(x + y * 5)).cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(maze.get([x, y].into()).cell_type, BlockCellPrimaryValue::UNVISITED);
+                assert_eq!(maze.buffer().get(CellID(x + y * 5)).cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -173,13 +173,13 @@ fn test_initialisation() {
 
         for y in 0usize..5 {
             for x in 0usize..5 {
-                assert_eq!(maze.get([x, y].into()).cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(maze.get([x, y].into()).cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
 
         for y in 0usize..9 {
             for x in 0usize..9 {
-                assert_eq!(maze.buffer().get(CellID(x + y * 9)).cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(maze.buffer().get(CellID(x + y * 9)).cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -194,8 +194,8 @@ fn test_boundary_single_without_scaling_or_padding() {
 
     for y in 0usize..5 {
         for x in 0usize..5 {
-            assert_eq!(maze.get([x, y].into()).cell_type, BlockCellValueType::UNVISITED);
-            assert_eq!(maze.buffer().get(CellID(x + y * 5)).cell_type, BlockCellValueType::UNVISITED);
+            assert_eq!(maze.get([x, y].into()).cell_type, BlockCellPrimaryValue::UNVISITED);
+            assert_eq!(maze.buffer().get(CellID(x + y * 5)).cell_type, BlockCellPrimaryValue::UNVISITED);
         }
     }
 
@@ -208,9 +208,9 @@ fn test_boundary_single_without_scaling_or_padding() {
             let cell = maze.get([x, y].into());
 
             if x == 1 && y == 2 {
-                assert_eq!(cell.cell_type, BlockCellValueType::BOUNDARY);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::BOUNDARY);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -224,9 +224,9 @@ fn test_boundary_single_without_scaling_or_padding() {
             let cell = maze.get([x, y].into());
 
             if x == 1 && y == 2 || x == 4 && y == 4 {
-                assert_eq!(cell.cell_type, BlockCellValueType::BOUNDARY);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::BOUNDARY);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -240,9 +240,9 @@ fn test_boundary_single_without_scaling_or_padding() {
             let cell = maze.get([x, y].into());
 
             if x == 1 && y == 2 || x == 4 && y == 4 || x == 1 && y == 3 {
-                assert_eq!(cell.cell_type, BlockCellValueType::BOUNDARY);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::BOUNDARY);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -257,13 +257,13 @@ fn test_boundary_single_with_scaling_without_padding() {
 
     for y in 0usize..5 {
         for x in 0usize..5 {
-            assert_eq!(maze.get([x, y].into()).cell_type, BlockCellValueType::UNVISITED);
+            assert_eq!(maze.get([x, y].into()).cell_type, BlockCellPrimaryValue::UNVISITED);
         }
     }
 
     for y in 0usize..9 {
         for x in 0usize..9 {
-            assert_eq!(maze.buffer().get(CellID(x + y * 9)).cell_type, BlockCellValueType::UNVISITED);
+            assert_eq!(maze.buffer().get(CellID(x + y * 9)).cell_type, BlockCellPrimaryValue::UNVISITED);
         }
     }
 
@@ -276,9 +276,9 @@ fn test_boundary_single_with_scaling_without_padding() {
             let cell = maze.get([x, y].into());
 
             if x == 1 && y == 2 {
-                assert_eq!(cell.cell_type, BlockCellValueType::BOUNDARY);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::BOUNDARY);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -288,9 +288,9 @@ fn test_boundary_single_with_scaling_without_padding() {
             let cell = maze.buffer().get(CellID(x + y * 9));
 
             if x == 2 && y == 4 {
-                assert_eq!(cell.cell_type, BlockCellValueType::BOUNDARY);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::BOUNDARY);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -304,9 +304,9 @@ fn test_boundary_single_with_scaling_without_padding() {
             let cell = maze.get([x, y].into());
 
             if x == 1 && y == 2 || x == 4 && y == 4 {
-                assert_eq!(cell.cell_type, BlockCellValueType::BOUNDARY);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::BOUNDARY);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -316,9 +316,9 @@ fn test_boundary_single_with_scaling_without_padding() {
             let cell = maze.buffer().get(CellID(x + y * 9));
 
             if x == 2 && y == 4 || x == 8 && y == 8 {
-                assert_eq!(cell.cell_type, BlockCellValueType::BOUNDARY);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::BOUNDARY);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -332,9 +332,9 @@ fn test_boundary_single_with_scaling_without_padding() {
             let cell = maze.get([x, y].into());
 
             if x == 1 && y == 2 || x == 4 && y == 4 || x == 1 && y == 3 {
-                assert_eq!(cell.cell_type, BlockCellValueType::BOUNDARY);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::BOUNDARY);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -344,9 +344,9 @@ fn test_boundary_single_with_scaling_without_padding() {
             let cell = maze.buffer().get(CellID(x + y * 9));
 
             if x == 2 && y == 4 || x == 8 && y == 8 || x == 2 && y == 6 {
-                assert_eq!(cell.cell_type, BlockCellValueType::BOUNDARY);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::BOUNDARY);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -361,8 +361,8 @@ fn test_boundary_between_without_scaling_or_padding() {
 
     for y in 0usize..5 {
         for x in 0usize..5 {
-            assert_eq!(maze.get([x, y].into()).cell_type, BlockCellValueType::UNVISITED);
-            assert_eq!(maze.buffer().get(CellID(x + y * 5)).cell_type, BlockCellValueType::UNVISITED);
+            assert_eq!(maze.get([x, y].into()).cell_type, BlockCellPrimaryValue::UNVISITED);
+            assert_eq!(maze.buffer().get(CellID(x + y * 5)).cell_type, BlockCellPrimaryValue::UNVISITED);
         }
     }
 
@@ -375,9 +375,9 @@ fn test_boundary_between_without_scaling_or_padding() {
             let cell = maze.get([x, y].into());
 
             if x == 1 && y == 2 || x == 1 && y == 3 {
-                assert_eq!(cell.cell_type, BlockCellValueType::BOUNDARY);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::BOUNDARY);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -392,9 +392,9 @@ fn test_boundary_between_without_scaling_or_padding() {
 
             if x == 1 && y == 2 || x == 1 && y == 3
                     || x == 4 && y == 4 || x == 3 && y == 4 {
-                assert_eq!(cell.cell_type, BlockCellValueType::BOUNDARY);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::BOUNDARY);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -410,9 +410,9 @@ fn test_boundary_between_without_scaling_or_padding() {
             if x == 1 && y == 2 || x == 1 && y == 3
                     || x == 4 && y == 4 || x == 3 && y == 4
                     || x == 2 && y == 3 {
-                assert_eq!(cell.cell_type, BlockCellValueType::BOUNDARY);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::BOUNDARY);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -427,13 +427,13 @@ fn test_boundary_between_with_scaling_without_padding() {
 
     for y in 0usize..5 {
         for x in 0usize..5 {
-            assert_eq!(maze.get([x, y].into()).cell_type, BlockCellValueType::UNVISITED);
+            assert_eq!(maze.get([x, y].into()).cell_type, BlockCellPrimaryValue::UNVISITED);
         }
     }
 
     for y in 0usize..9 {
         for x in 0usize..9 {
-            assert_eq!(maze.buffer().get(CellID(x + y * 9)).cell_type, BlockCellValueType::UNVISITED);
+            assert_eq!(maze.buffer().get(CellID(x + y * 9)).cell_type, BlockCellPrimaryValue::UNVISITED);
         }
     }
 
@@ -446,9 +446,9 @@ fn test_boundary_between_with_scaling_without_padding() {
             let cell = maze.get([x, y].into());
 
             if x == 1 && y == 2 || x == 1 && y == 3 {
-                assert_eq!(cell.cell_type, BlockCellValueType::BOUNDARY);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::BOUNDARY);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -458,9 +458,9 @@ fn test_boundary_between_with_scaling_without_padding() {
             let cell = maze.buffer().get(CellID(x + y * 9));
 
             if x == 2 && y == 4 || x == 2 && y == 5 || x == 2 && y == 6 {
-                assert_eq!(cell.cell_type, BlockCellValueType::BOUNDARY);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::BOUNDARY);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -475,9 +475,9 @@ fn test_boundary_between_with_scaling_without_padding() {
 
             if x == 1 && y == 2 || x == 1 && y == 3
                     || x == 4 && y == 4 || x == 3 && y == 4 {
-                assert_eq!(cell.cell_type, BlockCellValueType::BOUNDARY);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::BOUNDARY);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -488,9 +488,9 @@ fn test_boundary_between_with_scaling_without_padding() {
 
             if x == 2 && y == 4 || x == 2 && y == 5 || x == 2 && y == 6
                     || x == 8 && y == 8 || x == 7 && y == 8 || x == 6 && y == 8 {
-                assert_eq!(cell.cell_type, BlockCellValueType::BOUNDARY);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::BOUNDARY);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -506,9 +506,9 @@ fn test_boundary_between_with_scaling_without_padding() {
             if x == 1 && y == 2 || x == 1 && y == 3
                     || x == 4 && y == 4 || x == 3 && y == 4
                     || x == 2 && y == 3 {
-                assert_eq!(cell.cell_type, BlockCellValueType::BOUNDARY);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::BOUNDARY);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -520,9 +520,9 @@ fn test_boundary_between_with_scaling_without_padding() {
             if x == 2 && y == 4 || x == 2 && y == 5 || x == 2 && y == 6
                     || x == 8 && y == 8 || x == 7 && y == 8 || x == 6 && y == 8
                     || x == 3 && y == 6 || x == 4 && y == 6 {
-                assert_eq!(cell.cell_type, BlockCellValueType::BOUNDARY);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::BOUNDARY);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -537,8 +537,8 @@ fn test_wall_single_without_scaling_or_padding() {
 
     for y in 0usize..5 {
         for x in 0usize..5 {
-            assert_eq!(maze.get([x, y].into()).cell_type, BlockCellValueType::UNVISITED);
-            assert_eq!(maze.buffer().get(CellID(x + y * 5)).cell_type, BlockCellValueType::UNVISITED);
+            assert_eq!(maze.get([x, y].into()).cell_type, BlockCellPrimaryValue::UNVISITED);
+            assert_eq!(maze.buffer().get(CellID(x + y * 5)).cell_type, BlockCellPrimaryValue::UNVISITED);
         }
     }
 
@@ -551,9 +551,9 @@ fn test_wall_single_without_scaling_or_padding() {
             let cell = maze.get([x, y].into());
 
             if x == 1 && y == 2 {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -567,9 +567,9 @@ fn test_wall_single_without_scaling_or_padding() {
             let cell = maze.get([x, y].into());
 
             if x == 1 && y == 2 || x == 4 && y == 4 {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -583,9 +583,9 @@ fn test_wall_single_without_scaling_or_padding() {
             let cell = maze.get([x, y].into());
 
             if x == 1 && y == 2 || x == 4 && y == 4 || x == 1 && y == 3 {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -600,13 +600,13 @@ fn test_wall_single_with_scaling_without_padding() {
 
     for y in 0usize..5 {
         for x in 0usize..5 {
-            assert_eq!(maze.get([x, y].into()).cell_type, BlockCellValueType::UNVISITED);
+            assert_eq!(maze.get([x, y].into()).cell_type, BlockCellPrimaryValue::UNVISITED);
         }
     }
 
     for y in 0usize..9 {
         for x in 0usize..9 {
-            assert_eq!(maze.buffer().get(CellID(x + y * 9)).cell_type, BlockCellValueType::UNVISITED);
+            assert_eq!(maze.buffer().get(CellID(x + y * 9)).cell_type, BlockCellPrimaryValue::UNVISITED);
         }
     }
 
@@ -619,9 +619,9 @@ fn test_wall_single_with_scaling_without_padding() {
             let cell = maze.get([x, y].into());
 
             if x == 1 && y == 2 {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -631,9 +631,9 @@ fn test_wall_single_with_scaling_without_padding() {
             let cell = maze.buffer().get(CellID(x + y * 9));
 
             if x == 2 && y == 4 {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -647,9 +647,9 @@ fn test_wall_single_with_scaling_without_padding() {
             let cell = maze.get([x, y].into());
 
             if x == 1 && y == 2 || x == 4 && y == 4 {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -659,9 +659,9 @@ fn test_wall_single_with_scaling_without_padding() {
             let cell = maze.buffer().get(CellID(x + y * 9));
 
             if x == 2 && y == 4 || x == 8 && y == 8 {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -675,9 +675,9 @@ fn test_wall_single_with_scaling_without_padding() {
             let cell = maze.get([x, y].into());
 
             if x == 1 && y == 2 || x == 4 && y == 4 || x == 1 && y == 3 {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -687,9 +687,9 @@ fn test_wall_single_with_scaling_without_padding() {
             let cell = maze.buffer().get(CellID(x + y * 9));
 
             if x == 2 && y == 4 || x == 8 && y == 8 || x == 2 && y == 6 {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -704,8 +704,8 @@ fn test_wall_between_without_scaling_or_padding() {
 
     for y in 0usize..5 {
         for x in 0usize..5 {
-            assert_eq!(maze.get([x, y].into()).cell_type, BlockCellValueType::UNVISITED);
-            assert_eq!(maze.buffer().get(CellID(x + y * 5)).cell_type, BlockCellValueType::UNVISITED);
+            assert_eq!(maze.get([x, y].into()).cell_type, BlockCellPrimaryValue::UNVISITED);
+            assert_eq!(maze.buffer().get(CellID(x + y * 5)).cell_type, BlockCellPrimaryValue::UNVISITED);
         }
     }
 
@@ -718,9 +718,9 @@ fn test_wall_between_without_scaling_or_padding() {
             let cell = maze.get([x, y].into());
 
             if x == 1 && y == 2 || x == 1 && y == 3 {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -735,9 +735,9 @@ fn test_wall_between_without_scaling_or_padding() {
 
             if x == 1 && y == 2 || x == 1 && y == 3
                     || x == 4 && y == 4 || x == 3 && y == 4 {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -753,9 +753,9 @@ fn test_wall_between_without_scaling_or_padding() {
             if x == 1 && y == 2 || x == 1 && y == 3
                     || x == 4 && y == 4 || x == 3 && y == 4
                     || x == 2 && y == 3 {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -770,13 +770,13 @@ fn test_wall_between_with_scaling_without_padding() {
 
     for y in 0usize..5 {
         for x in 0usize..5 {
-            assert_eq!(maze.get([x, y].into()).cell_type, BlockCellValueType::UNVISITED);
+            assert_eq!(maze.get([x, y].into()).cell_type, BlockCellPrimaryValue::UNVISITED);
         }
     }
 
     for y in 0usize..9 {
         for x in 0usize..9 {
-            assert_eq!(maze.buffer().get(CellID(x + y * 9)).cell_type, BlockCellValueType::UNVISITED);
+            assert_eq!(maze.buffer().get(CellID(x + y * 9)).cell_type, BlockCellPrimaryValue::UNVISITED);
         }
     }
 
@@ -789,9 +789,9 @@ fn test_wall_between_with_scaling_without_padding() {
             let cell = maze.get([x, y].into());
 
             if x == 1 && y == 2 || x == 1 && y == 3 {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -801,9 +801,9 @@ fn test_wall_between_with_scaling_without_padding() {
             let cell = maze.buffer().get(CellID(x + y * 9));
 
             if x == 2 && y == 4 || x == 2 && y == 5 || x == 2 && y == 6 {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -818,9 +818,9 @@ fn test_wall_between_with_scaling_without_padding() {
 
             if x == 1 && y == 2 || x == 1 && y == 3
                     || x == 4 && y == 4 || x == 3 && y == 4 {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -831,9 +831,9 @@ fn test_wall_between_with_scaling_without_padding() {
 
             if x == 2 && y == 4 || x == 2 && y == 5 || x == 2 && y == 6
                     || x == 8 && y == 8 || x == 7 && y == 8 || x == 6 && y == 8 {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -849,9 +849,9 @@ fn test_wall_between_with_scaling_without_padding() {
             if x == 1 && y == 2 || x == 1 && y == 3
                     || x == 4 && y == 4 || x == 3 && y == 4
                     || x == 2 && y == 3 {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -863,9 +863,9 @@ fn test_wall_between_with_scaling_without_padding() {
             if x == 2 && y == 4 || x == 2 && y == 5 || x == 2 && y == 6
                     || x == 8 && y == 8 || x == 7 && y == 8 || x == 6 && y == 8
                     || x == 3 && y == 6 || x == 4 && y == 6 {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -880,8 +880,8 @@ fn test_passage_single_without_scaling_or_padding() {
 
     for y in 0usize..5 {
         for x in 0usize..5 {
-            assert_eq!(maze.get([x, y].into()).cell_type, BlockCellValueType::UNVISITED);
-            assert_eq!(maze.buffer().get(CellID(x + y * 5)).cell_type, BlockCellValueType::UNVISITED);
+            assert_eq!(maze.get([x, y].into()).cell_type, BlockCellPrimaryValue::UNVISITED);
+            assert_eq!(maze.buffer().get(CellID(x + y * 5)).cell_type, BlockCellPrimaryValue::UNVISITED);
         }
     }
 
@@ -894,11 +894,11 @@ fn test_passage_single_without_scaling_or_padding() {
             let cell = maze.get([x, y].into());
 
             if x == 1 && y == 2 {
-                assert_eq!(cell.cell_type, BlockCellValueType::PASSAGE);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::PASSAGE);
             } else if (x == 0 || x == 2) && y == 2 || x == 1 && (y == 1 || y == 3) {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -912,12 +912,12 @@ fn test_passage_single_without_scaling_or_padding() {
             let cell = maze.get([x, y].into());
 
             if x == 1 && y == 2 || x == 4 && y == 4 {
-                assert_eq!(cell.cell_type, BlockCellValueType::PASSAGE);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::PASSAGE);
             } else if (x == 0 || x == 2) && y == 2 || x == 1 && (y == 1 || y == 3)
                     || x == 3 && y == 4 || x == 4 && y == 3 {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -931,13 +931,13 @@ fn test_passage_single_without_scaling_or_padding() {
             let cell = maze.get([x, y].into());
 
             if x == 1 && y == 2 || x == 4 && y == 4 || x == 1 && y == 3 {
-                assert_eq!(cell.cell_type, BlockCellValueType::PASSAGE);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::PASSAGE);
             } else if (x == 0 || x == 2) && y == 2 || x == 1 && y == 1
                     || x == 3 && y == 4 || x == 4 && y == 3
                     || (x == 0 || x == 2) && y == 3 || x == 1 && y == 4 {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -952,13 +952,13 @@ fn test_passage_single_with_scaling_without_padding() {
 
     for y in 0usize..5 {
         for x in 0usize..5 {
-            assert_eq!(maze.get([x, y].into()).cell_type, BlockCellValueType::UNVISITED);
+            assert_eq!(maze.get([x, y].into()).cell_type, BlockCellPrimaryValue::UNVISITED);
         }
     }
 
     for y in 0usize..9 {
         for x in 0usize..9 {
-            assert_eq!(maze.buffer().get(CellID(x + y * 9)).cell_type, BlockCellValueType::UNVISITED);
+            assert_eq!(maze.buffer().get(CellID(x + y * 9)).cell_type, BlockCellPrimaryValue::UNVISITED);
         }
     }
 
@@ -971,9 +971,9 @@ fn test_passage_single_with_scaling_without_padding() {
             let cell = maze.get([x, y].into());
 
             if x == 1 && y == 2 {
-                assert_eq!(cell.cell_type, BlockCellValueType::PASSAGE);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::PASSAGE);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -983,11 +983,11 @@ fn test_passage_single_with_scaling_without_padding() {
             let cell = maze.buffer().get(CellID(x + y * 9));
 
             if x == 2 && y == 4 {
-                assert_eq!(cell.cell_type, BlockCellValueType::PASSAGE);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::PASSAGE);
             } else if (x == 1 || x == 3) && y == 4 || x == 2 && (y == 3 || y == 5) {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -1001,9 +1001,9 @@ fn test_passage_single_with_scaling_without_padding() {
             let cell = maze.get([x, y].into());
 
             if x == 1 && y == 2 || x == 4 && y == 4 {
-                assert_eq!(cell.cell_type, BlockCellValueType::PASSAGE);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::PASSAGE);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -1013,12 +1013,12 @@ fn test_passage_single_with_scaling_without_padding() {
             let cell = maze.buffer().get(CellID(x + y * 9));
 
             if x == 2 && y == 4 || x == 8 && y == 8 {
-                assert_eq!(cell.cell_type, BlockCellValueType::PASSAGE);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::PASSAGE);
             } else if (x == 1 || x == 3) && y == 4 || x == 2 && (y == 3 || y == 5)
                     || x == 7 && y == 8 || x == 8 && y == 7 {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -1032,9 +1032,9 @@ fn test_passage_single_with_scaling_without_padding() {
             let cell = maze.get([x, y].into());
 
             if x == 1 && y == 2 || x == 4 && y == 4 || x == 1 && y == 3 {
-                assert_eq!(cell.cell_type, BlockCellValueType::PASSAGE);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::PASSAGE);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -1044,13 +1044,13 @@ fn test_passage_single_with_scaling_without_padding() {
             let cell = maze.buffer().get(CellID(x + y * 9));
 
             if x == 2 && y == 4 || x == 8 && y == 8 || x == 2 && y == 6 {
-                assert_eq!(cell.cell_type, BlockCellValueType::PASSAGE);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::PASSAGE);
             } else if (x == 1 || x == 3) && y == 4 || x == 2 && (y == 3 || y == 5)
                     || x == 7 && y == 8 || x == 8 && y == 7
                     || (x == 1 || x == 3) && y == 6 || x == 2 && (y == 5 || y == 7) {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -1065,8 +1065,8 @@ fn test_passage_between_without_scaling_or_padding() {
 
     for y in 0usize..5 {
         for x in 0usize..5 {
-            assert_eq!(maze.get([x, y].into()).cell_type, BlockCellValueType::UNVISITED);
-            assert_eq!(maze.buffer().get(CellID(x + y * 5)).cell_type, BlockCellValueType::UNVISITED);
+            assert_eq!(maze.get([x, y].into()).cell_type, BlockCellPrimaryValue::UNVISITED);
+            assert_eq!(maze.buffer().get(CellID(x + y * 5)).cell_type, BlockCellPrimaryValue::UNVISITED);
         }
     }
 
@@ -1079,11 +1079,11 @@ fn test_passage_between_without_scaling_or_padding() {
             let cell = maze.get([x, y].into());
 
             if x == 1 && y == 2 || x == 1 && y == 3 {
-                assert_eq!(cell.cell_type, BlockCellValueType::PASSAGE);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::PASSAGE);
             } else if (x == 0 || x == 2) && y == 2 || x == 1 && y == 1 {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -1098,12 +1098,12 @@ fn test_passage_between_without_scaling_or_padding() {
 
             if x == 1 && y == 2 || x == 1 && y == 3
                     || x == 4 && y == 4 || x == 3 && y == 4 {
-                assert_eq!(cell.cell_type, BlockCellValueType::PASSAGE);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::PASSAGE);
             } else if (x == 0 || x == 2) && y == 2 || x == 1 && y == 1
                     || x == 4 && y == 3 {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -1119,13 +1119,13 @@ fn test_passage_between_without_scaling_or_padding() {
             if x == 1 && y == 2 || x == 1 && y == 3
                     || x == 4 && y == 4 || x == 3 && y == 4
                     || x == 2 && y == 3 {
-                assert_eq!(cell.cell_type, BlockCellValueType::PASSAGE);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::PASSAGE);
             } else if (x == 0 || x == 2) && y == 2 || x == 1 && y == 1
                     || x == 4 && y == 3
                     || x == 0 && y == 3 || x == 1 && y == 4 {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -1140,13 +1140,13 @@ fn test_passage_between_with_scaling_without_padding() {
 
     for y in 0usize..5 {
         for x in 0usize..5 {
-            assert_eq!(maze.get([x, y].into()).cell_type, BlockCellValueType::UNVISITED);
+            assert_eq!(maze.get([x, y].into()).cell_type, BlockCellPrimaryValue::UNVISITED);
         }
     }
 
     for y in 0usize..9 {
         for x in 0usize..9 {
-            assert_eq!(maze.buffer().get(CellID(x + y * 9)).cell_type, BlockCellValueType::UNVISITED);
+            assert_eq!(maze.buffer().get(CellID(x + y * 9)).cell_type, BlockCellPrimaryValue::UNVISITED);
         }
     }
 
@@ -1159,9 +1159,9 @@ fn test_passage_between_with_scaling_without_padding() {
             let cell = maze.get([x, y].into());
 
             if x == 1 && y == 2 || x == 1 && y == 3 {
-                assert_eq!(cell.cell_type, BlockCellValueType::PASSAGE);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::PASSAGE);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -1171,11 +1171,11 @@ fn test_passage_between_with_scaling_without_padding() {
             let cell = maze.buffer().get(CellID(x + y * 9));
 
             if x == 2 && y == 4 || x == 2 && y == 5 || x == 2 && y == 6 {
-                assert_eq!(cell.cell_type, BlockCellValueType::PASSAGE);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::PASSAGE);
             } else if (x == 1 || x == 3) && (y == 4 || y == 5) || x == 2 && y == 3 {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -1190,9 +1190,9 @@ fn test_passage_between_with_scaling_without_padding() {
 
             if x == 1 && y == 2 || x == 1 && y == 3
                     || x == 4 && y == 4 || x == 3 && y == 4 {
-                assert_eq!(cell.cell_type, BlockCellValueType::PASSAGE);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::PASSAGE);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -1203,12 +1203,12 @@ fn test_passage_between_with_scaling_without_padding() {
 
             if x == 2 && y == 4 || x == 2 && y == 5 || x == 2 && y == 6
                     || x == 8 && y == 8 || x == 7 && y == 8 || x == 6 && y == 8 {
-                assert_eq!(cell.cell_type, BlockCellValueType::PASSAGE);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::PASSAGE);
             } else if (x == 1 || x == 3) && (y == 4 || y == 5) || x == 2 && y == 3
                     || (x == 7 || x == 8) && y == 7 {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -1224,9 +1224,9 @@ fn test_passage_between_with_scaling_without_padding() {
             if x == 1 && y == 2 || x == 1 && y == 3
                     || x == 4 && y == 4 || x == 3 && y == 4
                     || x == 2 && y == 3 {
-                assert_eq!(cell.cell_type, BlockCellValueType::PASSAGE);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::PASSAGE);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }
@@ -1238,13 +1238,13 @@ fn test_passage_between_with_scaling_without_padding() {
             if x == 2 && y == 4 || x == 2 && y == 5 || x == 2 && y == 6
                     || x == 8 && y == 8 || x == 7 && y == 8 || x == 6 && y == 8
                     || x == 3 && y == 6 || x == 4 && y == 6 {
-                assert_eq!(cell.cell_type, BlockCellValueType::PASSAGE);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::PASSAGE);
             } else if (x == 1 || x == 3) && (y == 4 || y == 5) || x == 2 && y == 3
                     || (x == 7 || x == 8) && y == 7
                     || x == 1 && y == 6 || x == 2 && y == 7 || x == 3 && y == 7 {
-                assert_eq!(cell.cell_type, BlockCellValueType::WALL);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::WALL);
             } else {
-                assert_eq!(cell.cell_type, BlockCellValueType::UNVISITED);
+                assert_eq!(cell.cell_type, BlockCellPrimaryValue::UNVISITED);
             }
         }
     }

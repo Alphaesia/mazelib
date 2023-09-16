@@ -1,7 +1,7 @@
 use fluent_asserter::prelude::*;
 
 use crate::implm::buffer::VecBuffer;
-use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
+use crate::implm::cell::block::{BlockCellValue, BlockCellPrimaryValue};
 use crate::interface::buffer::MazeBuffer;
 use crate::interface::cell::CellID;
 
@@ -30,10 +30,10 @@ fn test_get_set() {
     assert_eq!(BlockCellValue::default(), buffer.get(CellID(2)));
     assert_eq!(BlockCellValue::default(), buffer.get(CellID(3)));
 
-    buffer.set(CellID(1), BlockCellValue { cell_type: BlockCellValueType::BOUNDARY, marked: false });
+    buffer.set(CellID(1), BlockCellValue { cell_type: BlockCellPrimaryValue::BOUNDARY, marked: false });
 
     assert_eq!(BlockCellValue::default(), buffer.get(CellID(0)));
-    assert_eq!(BlockCellValue { cell_type: BlockCellValueType::BOUNDARY, marked: false }, buffer.get(CellID(1)));
+    assert_eq!(BlockCellValue { cell_type: BlockCellPrimaryValue::BOUNDARY, marked: false }, buffer.get(CellID(1)));
     assert_eq!(BlockCellValue::default(), buffer.get(CellID(2)));
     assert_eq!(BlockCellValue::default(), buffer.get(CellID(3)));
 
@@ -42,28 +42,28 @@ fn test_get_set() {
     cell_ref.marked = true;
 
     assert_eq!(BlockCellValue::default(), buffer.get(CellID(0)));
-    assert_eq!(BlockCellValue { cell_type: BlockCellValueType::BOUNDARY, marked: false }, buffer.get(CellID(1)));
-    assert_eq!(BlockCellValue { cell_type: BlockCellValueType::default(), marked: true }, buffer.get(CellID(2)));
+    assert_eq!(BlockCellValue { cell_type: BlockCellPrimaryValue::BOUNDARY, marked: false }, buffer.get(CellID(1)));
+    assert_eq!(BlockCellValue { cell_type: BlockCellPrimaryValue::default(), marked: true }, buffer.get(CellID(2)));
     assert_eq!(BlockCellValue::default(), buffer.get(CellID(3)));
 
-    buffer.set(CellID(1), BlockCellValue { cell_type: BlockCellValueType::PASSAGE, marked: true });
+    buffer.set(CellID(1), BlockCellValue { cell_type: BlockCellPrimaryValue::PASSAGE, marked: true });
 
     assert_eq!(BlockCellValue::default(), buffer.get(CellID(0)));
-    assert_eq!(BlockCellValue { cell_type: BlockCellValueType::PASSAGE, marked: true }, buffer.get(CellID(1)));
-    assert_eq!(BlockCellValue { cell_type: BlockCellValueType::default(), marked: true }, buffer.get(CellID(2)));
+    assert_eq!(BlockCellValue { cell_type: BlockCellPrimaryValue::PASSAGE, marked: true }, buffer.get(CellID(1)));
+    assert_eq!(BlockCellValue { cell_type: BlockCellPrimaryValue::default(), marked: true }, buffer.get(CellID(2)));
     assert_eq!(BlockCellValue::default(), buffer.get(CellID(3)));
 
-    buffer.set(CellID(2), BlockCellValue { cell_type: BlockCellValueType::WALL, marked: true });
+    buffer.set(CellID(2), BlockCellValue { cell_type: BlockCellPrimaryValue::WALL, marked: true });
 
     assert_eq!(BlockCellValue::default(), buffer.get(CellID(0)));
-    assert_eq!(BlockCellValue { cell_type: BlockCellValueType::PASSAGE, marked: true }, buffer.get(CellID(1)));
-    assert_eq!(BlockCellValue { cell_type: BlockCellValueType::WALL, marked: true }, buffer.get(CellID(2)));
+    assert_eq!(BlockCellValue { cell_type: BlockCellPrimaryValue::PASSAGE, marked: true }, buffer.get(CellID(1)));
+    assert_eq!(BlockCellValue { cell_type: BlockCellPrimaryValue::WALL, marked: true }, buffer.get(CellID(2)));
     assert_eq!(BlockCellValue::default(), buffer.get(CellID(3)));
 
     buffer.set(CellID(2), BlockCellValue::default());
 
     assert_eq!(BlockCellValue::default(), buffer.get(CellID(0)));
-    assert_eq!(BlockCellValue { cell_type: BlockCellValueType::PASSAGE, marked: true }, buffer.get(CellID(1)));
+    assert_eq!(BlockCellValue { cell_type: BlockCellPrimaryValue::PASSAGE, marked: true }, buffer.get(CellID(1)));
     assert_eq!(BlockCellValue::default(), buffer.get(CellID(2)));
     assert_eq!(BlockCellValue::default(), buffer.get(CellID(3)));
 }

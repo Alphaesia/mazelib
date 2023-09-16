@@ -14,7 +14,7 @@ use std::marker::PhantomData;
 
 use crate::implm::cell::block::BlockCellLocation;
 use crate::implm::cell::inline::InlineCellValue;
-use crate::implm::cell::inline::InlineCellValueEdgeType;
+use crate::implm::cell::inline::InlineCellValueEdge;
 use crate::implm::export::text::BoxSpaceInlineCellTextMazeExporter;
 use crate::implm::point::boxy::BoxCoordinateSpace;
 use crate::interface::buffer::MazeBuffer;
@@ -102,25 +102,25 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Bo
         self.buffer.get_mut(self.pt_to_cell_id(pt))
     }
 
-    fn set_unvisited_edges_to_wall(cell: &mut [[InlineCellValueEdgeType; 2]; DIMENSION]) {
+    fn set_unvisited_edges_to_wall(cell: &mut [[InlineCellValueEdge; 2]; DIMENSION]) {
         for i in 0..DIMENSION {
             let dim = &mut cell[i];
 
-            if dim[0] == InlineCellValueEdgeType::UNVISITED {
-                dim[0] = InlineCellValueEdgeType::WALL;
+            if dim[0] == InlineCellValueEdge::UNVISITED {
+                dim[0] = InlineCellValueEdge::WALL;
             }
 
-            if dim[1] == InlineCellValueEdgeType::UNVISITED {
-                dim[1] = InlineCellValueEdgeType::WALL;
+            if dim[1] == InlineCellValueEdge::UNVISITED {
+                dim[1] = InlineCellValueEdge::WALL;
             }
         }
     }
 
     /// Set the edge between the two cells to `edge_type`, for both cells.
     ///
-    /// All [InlineCellValueEdgeType::UNVISITED] edges will be replaced with
-    /// [InlineCellValueEdgeType::WALL].
-    fn make_between(&mut self, from: pt!(), to: pt!(), edge_type: InlineCellValueEdgeType) {
+    /// All [InlineCellValueEdge::UNVISITED] edges will be replaced with
+    /// [InlineCellValueEdge::WALL].
+    fn make_between(&mut self, from: pt!(), to: pt!(), edge_type: InlineCellValueEdge) {
         let axis_of_adjacency = Self::get_axis_of_adjacency(from, to).expect("from and to are not adjacent");
 
         let from_pos = from[axis_of_adjacency];
@@ -176,59 +176,59 @@ impl <Buffer: MazeBuffer<InlineCellValue<DIMENSION>>, const DIMENSION: usize> Ma
         let to_wall = self.get(to).edges[axis_of_adjacency][to_wall_side];
 
         return match [from_wall, to_wall] {
-            [InlineCellValueEdgeType::BOUNDARY,  _] | [_, InlineCellValueEdgeType::BOUNDARY ] => ConnectionType::BOUNDARY,
-            [InlineCellValueEdgeType::UNVISITED, _] | [_, InlineCellValueEdgeType::UNVISITED] => ConnectionType::UNVISITED,
-            [InlineCellValueEdgeType::WALL,      _] | [_, InlineCellValueEdgeType::WALL     ] => ConnectionType::WALL,
-            [InlineCellValueEdgeType::PASSAGE, InlineCellValueEdgeType::PASSAGE]              => ConnectionType::PASSAGE,
+            [InlineCellValueEdge::BOUNDARY,  _] | [_, InlineCellValueEdge::BOUNDARY ] => ConnectionType::BOUNDARY,
+            [InlineCellValueEdge::UNVISITED, _] | [_, InlineCellValueEdge::UNVISITED] => ConnectionType::UNVISITED,
+            [InlineCellValueEdge::WALL,      _] | [_, InlineCellValueEdge::WALL     ] => ConnectionType::WALL,
+            [InlineCellValueEdge::PASSAGE, InlineCellValueEdge::PASSAGE]              => ConnectionType::PASSAGE,
         };
     }
 
-    /// Replace all edges of `pt` that are [InlineCellValueEdgeType::UNVISITED] with
-    /// [InlineCellValueEdgeType::WALL].
+    /// Replace all edges of `pt` that are [InlineCellValueEdge::UNVISITED] with
+    /// [InlineCellValueEdge::WALL].
     fn make_passage(&mut self, pt: pt!()) {
         Self::set_unvisited_edges_to_wall(&mut self.get_mut(pt).edges);
     }
 
-    /// Set the edge between the two cells to [InlineCellValueEdgeType::PASSAGE],
+    /// Set the edge between the two cells to [InlineCellValueEdge::PASSAGE],
     /// for both cells.
     ///
-    /// All [InlineCellValueEdgeType::UNVISITED] edges will be replaced with
-    /// [InlineCellValueEdgeType::WALL].
+    /// All [InlineCellValueEdge::UNVISITED] edges will be replaced with
+    /// [InlineCellValueEdge::WALL].
     fn make_passage_between(&mut self, from: pt!(), to: pt!()) {
-        self.make_between(from, to, InlineCellValueEdgeType::PASSAGE)
+        self.make_between(from, to, InlineCellValueEdge::PASSAGE)
     }
 
-    /// Set all edges of `pt` to [InlineCellValueEdgeType::WALL].
+    /// Set all edges of `pt` to [InlineCellValueEdge::WALL].
     fn make_wall(&mut self, pt: pt!()) {
         let cell_value = self.get_mut(pt);
 
-        cell_value.edges = [[InlineCellValueEdgeType::WALL; 2]; DIMENSION];
+        cell_value.edges = [[InlineCellValueEdge::WALL; 2]; DIMENSION];
     }
 
-    /// Set the edge between the two cells to [InlineCellValueEdgeType::WALL],
+    /// Set the edge between the two cells to [InlineCellValueEdge::WALL],
     /// for both cells.
     ///
-    /// All [InlineCellValueEdgeType::UNVISITED] edges will be replaced with
-    /// [InlineCellValueEdgeType::WALL].
+    /// All [InlineCellValueEdge::UNVISITED] edges will be replaced with
+    /// [InlineCellValueEdge::WALL].
     fn make_wall_between(&mut self, from: pt!(), to: pt!()) {
-        self.make_between(from, to, InlineCellValueEdgeType::WALL)
+        self.make_between(from, to, InlineCellValueEdge::WALL)
     }
 
-    /// Set all edges of `pt` to [InlineCellValueEdgeType::BOUNDARY].
+    /// Set all edges of `pt` to [InlineCellValueEdge::BOUNDARY].
     fn make_boundary(&mut self, pt: pt!()) {
         let cell_value = self.get_mut(pt);
 
-        cell_value.edges = [[InlineCellValueEdgeType::BOUNDARY; 2]; DIMENSION];
+        cell_value.edges = [[InlineCellValueEdge::BOUNDARY; 2]; DIMENSION];
     }
 
     // TODO what should we do with unvisited edges here? set to wall, boundary, or ignore?
-    /// Set the edge between the two cells to [InlineCellValueEdgeType::BOUNDARY],
+    /// Set the edge between the two cells to [InlineCellValueEdge::BOUNDARY],
     /// for both cells.
     ///
-    /// All [InlineCellValueEdgeType::UNVISITED] edges will be replaced with
-    /// [InlineCellValueEdgeType::WALL].
+    /// All [InlineCellValueEdge::UNVISITED] edges will be replaced with
+    /// [InlineCellValueEdge::WALL].
     fn make_boundary_between(&mut self, from: pt!(), to: pt!()) {
-        self.make_between(from, to, InlineCellValueEdgeType::BOUNDARY)
+        self.make_between(from, to, InlineCellValueEdge::BOUNDARY)
     }
 }
 
