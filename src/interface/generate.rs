@@ -65,10 +65,10 @@ pub trait MazeGenerator<M: MazeCoordinator> {
 /// # use mazelib::interface::generate::MazeGenerator;
 /// # use mazelib::implm::buffer::VecBuffer;
 /// # use mazelib::implm::cell::block::BlockCellValue;
-/// # use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinatorBuilder;
+/// # use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinator;
 /// # use mazelib::implm::generate::HuntAndKillGenerator;
 /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
-/// # let mut maze = BoxSpaceBlockCellMazeCoordinatorBuilder::<VecBuffer<BlockCellValue>, 1>::new(BoxCoordinateSpace::new_checked([1])).build();
+/// # let mut maze = BoxSpaceBlockCellMazeCoordinator::<VecBuffer<BlockCellValue>, 1>::builder(BoxCoordinateSpace::new_checked([1])).build();
 /// #
 /// HuntAndKillGenerator::new().generate(&mut maze);
 /// ```
@@ -77,10 +77,10 @@ pub trait MazeGenerator<M: MazeCoordinator> {
 /// # use mazelib::interface::generate::DefaultMazeGenerator;
 /// # use mazelib::implm::buffer::VecBuffer;
 /// # use mazelib::implm::cell::block::BlockCellValue;
-/// # use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinatorBuilder;
+/// # use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinator;
 /// # use mazelib::implm::generate::HuntAndKillGenerator;
 /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
-/// # let mut maze = BoxSpaceBlockCellMazeCoordinatorBuilder::<VecBuffer<BlockCellValue>, 1>::new(BoxCoordinateSpace::new_checked([1])).build();
+/// # let mut maze = BoxSpaceBlockCellMazeCoordinator::<VecBuffer<BlockCellValue>, 1>::builder(BoxCoordinateSpace::new_checked([1])).build();
 /// #
 /// HuntAndKillGenerator::generate(&mut maze);
 /// ```

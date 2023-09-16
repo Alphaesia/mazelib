@@ -111,7 +111,7 @@ pub trait MazeExporter<M: MazeCoordinator, O: Write> {
 /// # use mazelib::interface::generate::MazeGenerator;
 /// # use mazelib::implm::buffer::VecBuffer;
 /// # use mazelib::implm::cell::block::BlockCellValue;
-/// # use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinatorBuilder;
+/// # use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinator;
 /// # use mazelib::implm::generate::HuntAndKillGenerator;
 /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
 /// # use mazelib::implm::export::text::BoxSpaceBlockCellTextMazeExporter;
@@ -119,7 +119,7 @@ pub trait MazeExporter<M: MazeCoordinator, O: Write> {
 /// #
 /// # fn test() -> std::io::Result<()> {
 /// #
-/// # let mut maze = BoxSpaceBlockCellMazeCoordinatorBuilder::<VecBuffer<BlockCellValue>, 2>::new(BoxCoordinateSpace::new_checked([1, 1])).build();
+/// # let mut maze = BoxSpaceBlockCellMazeCoordinator::<VecBuffer<BlockCellValue>, 2>::builder(BoxCoordinateSpace::new_checked([1, 1])).build();
 /// # let mut output = File::create(Path::new("")).unwrap();
 /// #
 /// BoxSpaceBlockCellTextMazeExporter::builder().build().export(&mut maze, &mut output)
@@ -132,7 +132,7 @@ pub trait MazeExporter<M: MazeCoordinator, O: Write> {
 /// # use mazelib::interface::generate::MazeGenerator;
 /// # use mazelib::implm::buffer::VecBuffer;
 /// # use mazelib::implm::cell::block::BlockCellValue;
-/// # use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinatorBuilder;
+/// # use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinator;
 /// # use mazelib::implm::generate::HuntAndKillGenerator;
 /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
 /// # use mazelib::implm::export::text::BoxSpaceBlockCellTextMazeExporter;
@@ -140,7 +140,7 @@ pub trait MazeExporter<M: MazeCoordinator, O: Write> {
 /// #
 /// # fn test() -> std::io::Result<()> {
 /// #
-/// # let mut maze = BoxSpaceBlockCellMazeCoordinatorBuilder::<VecBuffer<BlockCellValue>, 2>::new(BoxCoordinateSpace::new_checked([1, 1])).build();
+/// # let mut maze = BoxSpaceBlockCellMazeCoordinator::<VecBuffer<BlockCellValue>, 2>::builder(BoxCoordinateSpace::new_checked([1, 1])).build();
 /// # let mut output = File::create(Path::new("")).unwrap();
 /// #
 /// BoxSpaceBlockCellTextMazeExporter::export(&mut maze, &mut output)

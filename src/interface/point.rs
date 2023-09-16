@@ -34,7 +34,7 @@ use rand::Rng;
 ///
 /// # use mazelib::implm::buffer::VecBuffer;
 /// # use mazelib::implm::cell::block::BlockCellValue;
-/// # use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinatorBuilder;
+/// # use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinator;
 /// # use mazelib::implm::point::boxy::BoxCoordinateSpace;
 /// #
 /// # type Buffer = VecBuffer<BlockCellValue>;
@@ -44,7 +44,7 @@ use rand::Rng;
 /// let space = BoxCoordinateSpace::new_checked(dimensions);
 ///
 /// // Will need to pick your own buffer
-/// let maze = BoxSpaceBlockCellMazeCoordinatorBuilder::<Buffer, _>::new(space).build();
+/// let maze = BoxSpaceBlockCellMazeCoordinator::<Buffer, _>::builder(space).build();
 /// ```
 ///
 /// # See Also

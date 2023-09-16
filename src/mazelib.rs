@@ -11,7 +11,7 @@
 //! ```
 //! use mazelib::implm::buffer::VecBuffer;
 //! use mazelib::implm::cell::block::BlockCellValue;
-//! use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinatorBuilder;
+//! use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinator;
 //! use mazelib::implm::generate::HuntAndKillGenerator;
 //! use mazelib::implm::point::boxy::BoxCoordinateSpace;
 //! use mazelib::implm::export::text::BoxSpaceBlockCellTextMazeExporter;
@@ -31,7 +31,7 @@
 //! // "BlockCell" means it will use BlockCells for cells
 //! // "MazeCoordinator" means it's a maze object (roughly)
 //! // 2 means we're creating a 2D maze
-//! let mut maze = BoxSpaceBlockCellMazeCoordinatorBuilder::<Buffer, 2>::new(coord_space).build();
+//! let mut maze = BoxSpaceBlockCellMazeCoordinator::<Buffer, 2>::builder(coord_space).build();
 //!
 //! // Give our maze a nice thick border
 //! apply_solid_border(&mut maze);

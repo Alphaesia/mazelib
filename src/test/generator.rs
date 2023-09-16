@@ -4,7 +4,7 @@ use rand_chacha::ChaCha8Rng;
 use crate::implm::buffer::VecBuffer;
 use crate::implm::cell::block::BlockCellValue;
 use crate::implm::cell::inline::InlineCellValue;
-use crate::implm::coordinator::block::{BoxSpaceBlockCellMazeCoordinator, BoxSpaceBlockCellMazeCoordinatorBuilder};
+use crate::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinator;
 use crate::implm::coordinator::inline::{BoxSpaceInlineCellMazeCoordinator, BoxSpaceInlineCellMazeCoordinatorBuilder};
 use crate::implm::export::text::{BoxSpaceBlockCellTextMazeExporter, BoxSpaceInlineCellTextMazeExporter};
 use crate::implm::generate::{HuntAndKillGenerator, NAryTreeGenerator, RecursiveBacktrackerGenerator};
@@ -234,7 +234,7 @@ fn get_test_rng() -> ChaCha8Rng {
 }
 
 fn get_new_block_cell_maze() -> BoxSpaceBlockCellMazeCoordinator<VecBuffer<BlockCellValue>, 2> {
-    BoxSpaceBlockCellMazeCoordinatorBuilder::<VecBuffer<BlockCellValue>, 2>::new(BoxCoordinateSpace::<2>::new_checked([9, 9])).build()
+    BoxSpaceBlockCellMazeCoordinator::<VecBuffer<BlockCellValue>, 2>::builder(BoxCoordinateSpace::<2>::new_checked([9, 9])).build()
 }
 
 fn get_new_inline_cell_maze() -> BoxSpaceInlineCellMazeCoordinator::<VecBuffer<InlineCellValue<2>>, 2> {

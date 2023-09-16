@@ -1,6 +1,18 @@
+//! Coordinators for [block cells][crate::implm::cell::block].
+//!
+//! # Comparison by Example
+//!
+//! Here is a comparison of a typical maze of each coordinator. You can see commentary on each
+//! example on their individual pages.
+//!
+//! [`BoxSpaceBlockCellMazeCoordinator`]:
+//!
+//! ![A pixellated-looking maze, where every cell is one pixel][box-space-block-cell-coordinator-example]
+
 use std::fmt::{Debug, Formatter};
 use std::marker::PhantomData;
 use std::num::NonZeroUsize;
+use embed_doc_image::embed_doc_image;
 
 use crate::implm::cell::block::{BlockCellValue, BlockCellValueType};
 use crate::implm::cell::block::BlockCellLocation;
@@ -16,7 +28,21 @@ use crate::internal::array_util::{ArrayZipMap, CheckedProduct, CheckedSum};
 use crate::internal::noise_util::pt;
 use crate::internal::util::{NONZERO_USIZE_TWO, try_usize_array_to_nonzero_usize_array};
 
-/// TODO write a description
+/// A maze coordinator that maps a box-like coordinate space to box-like cells.
+/// 
+/// ![A pixellated-looking maze, where every cell is one pixel][box-space-block-cell-coordinator-example]
+/// 
+/// It produces mazes with a distinct pixellated look.
+/// 
+/// Every point is mapped to a box of cells (a square, cube, etc.). The dimensionality of the box is
+/// the same as the coordinate space, so for a 2D maze they would be squares. Every box is exactly
+/// the same size. The width, height, depth, etc. of these boxes is controlled by the coordinator's
+/// *scale factors*. Every scale factor must be at least 1 (so every point maps to at least one
+/// cell). Additionally, there may be some *padding* cells. These exist on the edge of the cell
+/// space and are not mapped by any point. Each edge may have zero or more padding cells, and
+/// different edges can have different amounts. They're useful for adding borders to mazes.
+/// 
+/// TODO insert annotated diagram
 ///
 /// # Examples
 ///
@@ -25,25 +51,41 @@ use crate::internal::util::{NONZERO_USIZE_TWO, try_usize_array_to_nonzero_usize_
 /// use mazelib::implm::point::boxy::TwoDimensionalBoxCoordinateSpace;
 /// use mazelib::implm::cell::block::BlockCellValue;
 /// use mazelib::implm::buffer::VecBuffer;
-/// use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinatorBuilder;
+/// use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinator;
 ///
 /// let coord_space = TwoDimensionalBoxCoordinateSpace::new_checked([11, 11]); // Standard 2D coordinate space
-/// let scale_factor = [2, 2]; // A simple scale factor of 2 for a clean look
+/// let scale_factors = [2, 2]; // A simple scale factor of 2 for a clean look
 /// let padding = [[1, 1], [1, 1]]; // 1 cell on each side for a border
 /// type CellType = BlockCellValue; // Pixelated maze style
 ///
 /// type MazeBuffer = VecBuffer<CellType>;
 ///
-/// let maze = BoxSpaceBlockCellMazeCoordinatorBuilder::<MazeBuffer, 2>::new(coord_space)
-///                                             .scale_factor_checked(scale_factor)
-///                                             .padding(padding)
-///                                             .build();
+/// let maze = BoxSpaceBlockCellMazeCoordinator::<MazeBuffer, 2>::builder(coord_space)
+///     .scale_factors_checked(scale_factors)
+///     .padding(padding)
+///     .build();
 /// ```
+/// 
+/// TODO add image showing result
+#[embed_doc_image("box-space-block-cell-coordinator-example", "src/doc/img/coordinator/box-space-block-cell/example-large.png")]
 pub struct BoxSpaceBlockCellMazeCoordinator<Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> {
+    /// The maze buffer the maze is stored in.
     buffer: Buffer,
+    /// The maze's coordinate space.
     space: BoxCoordinateSpace<DIMENSION>,
-    scale_factor: [NonZeroUsize; DIMENSION],
+    /// The number of cells a point corresponds to, for each axis.
+    /// 
+    /// The scale factors are ordered from most minor axis to most major.
+    scale_factors: [NonZeroUsize; DIMENSION],
+    /// The number of cells on the edge of the maze that are not mapped to any point, for each
+    /// direction.
+    ///
+    /// The scale factor pairs are ordered from most minor axis to most major. The number of cells
+    /// on the negative edge is the first in each pair, and the number on the positive edge is
+    /// second.
     padding: [[usize; 2]; DIMENSION],
+    /// The dimensions of the cell space, derived from the coordinate space's dimensions, scaled,
+    /// and padded. Cached for performance.
     full_dimensions: [NonZeroUsize; DIMENSION],
 }
 
@@ -53,32 +95,32 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     ///
     /// # Parameters
     ///
-    /// `space`        --- the coordinate space for this maze.
-    /// `scale_factor` --- the scale factor for points to cells. You can think about it
-    ///                    like `cells:points`. A scale factor of 3 will yield 3 cells
-    ///                    for every point (a 3:1 ratio). Each axis is scaled independently.
-    ///                    The ordering of the scalars is the same as the standard ordering
-    ///                    of the coordinate axes.
-    /// `padding`      --- How many extra cells to place between edge-adjacent points
-    ///                    and the edge of the maze. For example, a value of 1 will yield
-    ///                    a 1-cell thick "border" along that edge of the maze. The ordering
-    ///                    of the outer elements is the same as the standard ordering of
-    ///                    the coordinate axes. For the inner elements, the side closest
-    ///                    to zero comes before the side furthest from zero.
+    /// `space`         --- the coordinate space for this maze.
+    /// `scale_factors` --- the scale factor for points to cells. You can think about it
+    ///                     like `cells:points`. A scale factor of 3 will yield 3 cells
+    ///                     for every point (a 3:1 ratio). Each axis is scaled independently.
+    ///                     The ordering of the scale factors is the same as the standard ordering
+    ///                     of the coordinate axes.
+    /// `padding`       --- How many extra cells to place between edge-adjacent points
+    ///                     and the edge of the maze. For example, a value of 1 will yield
+    ///                     a 1-cell thick "border" along that edge of the maze. The ordering
+    ///                     of the outer elements is the same as the standard ordering of
+    ///                     the coordinate axes. For the inner elements, the side closest
+    ///                     to zero comes before the side furthest from zero.
     ///
     /// # Type Parameter
     ///
     /// `Buffer` --- the type of buffer to use. A buffer instance will be automatically
     ///              constructed from this type.
     #[must_use]
-    fn new(space: BoxCoordinateSpace<DIMENSION>, scale_factor: [NonZeroUsize; DIMENSION], padding: [[usize; 2]; DIMENSION]) -> Self {
+    fn new(space: BoxCoordinateSpace<DIMENSION>, scale_factors: [NonZeroUsize; DIMENSION], padding: [[usize; 2]; DIMENSION]) -> Self {
         // Arithmetic is so easy and beautiful and succinct
         let full_dimensions = space.dimensions()
-            .zip_map(&scale_factor, |dim, scalar| {
+            .zip_map(&scale_factors, |dim, scale_factor| {
                 // NonZeroUsize::new only returns None if the scaled dimension == usize::MAX (which I don't
                 // think is mathematically even possible, but in such a hypothetical case) the +1 would cause
                 // the sum to overflow to zero
-                (usize::from(*dim) - 1).checked_mul(usize::from(*scalar))
+                (usize::from(*dim) - 1).checked_mul(usize::from(*scale_factor))
                     .and_then(|scaled_dim| NonZeroUsize::new(scaled_dim + 1))
                     .expect("The scaled dimensions do not all fit within a usize")
             })
@@ -88,7 +130,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
 
         let cells_required = full_dimensions.checked_product().expect("The full dimensions specified are too large. The number of cells in the maze does not fit within a usize.");
 
-        Self { buffer: Buffer::new(cells_required), space, scale_factor, full_dimensions, padding }
+        Self { buffer: Buffer::new(cells_required), space, scale_factors, full_dimensions, padding }
     }
 }
 
@@ -99,7 +141,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
         &self.buffer
     }
 
-    /// The dimensions of the coordinate space, scaled by the resolution, plus padding.
+    /// The dimensions of the coordinate space, scaled by the scale factors, plus padding.
     #[must_use]
     pub fn get_full_dimensions(&self) -> [NonZeroUsize; DIMENSION] {
         self.full_dimensions
@@ -113,8 +155,8 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// Does not affect the distance of points from the outer edge of the maze (see
     /// [`padding()`][Self::padding]).
     #[must_use]
-    pub fn scale_factor(&self) -> [NonZeroUsize; DIMENSION] {
-        self.scale_factor
+    pub fn scale_factors(&self) -> [NonZeroUsize; DIMENSION] {
+        self.scale_factors
     }
 
     /// The number of cells between the edge of the maze and the outermost cell that is mapped to
@@ -130,7 +172,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
         let mut pt: [usize; DIMENSION] = pt.into();
 
         for i in 0..DIMENSION {
-            pt[i] *= usize::from(self.scale_factor[i]);
+            pt[i] *= usize::from(self.scale_factors[i]);
             pt[i] += self.padding[i][0];
         }
 
@@ -139,7 +181,9 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
 
     /// Get the value of the point `pt` for mutation.
     ///
-    /// *See also: [`get()`][Self::get].*
+    /// # See Also
+    /// 
+    /// [`get()`][Self::get] for non-mutable borrowing.
     #[must_use]
     pub fn get_mut(&mut self, pt: pt!()) -> &mut <Self as MazeCoordinator>::CellVal {
         self.get_cell_value_mut(self.map_pt_to_cell_loc(pt))
@@ -150,9 +194,9 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// # use mazelib::implm::buffer::VecBuffer;
     /// # use mazelib::implm::cell::block::{BlockCellValue, BlockCellValueType};
     /// # use mazelib::implm::cell::inline::InlineCellValue;
-    /// # use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinatorBuilder;
+    /// # use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinator;
     /// # use mazelib::implm::point::boxy::{BoxCoordinateSpace, CoordinateTuplet};
-    /// # let mut maze = BoxSpaceBlockCellMazeCoordinatorBuilder::<VecBuffer<BlockCellValue>, 1>::new(BoxCoordinateSpace::new_checked([1])).build();
+    /// # let mut maze = BoxSpaceBlockCellMazeCoordinator::<VecBuffer<BlockCellValue>, 1>::builder(BoxCoordinateSpace::new_checked([1])).build();
     /// # let pt: CoordinateTuplet<1> = [0].into();
     /// # let cell_type = BlockCellValueType::PASSAGE;
     /// #
@@ -182,7 +226,8 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// reason you should use this method is to access a cell that is not mapped by
     /// the coordinated space.
     ///
-    /// See also: [`Self::get_cell_value()`].
+    /// # See Also
+    /// [`Self::get_cell_value()`] for non-mutable borrowing.
     #[must_use]
     pub fn get_cell_value_mut(&mut self, loc: <Self as MazeCoordinator>::CellLoc) -> &mut BlockCellValue {
         self.buffer.get_mut(self.cell_loc_to_id(loc))
@@ -206,9 +251,9 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
     /// # use mazelib::implm::buffer::VecBuffer;
     /// # use mazelib::implm::cell::block::{BlockCellLocation, BlockCellValue, BlockCellValueType};
     /// # use mazelib::implm::cell::inline::InlineCellValue;
-    /// # use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinatorBuilder;
+    /// # use mazelib::implm::coordinator::block::BoxSpaceBlockCellMazeCoordinator;
     /// # use mazelib::implm::point::boxy::{BoxCoordinateSpace, CoordinateTuplet};
-    /// # let mut maze = BoxSpaceBlockCellMazeCoordinatorBuilder::<VecBuffer<BlockCellValue>, 1>::new(BoxCoordinateSpace::new_checked([1])).build();
+    /// # let mut maze = BoxSpaceBlockCellMazeCoordinator::<VecBuffer<BlockCellValue>, 1>::builder(BoxCoordinateSpace::new_checked([1])).build();
     /// # let loc: BlockCellLocation<1> = [0].into();
     /// # let cell_type = BlockCellValueType::PASSAGE;
     /// #
@@ -298,6 +343,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> MazeCoordinato
         }
     }
 
+    //noinspection RsUnnecessaryQualifications
     /// Set `pt` to [`BlockCellValueType::PASSAGE`].
     fn make_passage(&mut self, pt: pt!()) {
         let cell_loc = self.map_pt_to_cell_loc(pt);
@@ -306,8 +352,9 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> MazeCoordinato
         self.set_unvisited_neighbours_to_wall(cell_loc);
     }
 
-    /// Set `from` and `to` to [`BlockCellValueType::PASSAGE`]. If the resolution is greater than
-    /// one along the axis of adjacency, then all intermediate cells will be set to walls too.
+    //noinspection RsUnnecessaryQualifications
+    /// Set `from` and `to` to [`BlockCellValueType::PASSAGE`]. If the scale factor along the axis
+    /// of adjacency is greater than 1, then all intermediate cells will be set to passages too.
     ///
     /// All cells that are adjacent to from, or any of the intermediate cells, and are unvisited,
     /// will be set to [`BlockCellValueType::WALL`]. Note that this excludes `to`, so that
@@ -343,13 +390,15 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> MazeCoordinato
         self.set_cell_value_type(to, PASSAGE);
     }
 
+    //noinspection RsUnnecessaryQualifications
     /// Set `pt` to [`BlockCellValueType::WALL`].
     fn make_wall(&mut self, pt: pt!()) {
         self.set_type(pt, WALL);
     }
 
-    /// Set `from` and `to` to [`BlockCellValueType::WALL`]. If the resolution is greater than
-    /// one along the axis of adjacency, then all intermediate cells will be set to walls too.
+    //noinspection RsUnnecessaryQualifications
+    /// Set `from` and `to` to [`BlockCellValueType::WALL`]. If the scale factor along the axis of
+    /// adjacency is greater than 1, then all intermediate cells will be set to walls too.
     fn make_wall_between(&mut self, from: pt!(), to: pt!()) {
         let axis_of_adjacency = Self::get_axis_of_adjacency(from, to).expect("from and to are not adjacent");
 
@@ -370,13 +419,15 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> MazeCoordinato
         }
     }
 
+    //noinspection RsUnnecessaryQualifications
     /// Set `pt` to [`BlockCellValueType::BOUNDARY`].
     fn make_boundary(&mut self, pt: pt!()) {
         self.set_type(pt, BOUNDARY);
     }
 
-    /// Set `from` and `to` to [`BlockCellValueType::BOUNDARY`]. If the resolution is greater than
-    /// one along the axis of adjacency, then all intermediate cells will be set to boundaries too.
+    //noinspection RsUnnecessaryQualifications
+    /// Set `from` and `to` to [`BlockCellValueType::BOUNDARY`]. If the scale factor along the axis
+    /// of adjacency is greater than 1, then all intermediate cells will be set to boundaries too.
     fn make_boundary_between(&mut self, from: pt!(), to: pt!()) {
         let axis_of_adjacency = Self::get_axis_of_adjacency(from, to).expect("from and to are not adjacent");
 
@@ -398,43 +449,95 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> MazeCoordinato
     }
 }
 
+// Builder
+impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockCellMazeCoordinator<Buffer, DIMENSION> {
+    /// Construct a new builder for a `BoxSpaceBlockCellMazeCoordinator`.
+    pub fn builder(space: BoxCoordinateSpace<DIMENSION>) -> BoxSpaceBlockCellMazeCoordinatorBuilder<Buffer, DIMENSION> {
+        BoxSpaceBlockCellMazeCoordinatorBuilder::new(space)
+    }
+}
+
+/// A builder for a [`BoxSpaceBlockCellMazeCoordinator`].
 #[must_use]
 pub struct BoxSpaceBlockCellMazeCoordinatorBuilder<Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> {
     _buffer: PhantomData<Buffer>,  // We're not actually interested in constructing a buffer yet
+    /// The maze's coordinate space.
     space: BoxCoordinateSpace<DIMENSION>,
-    scale_factor: [NonZeroUsize; DIMENSION],
+    /// The number of cells a point corresponds to, for each axis.
+    /// 
+    /// The scale factors are ordered from most minor axis to most major.
+    scale_factors: [NonZeroUsize; DIMENSION],
+    /// The number of cells on the edge of the maze that are not mapped to any point, for each
+    /// direction.
+    /// 
+    /// The scale factor pairs are ordered from most minor axis to most major. The number of cells
+    /// on the negative edge is the first in each pair, and the number on the positive edge is
+    /// second.
     padding: [[usize; 2]; DIMENSION],
 }
 
 impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockCellMazeCoordinatorBuilder<Buffer, DIMENSION> {
-    pub fn new(space: BoxCoordinateSpace<DIMENSION>) -> Self {
+    /// Construct a new builder for a `BoxSpaceBlockCellMazeCoordinator`.
+    /// 
+    /// # Parameters
+    /// 
+    /// `space` --- the coordinate space to use for the maze.
+    fn new(space: BoxCoordinateSpace<DIMENSION>) -> Self {
         Self {
             _buffer: PhantomData,
             space,
-            scale_factor: [NONZERO_USIZE_TWO; DIMENSION],
+            scale_factors: [NONZERO_USIZE_TWO; DIMENSION],
             padding: [[1, 1]; DIMENSION],
         }
     }
 
-    pub fn scale_factor(mut self, scale_factor: [NonZeroUsize; DIMENSION]) -> Self {
-        self.scale_factor = scale_factor;
+    /// Set the number of cells a point corresponds to, for each axis.
+    /// 
+    /// The scale factors are ordered from most minor axis to most major.
+    /// 
+    /// # See Also
+    ///
+    /// [`Self::scale_factors_checked()`]. If you're using integer literals, you may with to use
+    /// this instead.
+    pub fn scale_factors(mut self, scale_factors: [NonZeroUsize; DIMENSION]) -> Self {
+        self.scale_factors = scale_factors;
 
         return self
     }
 
-    pub fn scale_factor_checked(self, scale_factor: [usize; DIMENSION]) -> Self {
-        self.scale_factor(try_usize_array_to_nonzero_usize_array(scale_factor).expect("All scalars must be non-zero"))
+    /// Set the number of cells a point corresponds to, for each axis.
+    /// 
+    /// The scale factors are ordered from most minor axis to most major.
+    ///
+    /// All scale factors must be non-zero.
+    ///
+    /// # Panics
+    ///
+    /// If `count` is zero.
+    /// 
+    /// # See Also
+    /// 
+    /// [`Self::scale_factors()`], which takes `NonZeroUsize`s.
+    pub fn scale_factors_checked(self, scale_factors: [usize; DIMENSION]) -> Self {
+        self.scale_factors(try_usize_array_to_nonzero_usize_array(scale_factors).expect("All scale factors must be non-zero"))
     }
 
+    /// Set the number of cells on the edge of the maze that are not mapped to any point, for each
+    /// direction.
+    ///
+    /// The scale factor pairs are ordered from most minor axis to most major. The number of cells
+    /// on the negative edge is the first in each pair, and the number on the positive edge is
+    /// second.
     pub fn padding(mut self, padding: [[usize; 2]; DIMENSION]) -> Self {
         self.padding = padding;
 
         return self
     }
 
+    /// Finalise the [`BoxSpaceBlockCellMazeCoordinator`].
     #[must_use]
     pub fn build(&self) -> BoxSpaceBlockCellMazeCoordinator<Buffer, DIMENSION> {
-        BoxSpaceBlockCellMazeCoordinator::new(self.space, self.scale_factor, self.padding)
+        BoxSpaceBlockCellMazeCoordinator::new(self.space, self.scale_factors, self.padding)
     }
 }
 
@@ -453,7 +556,7 @@ impl <Buffer: MazeBuffer<BlockCellValue>, const DIMENSION: usize> BoxSpaceBlockC
         writeln!(f, "BoxSpaceBlockCellMazeCoordinator {{")?;
         writeln!(f, "\tbuffer: {:?}", self.buffer)?;
         writeln!(f, "\tspace: {:?}", self.space)?;
-        writeln!(f, "\tresolution: {:?}", self.scale_factor)?;
+        writeln!(f, "\tscale_factors: {:?}", self.scale_factors)?;
         writeln!(f, "\tpadding: {:?}", self.padding)?;
         writeln!(f, "\tfull_dimensions: {:?}", self.full_dimensions)?;
 

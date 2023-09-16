@@ -140,6 +140,11 @@ impl BoxSpaceBlockCellTextMazeExporterBuilder {
     }
 
     /// Set the number of the characters to emit horizontally per cell.
+    /// 
+    /// # See Also
+    /// 
+    /// [`Self::chars_per_cell_horizontally_checked()`]. If you're using integer literals, you may
+    /// wish to use this instead.
     pub fn chars_per_cell_horizontally(mut self, count: NonZeroUsize) -> Self {
         self.chars_per_cell_horizontally = count;
 
@@ -149,11 +154,24 @@ impl BoxSpaceBlockCellTextMazeExporterBuilder {
     /// Set the number of the characters to emit horizontally per cell.
     /// 
     /// `count` must be non-zero.
+    /// 
+    /// # Panics
+    /// 
+    /// If `count` is zero.
+    ///
+    /// # See Also
+    ///
+    /// [`Self::chars_per_cell_horizontally()`], which takes a `NonZeroUsize`.
     pub fn chars_per_cell_horizontally_checked(self, count: usize) -> Self {
         self.chars_per_cell_horizontally(NonZeroUsize::new(count).expect("count was zero"))
     }
 
     /// Set the number of the characters to emit vertically per cell.
+    /// 
+    /// # See Also
+    ///
+    /// [`Self::chars_per_cell_vertically_checked()`]. If you're using integer literals, you may
+    /// wish to use this instead.
     pub fn chars_per_cell_vertically(mut self, count: NonZeroUsize) -> Self {
         self.chars_per_cell_vertically = count;
 
@@ -163,6 +181,14 @@ impl BoxSpaceBlockCellTextMazeExporterBuilder {
     /// Set the number of the characters to emit vertically per cell.
     ///
     /// `count` must be non-zero.
+    ///
+    /// # Panics
+    ///
+    /// If `count` is zero.
+    ///
+    /// # See Also
+    ///
+    /// [`Self::chars_per_cell_vertically()`], which takes a `NonZeroUsize`.
     pub fn chars_per_cell_vertically_checked(self, count: usize) -> Self {
         self.chars_per_cell_vertically(NonZeroUsize::new(count).expect("count was zero"))
     }

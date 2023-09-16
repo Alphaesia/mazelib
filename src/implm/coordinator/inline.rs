@@ -1,3 +1,14 @@
+//! Coordinators for [inline cells][crate::implm::cell::inline].
+//!
+//! # Comparison by Example
+//!
+//! Here is a comparison of a typical maze of each coordinator. You can see commentary on each
+//! example on their individual pages.
+//!
+//! [`BoxSpaceInlineCellMazeCoordinator`]:
+//!
+//! TODO
+
 use std::fmt::{Debug, Formatter};
 use std::marker::PhantomData;
 
@@ -14,6 +25,8 @@ use crate::interface::point::CoordinateSpace;
 use crate::internal::array_util::Product;
 use crate::pt;
 
+/// TODO
+/// 
 /// As this coordinator implements a one-to-one mapping between points and cells, there is
 /// no separate [`CellLocation`][crate::interface::cell::CellLocation] struct.
 /// [`CoordinateTuplet`][crate::implm::point::boxy::CoordinateTuplet]s are converted directly
