@@ -1,0 +1,420 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/interface/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ae1b282cda4c21ec.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="mazelib" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-nightly (20999de3a 2023-09-15)" data-channel="nightly" data-search-js="search-5d3eaacf19ebf04f.js" data-settings-js="settings-74424d7eec62a23e.js" data-theme-light-css="light-f194925aa375ae96.css" data-theme-dark-css="dark-1dd4d1ce031e15de.css" data-theme-ayu-css="ayu-49e58d069f567085.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-cabe4b1bd7b9da95.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-f194925aa375ae96.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1dd4d1ce031e15de.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="stylesheet" href="../../../theme.css"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../mazelib/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<a href="#2" id="2">2</a>
+<a href="#3" id="3">3</a>
+<a href="#4" id="4">4</a>
+<a href="#5" id="5">5</a>
+<a href="#6" id="6">6</a>
+<a href="#7" id="7">7</a>
+<a href="#8" id="8">8</a>
+<a href="#9" id="9">9</a>
+<a href="#10" id="10">10</a>
+<a href="#11" id="11">11</a>
+<a href="#12" id="12">12</a>
+<a href="#13" id="13">13</a>
+<a href="#14" id="14">14</a>
+<a href="#15" id="15">15</a>
+<a href="#16" id="16">16</a>
+<a href="#17" id="17">17</a>
+<a href="#18" id="18">18</a>
+<a href="#19" id="19">19</a>
+<a href="#20" id="20">20</a>
+<a href="#21" id="21">21</a>
+<a href="#22" id="22">22</a>
+<a href="#23" id="23">23</a>
+<a href="#24" id="24">24</a>
+<a href="#25" id="25">25</a>
+<a href="#26" id="26">26</a>
+<a href="#27" id="27">27</a>
+<a href="#28" id="28">28</a>
+<a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
+<a href="#31" id="31">31</a>
+<a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
+<a href="#34" id="34">34</a>
+<a href="#35" id="35">35</a>
+<a href="#36" id="36">36</a>
+<a href="#37" id="37">37</a>
+<a href="#38" id="38">38</a>
+<a href="#39" id="39">39</a>
+<a href="#40" id="40">40</a>
+<a href="#41" id="41">41</a>
+<a href="#42" id="42">42</a>
+<a href="#43" id="43">43</a>
+<a href="#44" id="44">44</a>
+<a href="#45" id="45">45</a>
+<a href="#46" id="46">46</a>
+<a href="#47" id="47">47</a>
+<a href="#48" id="48">48</a>
+<a href="#49" id="49">49</a>
+<a href="#50" id="50">50</a>
+<a href="#51" id="51">51</a>
+<a href="#52" id="52">52</a>
+<a href="#53" id="53">53</a>
+<a href="#54" id="54">54</a>
+<a href="#55" id="55">55</a>
+<a href="#56" id="56">56</a>
+<a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
+<a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+</pre></div><pre class="rust"><code><span class="comment">// TODO fix the alignment of all of the annotations in the figures
+</span><span class="doccomment">//! The core abstractions of our maze model.
+//!
+//! There are a number of different concepts that all contribute to make a maze a maze. It is
+//! important to understand them as they are the foundation for this library.
+//!
+//! Mazes are made up of: a [cell space](#cell), a [cell class](#cell),
+//! a [coordinate space](#coordinate-space), a [buffer](#buffer), and a [coordinator](#coordinator)
+//! to tie them all together. We&#39;ll go through them one-by-one.
+//!
+//! There are also other entities which, while separate from mazes, interact with them deeply.
+//! Some examples include [generators](#generator), [solvers](#solver), and [exporters](#exporter).
+//!
+//! # Core Maze Concepts
+//!
+//! ## Cell
+//!
+//! Mazes are fundamentally a collection of cells. A cell is the smallest indivisible unit
+//! of a maze, like a passage segment or a wall segment.
+//!
+//! Cells are best understood visually. Consider this maze:
+//!
+//! ![An image of a pixelated maze.][example-maze-unannotated]
+//!
+//! Here are all the cells of the maze outlined in red:
+//!
+//! ![The same maze from before, but all the pixels are outlined in red.][example-maze-cell-outlines]
+//!
+//! Cells are too small to hold any semantic meaning useful enough for analysis. That job is
+//! handled by points, which we&#39;ll come to next. Rather, *cells represent the physical structure
+//! of the maze*. If you were to build the maze, cells tell you what materials you need to place
+//! where --- &quot;Do I need a piece of wall here, or a path?&quot; (And we do indeed build the maze, using
+//! exporters, which will also be discussed later).
+//!
+//! Cells are primarily defined by way they connect to other cells.
+//! Cells are not restricted to being square. They can be
+//! [triangles](https://www.astrolog.org/labyrnth/maze/delta.gif),
+//! [hexagons](https://www.astrolog.org/labyrnth/maze/sigma.gif),
+//! [circular sectors](https://www.astrolog.org/labyrnth/maze/theta.gif),
+//! [multiple shapes](https://www.astrolog.org/labyrnth/maze/upsilon.gif), or
+//! [completely irregular](https://www.astrolog.org/labyrnth/maze/crack.gif).
+//! Each type of cell is called a *cell class*. Each maze uses a single class.
+//!
+//! Cell classes are generally designed to be paired up with specific (classes of) coordinate
+//! spaces.
+//!
+//! A cell has three components: a location, an ordinal ID, and a value.
+//!
+//! ### Identifying Cells
+//!
+//! Cells can be identified in two ways: by their location, and by their ordinal ID. These two
+//! forms of identification are inextricably linked.
+//!
+//! A cell location is a unique absolute position in the maze. The structure (e.g. 2-tuple, 3-tuple,
+//! UUID) of a cell location is specific to each cell class. Cell locations are represented by the
+//! [`CellLocation`][cell::CellLocation] trait. The set of all legal cell locations in the context
+//! of a maze is known as the maze&#39;s *cell space*. The cell space is every position in a maze where
+//! it is possible to physically exist. In a way, it is the fabric of reality. The cell space of a
+//! maze (and the type of cell location used) is derived from the maze&#39;s coordinate space (loosely,
+//! how big the maze is) and its cell class (how the cells connect). Because all the information
+//! about a cell space can be derived, it is not explicitly represented anywhere in this library.
+//!
+//! Every cell in a maze is assigned an arbitrary ordinal integer (0, 1, 2, ...) called its
+//! *cell id*. It is represented by the [`CellID`][cell::CellID] struct. How locations are mapped
+//! to IDs is up to the [maze&#39;s coordinator (discussed later)](#coordinator). However, if the cell
+//! space has an origin, that origin is always mapped to ID 0.
+//!
+//! Here&#39;s an example of how locations *could* be mapped to IDs:
+//!
+//! ![The red-outlined maze, but the cells are numbered from left-to-right top-to-bottom starting from zero. Cell 14 is highlighted in green.][example-maze-cell-outlines-with-annotated-ids]
+//!
+//! ### Cell Values
+//!
+//! A cell&#39;s value determines the [movement rules][cell::ConnectionType] between itself and its
+//! neighbours. This may be as blunt as &quot;this cell can be moved through&quot; and &quot;this cell can&#39;t&quot;, or
+//! it may be more granular. The information carried by a cell (and thus the! set of possible
+//! values) can differ between cell classes. Cell values are represented by the
+//! [`CellValue`][cell::CellValue] trait.
+//!
+//! ## Point
+//!
+//! A [point][self::point::Point] is a *potential junction* of a maze. This includes features
+//! such as intersections, junctions, and straight hallways. Passageways are simply two connected
+//! points with passage cells between them. More generally, a point is a logical location in a maze.
+//! They are represented by the [`Point`][point::Point] trait.
+//!
+//! Here are all the points annotated on the maze from before:
+//!
+//! ![The pixelated maze, wth a grid of blue dots overlaid.][example-maze-points]
+//!
+//! The key difference compared to cells is that relationship between points has *semantic meaning*.
+//! Moving from one cell to another is like moving from one patch of dirt to another. Moving from
+//! point to point is equivalent to moving from junction to junction in a maze. They&#39;re the basis
+//! for doing anything interesting with mazes (like solving them).
+//!
+//! It is easier, for both humans and computers, to think about mazes in terms of points instead of
+//! cells. For humans, it is easier to consider junctions, intersections, and turns than it is to
+//! single out specific cells. For computers, there can be far less cells than points, which makes
+//! it easier (and faster) to compute things. Our example maze has 144 cells, but only 16 points
+//! --- an order of magnitude less.
+//!
+//! Unlike cells, which have both a location and a value, points are only a location. Instead points
+//! are mapped to specific cells. The value of the point is the value of the cell(s) it maps to.
+//! Though as discussed we&#39;re more interested in the relationship between points than the points
+//! themselves. We look at the cells between and including two points. There does not need to exist
+//! a one-to-one mapping between points and cells. A point might be mapped to multiple cells, and a
+//! cell might not be mapped to a point at all. Precisely how they are mapped is up to the maze&#39;s
+//! coordinator (which we&#39;ll come to soon).
+//!
+//! You may notice that on the figure the entrances and exits are not marked as points. This is an
+//! example of how the cell space captures nuances of the physical layout that aren&#39;t relevant for
+//! analysis. In this maze, if you wanted to find a path to the exit, you would just treat the point
+//! nearest to the exit as the goal itself.
+//!
+//! ## Coordinate Space
+//!
+//! The [coordinate space][point::CoordinateSpace] is the topology the maze. It defines the set of
+//! points (potential junctions) that exist in a maze, and how they connect. This dictates the size
+//! and shape of the maze.
+//!
+//! Like how a maze&#39;s cell space is the set of all positions where it is possible to physically
+//! exist, a maze&#39;s coordinate space is the set of all positions we care about (have semantic
+//! meaning). The coordinate space lets you traverse the maze without getting bogged down in all
+//! the details of &quot;this passage is exactly twelve cells long, but this other passage is eleven&quot;.
+//! When solving a maze, you just move from point to point until you find the &quot;end point&quot;.
+//!
+//! Specifically, coordinate spaces are
+//! [graphs](https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)), with points as its
+//! vertices, potential passages between those points as its edges, and a few other bits of
+//! information (e.g. the origin). They are represented by the
+//! [`CoordinateSpace`][point::CoordinateSpace] trait.
+//!
+//! Here, the turquoise lines between points represent the potential ways one could move between
+//! points. Only some of these connections are passages and can be moved through. The others are
+//! walls and impassable.
+//!
+//! ![The pixelated maze with the grid of blue dots, but now with a grid of turquoise lines. The dots lie at all intersections of the lines.][example-maze-points-connected]
+//!
+//! While the coordinate space defines the connections between points, it does not carry the state
+//! of the connection (e.g. if it&#39;s a passage or not). That is determined by the cells at the
+//! location. You could imagine it as if the coordinate space describes the maze as if there were
+//! no walls.
+//!
+//! ## Buffer
+//!
+//! The [buffer][self::buffer::MazeBuffer] handles storing mazes while they are being worked on.
+//! They carry the raw data of the maze.
+//!
+//! They only store the mazes cells, indexed by their unique consecutive IDs. They have no knowledge
+//! of the higher-order structure of the maze. Typically buffers will just be something akin to a
+//! [`Vec`][crate::implm::buffer::VecBuffer] wrapper but other more exotic buffers are possible.
+//! Buffers are represented by the [`MazeBuffer`][buffer::MazeBuffer] trait.
+//!
+//! Buffers do not handle exporting mazes into more permanent forms. That is handled by
+//! [exporters](#exporter).
+//!
+//! ## Coordinator
+//!
+//! So a maze has both a coordinate space and a cell space. But how do you map one to the other?
+//! And if you want to make a passageway from point A to point B, which cells do you have to
+//! change? This is the job of the coordinator. The coordinator knows how to convert high-level
+//! queries (*&quot;Is there a passageway from point A to B?&quot;*) into low-level checks on specific cells.
+//!
+//! The coordinator is the glue that ties the maze together. It concretises the abstract coordinate
+//! space into physical cells, and stores those cells in the buffer. The coordinator owns all of
+//! the components of the maze and is effectively the maze itself. If you ever want to interact
+//! with a maze directly, you will almost always do it through the coordinator.
+//!
+//! In practical terms, the coordinator is the most important concept for using this library. It is
+//! represented by the [`MazeCoordinator`][coordinate::MazeCoordinator] trait.
+//!
+//! # External Concepts
+//!
+//! ## Generator
+//!
+//! Generators are responsible for creating the actual layouts of mazes. They turn blank canvases
+//! into real challenges. Generators may operate on clean slates, or mazes that already have
+//! some parts created. A human could draw the main structural features of the maze and let a
+//! generator fill in the gaps. Or the generator could create the whole maze from start to finish.
+//! 
+//! No two generators are alike. Every generator has its own quirks and identity in the output it
+//! produces. They also use a random-number source to ensure that every maze generated is unique.
+//! 
+//! Generators are represented by the [`MazeGenerator`][generate::MazeGenerator] trait.
+//!
+//! ## Solver
+//!
+//! TODO
+//!
+//! ## Exporter
+//!
+//! Once a maze has been generated / solved / manipulated / etc., you&#39;ll likely want to take it out
+//! of memory and turn it into something you can look at. Exporters will take a maze and encode it
+//! into a given format. There are no restrictions on what they can produce. It could be anywhere
+//! from an ASCII diagram or image to a super-niche binary format for a particular game. Most
+//! exporters though are only capable with dealing with with a small number of maze coordinators
+//! due to restrictions inherent in the format. You&#39;re not exporting a 3D maze to a 2D image after
+//! all. Exporters are represented by the [`MazeExporter`][export::MazeExporter] trait.
+</span><span class="attr">#![doc = <span class="macro">embed_doc_image::embed_image!</span>(<span class="string">&quot;example-maze-unannotated&quot;</span>, <span class="string">&quot;src/doc/img/maze-model/example-maze-unannotated.png&quot;</span>)]
+#![doc = <span class="macro">embed_doc_image::embed_image!</span>(<span class="string">&quot;example-maze-cell-outlines&quot;</span>, <span class="string">&quot;src/doc/img/maze-model/example-maze-cell-outlines.png&quot;</span>)]
+#![doc = <span class="macro">embed_doc_image::embed_image!</span>(<span class="string">&quot;example-maze-cell-outlines-with-annotated-ids&quot;</span>, <span class="string">&quot;src/doc/img/maze-model/example-maze-cell-outlines-with-annotated-ids.png&quot;</span>)]
+#![doc = <span class="macro">embed_doc_image::embed_image!</span>(<span class="string">&quot;example-maze-points&quot;</span>, <span class="string">&quot;src/doc/img/maze-model/example-maze-points.png&quot;</span>)]
+#![doc = <span class="macro">embed_doc_image::embed_image!</span>(<span class="string">&quot;example-maze-points-connected&quot;</span>, <span class="string">&quot;src/doc/img/maze-model/example-maze-points-connected.png&quot;</span>)]
+
+</span><span class="kw">pub mod </span>buffer;
+<span class="kw">pub mod </span>cell;
+<span class="kw">pub mod </span>point;
+<span class="kw">pub mod </span>coordinate;
+<span class="kw">pub mod </span>export;
+<span class="kw">pub mod </span>generate;</code></pre></div></section></main></body></html>

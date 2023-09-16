@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["InlineCellValueEdge","InlineCellValueEdgeSide"],"struct":["InlineCellLocation","InlineCellValue"]};

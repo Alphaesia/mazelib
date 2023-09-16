@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["apply_solid_border","convert_unvisited_points_to_walls"]};

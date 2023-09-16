@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["BoxCoordinateSpace","BoxCoordinateSpaceIterator","CoordinateTuplet"],"type":["CoordinatePair","CoordinateTriplet","ThreeDimensionalBoxCoordinateSpace","TwoDimensionalBoxCoordinateSpace"]};
